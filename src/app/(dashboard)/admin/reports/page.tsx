@@ -3,6 +3,10 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { StrategistEvaluationsReport } from "@/components/admin/strategist-evaluations-report"
+import { WriterEvaluationsReport } from "@/components/admin/writer-evaluations-report"
+import { FeedbackReport } from "@/components/admin/feedback-report"
 
 export default async function ReportsPage() {
   const session = await auth()
@@ -18,18 +22,26 @@ export default async function ReportsPage() {
     writerFeedbacks: await prisma.writerFeedback.count(),
   }
 
-  const recentStrategistEvaluations = await prisma.strategistEvaluation.findMany({
-    take: 5,
-    orderBy: { createdAt: 'desc' },
+  // Get all strategist evaluations with full details
+  const strategistEvaluations = await prisma.strategistEvaluation.findMany({
+    orderBy: [
+      { year: 'desc' },
+      { month: 'desc' },
+      { createdAt: 'desc' },
+    ],
     include: {
       strategist: true,
       evaluator: true,
     },
   })
 
-  const recentWriterEvaluations = await prisma.writerEvaluation.findMany({
-    take: 5,
-    orderBy: { createdAt: 'desc' },
+  // Get all writer evaluations with full details
+  const writerEvaluations = await prisma.writerEvaluation.findMany({
+    orderBy: [
+      { year: 'desc' },
+      { month: 'desc' },
+      { createdAt: 'desc' },
+    ],
     include: {
       writer: true,
       strategist: true,
@@ -37,12 +49,25 @@ export default async function ReportsPage() {
     },
   })
 
+  // Get all writer feedbacks
+  const writerFeedbacks = await prisma.writerFeedback.findMany({
+    orderBy: [
+      { year: 'desc' },
+      { month: 'desc' },
+      { createdAt: 'desc' },
+    ],
+    include: {
+      writer: true,
+      workgroup: true,
+    },
+  })
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">گزارشات سیستم</h1>
+        <h1 className="text-3xl font-bold text-slate-900">گزارشات کامل سیستم</h1>
         <p className="text-slate-600 mt-1">
-          آمار و گزارشات کلی سیستم KPI
+          مشاهده تمام ارزیابی‌ها و بازخوردها با جزئیات کامل
         </p>
       </div>
 
@@ -95,77 +120,32 @@ export default async function ReportsPage() {
         </Card>
       </div>
 
-      {/* Recent Evaluations */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>آخرین ارزیابی‌های استراتژیست</CardTitle>
-            <CardDescription>
-              {recentStrategistEvaluations.length} ارزیابی اخیر
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentStrategistEvaluations.length === 0 ? (
-                <p className="text-sm text-slate-500 text-center py-4">
-                  هنوز ارزیابی ثبت نشده است
-                </p>
-              ) : (
-                recentStrategistEvaluations.map((evaluation) => (
-                  <div key={evaluation.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">
-                        {evaluation.strategist.firstName} {evaluation.strategist.lastName}
-                      </p>
-                      <p className="text-sm text-slate-600">
-                        {evaluation.month}/{evaluation.year}
-                      </p>
-                    </div>
-                    <Badge variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}>
-                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                    </Badge>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Detailed Reports Tabs */}
+      <Tabs defaultValue="strategist" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="strategist">
+            ارزیابی استراتژیست‌ها ({strategistEvaluations.length})
+          </TabsTrigger>
+          <TabsTrigger value="writer">
+            ارزیابی نویسنده‌ها ({writerEvaluations.length})
+          </TabsTrigger>
+          <TabsTrigger value="feedback">
+            بازخوردها ({writerFeedbacks.length})
+          </TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>آخرین ارزیابی‌های نویسنده</CardTitle>
-            <CardDescription>
-              {recentWriterEvaluations.length} ارزیابی اخیر
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentWriterEvaluations.length === 0 ? (
-                <p className="text-sm text-slate-500 text-center py-4">
-                  هنوز ارزیابی ثبت نشده است
-                </p>
-              ) : (
-                recentWriterEvaluations.map((evaluation) => (
-                  <div key={evaluation.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">
-                        {evaluation.writer.firstName} {evaluation.writer.lastName}
-                      </p>
-                      <p className="text-sm text-slate-600">
-                        {evaluation.workgroup.name} - {evaluation.month}/{evaluation.year}
-                      </p>
-                    </div>
-                    <Badge variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}>
-                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                    </Badge>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="strategist">
+          <StrategistEvaluationsReport evaluations={strategistEvaluations} />
+        </TabsContent>
+
+        <TabsContent value="writer">
+          <WriterEvaluationsReport evaluations={writerEvaluations} />
+        </TabsContent>
+
+        <TabsContent value="feedback">
+          <FeedbackReport feedbacks={writerFeedbacks} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
-
