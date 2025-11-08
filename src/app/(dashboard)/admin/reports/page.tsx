@@ -111,18 +111,18 @@ export default async function ReportsPage() {
                   هنوز ارزیابی ثبت نشده است
                 </p>
               ) : (
-                recentStrategistEvaluations.map((eval) => (
-                  <div key={eval.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
+                recentStrategistEvaluations.map((evaluation) => (
+                  <div key={evaluation.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
                     <div>
                       <p className="font-medium">
-                        {eval.strategist.firstName} {eval.strategist.lastName}
+                        {evaluation.strategist.firstName} {evaluation.strategist.lastName}
                       </p>
                       <p className="text-sm text-slate-600">
-                        {eval.month}/{eval.year}
+                        {evaluation.month}/{evaluation.year}
                       </p>
                     </div>
-                    <Badge variant={eval.status === "COMPLETED" ? "default" : "secondary"}>
-                      {eval.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
+                    <Badge variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}>
+                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
                     </Badge>
                   </div>
                 ))
@@ -145,18 +145,18 @@ export default async function ReportsPage() {
                   هنوز ارزیابی ثبت نشده است
                 </p>
               ) : (
-                recentWriterEvaluations.map((eval) => (
-                  <div key={eval.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
+                recentWriterEvaluations.map((evaluation) => (
+                  <div key={evaluation.id} className="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
                     <div>
                       <p className="font-medium">
-                        {eval.writer.firstName} {eval.writer.lastName}
+                        {evaluation.writer.firstName} {evaluation.writer.lastName}
                       </p>
                       <p className="text-sm text-slate-600">
-                        {eval.workgroup.name} - {eval.month}/{eval.year}
+                        {evaluation.workgroup.name} - {evaluation.month}/{evaluation.year}
                       </p>
                     </div>
-                    <Badge variant={eval.status === "COMPLETED" ? "default" : "secondary"}>
-                      {eval.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
+                    <Badge variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}>
+                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
                     </Badge>
                   </div>
                 ))
