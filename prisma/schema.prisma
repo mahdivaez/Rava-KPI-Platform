@@ -1,0 +1,169 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum WorkgroupRole {
+  STRATEGIST
+  WRITER
+}
+
+enum EvaluationStatus {
+  PENDING
+  COMPLETED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  
+  isAdmin           Boolean  @default(false)
+  isTechnicalDeputy Boolean  @default(false)
+  
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workgroupMemberships      WorkgroupMember[]
+  strategistEvaluations     StrategistEvaluation[] @relation("EvaluatedStrategist")
+  evaluatorEvaluations      StrategistEvaluation[] @relation("Evaluator")
+  writerEvaluations         WriterEvaluation[]     @relation("EvaluatedWriter")
+  strategistAsEvaluator     WriterEvaluation[]     @relation("StrategistEvaluator")
+  writerFeedbacks           WriterFeedback[]
+
+  @@index([email])
+}
+
+model Workgroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members           WorkgroupMember[]
+  writerEvaluations WriterEvaluation[]
+  writerFeedbacks   WriterFeedback[]
+
+  @@index([name])
+}
+
+model WorkgroupMember {
+  id          String        @id @default(cuid())
+  workgroupId String
+  userId      String
+  role        WorkgroupRole
+  createdAt   DateTime      @default(now())
+
+  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workgroupId, userId, role])
+  @@index([workgroupId])
+  @@index([userId])
+}
+
+model StrategistEvaluation {
+  id           String           @id @default(cuid())
+  strategistId String
+  evaluatorId  String
+  month        Int
+  year         Int
+  status       EvaluationStatus @default(PENDING)
+  
+  ideation           Int
+  avgViews           Int
+  qualityControl     Int
+  teamRelations      Int
+  clientRelations    Int
+  responsiveness     Int
+  clientSatisfaction Int
+  
+  strengths      String?
+  improvements   String?
+  suggestions    String?
+  evaluatorNotes String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  strategist User @relation("EvaluatedStrategist", fields: [strategistId], references: [id])
+  evaluator  User @relation("Evaluator", fields: [evaluatorId], references: [id])
+
+  @@unique([strategistId, month, year])
+  @@index([strategistId])
+  @@index([evaluatorId])
+  @@index([month, year])
+}
+
+model WriterEvaluation {
+  id            String           @id @default(cuid())
+  writerId      String
+  strategistId  String
+  workgroupId   String
+  month         Int
+  year          Int
+  status        EvaluationStatus @default(PENDING)
+  
+  responsibility         Int
+  strategistSatisfaction Int
+  meetingEngagement      Int
+  scenarioPerformance    Int
+  clientSatisfaction     Int
+  brandAlignment         Int
+  
+  strengths      String?
+  improvements   String?
+  suggestions    String?
+  evaluatorNotes String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  writer     User      @relation("EvaluatedWriter", fields: [writerId], references: [id])
+  strategist User      @relation("StrategistEvaluator", fields: [strategistId], references: [id])
+  workgroup  Workgroup @relation(fields: [workgroupId], references: [id])
+
+  @@unique([writerId, strategistId, workgroupId, month, year])
+  @@index([writerId])
+  @@index([strategistId])
+  @@index([workgroupId])
+  @@index([month, year])
+}
+
+model WriterFeedback {
+  id           String   @id @default(cuid())
+  writerId     String
+  strategistId String
+  workgroupId  String
+  month        Int
+  year         Int
+  
+  communication   Int
+  supportLevel    Int
+  clarityOfTasks  Int
+  feedbackQuality Int
+  
+  positivePoints String?
+  improvements   String?
+  suggestions    String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  writer    User      @relation(fields: [writerId], references: [id])
+  workgroup Workgroup @relation(fields: [workgroupId], references: [id])
+
+  @@unique([writerId, strategistId, workgroupId, month, year])
+  @@index([strategistId])
+  @@index([workgroupId])
+  @@index([month, year])
+}
