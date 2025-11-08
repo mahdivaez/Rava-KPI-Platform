@@ -61,10 +61,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-slate-200;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-50 text-slate-900;
     direction: rtl;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
