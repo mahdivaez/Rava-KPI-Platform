@@ -61,9 +61,9 @@ export function UsersTable({ users }: { users: User[] }) {
               <TableCell className="text-slate-600">{user.email}</TableCell>
               <TableCell>
                 <div className="flex gap-1 flex-wrap">
-                  {user.isAdmin && <Badge className="bg-blue-500">مدیر</Badge>}
+                  {user.isAdmin && <Badge className="badge-error">مدیر</Badge>}
                   {user.isTechnicalDeputy && (
-                    <Badge className="bg-purple-500">معاون فنی</Badge>
+                    <Badge className="badge-neutral">معاون فنی</Badge>
                   )}
                   {!user.isAdmin && !user.isTechnicalDeputy && (
                     <Badge variant="outline">کاربر</Badge>

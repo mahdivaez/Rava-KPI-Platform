@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LogOut, User, Bell } from "lucide-react"
+import { LogOut, User, Bell, Settings, Search } from "lucide-react"
 
 export async function Navbar() {
   const session = await auth()
@@ -21,65 +21,95 @@ export async function Navbar() {
     .join('')
 
   return (
-    <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm">
-      {/* Search or breadcrumb could go here */}
-      <div className="flex items-center gap-4">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-xl opacity-30"></div>
-          <h2 className="relative text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            خوش آمدید
+    <header className="h-18 bg-white border-b border-nude-200 flex items-center justify-between px-8">
+      {/* Left Section - Welcome */}
+      <div className="flex items-center gap-6">
+        <div>
+          <h2 className="text-2xl font-bold text-nude-900">
+            خوش آمدید، {session.user.name?.split(' ')[0]}
           </h2>
+          <p className="text-sm text-nude-500 mt-0.5">
+            {new Date().toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
         </div>
       </div>
       
       {/* Right Section */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        {/* Search Button */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="hover:bg-nude-50 rounded-xl w-10 h-10 text-nude-600 hover:text-nude-900"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+
         {/* Notifications */}
         <Button 
           variant="ghost" 
           size="icon"
-          className="relative hover:bg-purple-50 rounded-full w-11 h-11"
+          className="relative hover:bg-nude-50 rounded-xl w-10 h-10 text-nude-600 hover:text-nude-900"
         >
-          <Bell className="h-5 w-5 text-slate-600" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></span>
+          <Bell className="h-5 w-5" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-nude-500 rounded-full ring-2 ring-white"></span>
         </Button>
+
+        {/* Settings */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="hover:bg-nude-50 rounded-xl w-10 h-10 text-nude-600 hover:text-nude-900"
+        >
+          <Settings className="h-5 w-5" />
+        </Button>
+
+        {/* Divider */}
+        <div className="h-8 w-px bg-nude-200 mx-2"></div>
 
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="flex items-center gap-3 hover:bg-purple-50 rounded-xl px-4 h-12"
+              className="flex items-center gap-3 hover:bg-nude-50 rounded-xl px-3 h-12"
             >
               <div className="text-right">
-                <p className="text-sm font-semibold text-slate-900">{session.user.name}</p>
-                <p className="text-xs text-slate-500">
-                  {session.user.isAdmin ? 'مدیر سیستم' : 'کاربر'}
+                <p className="text-sm font-semibold text-nude-900">{session.user.name}</p>
+                <p className="text-xs text-nude-500">
+                  {session.user.isAdmin ? 'مدیر سیستم' : 
+                   session.user.isTechnicalDeputy ? 'معاون فنی' : 'کاربر'}
                 </p>
               </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-sm"></div>
-                <Avatar className="relative h-10 w-10 border-2 border-white shadow-lg">
-                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+              <Avatar className="h-10 w-10 border-2 border-nude-200 shadow-sm">
+                <AvatarFallback className="bg-gradient-to-br from-nude-400 to-nude-600 text-white font-semibold text-sm">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-slate-200">
+          <DropdownMenuContent align="end" className="w-64 rounded-xl shadow-lg border-nude-200">
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-slate-900">{session.user.name}</p>
-                <p className="text-xs text-slate-500">{session.user.email}</p>
+              <div className="flex flex-col space-y-1 py-2">
+                <p className="text-sm font-semibold text-nude-900">{session.user.name}</p>
+                <p className="text-xs text-nude-500">{session.user.email}</p>
+                {session.user.isAdmin && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-nude-100 text-nude-700 w-fit mt-1">
+                    مدیر سیستم
+                  </span>
+                )}
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer rounded-lg">
+            <DropdownMenuSeparator className="bg-nude-200" />
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-nude-700 hover:text-nude-900 hover:bg-nude-50">
               <User className="ml-2 h-4 w-4" />
-              پروفایل
+              <span>پروفایل من</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-nude-700 hover:text-nude-900 hover:bg-nude-50">
+              <Settings className="ml-2 h-4 w-4" />
+              <span>تنظیمات</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-nude-200" />
             <form
               action={async () => {
                 "use server"
@@ -87,9 +117,9 @@ export async function Navbar() {
               }}
             >
               <DropdownMenuItem asChild>
-                <button type="submit" className="w-full flex items-center text-red-600 cursor-pointer rounded-lg">
+                <button type="submit" className="w-full flex items-center text-destructive cursor-pointer rounded-lg hover:bg-red-50">
                   <LogOut className="ml-2 h-4 w-4" />
-                  خروج از حساب
+                  <span>خروج از حساب</span>
                 </button>
               </DropdownMenuItem>
             </form>

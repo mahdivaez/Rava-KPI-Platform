@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
 
 export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -49,71 +50,82 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-5">
+      {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-white text-sm font-medium">
+        <Label htmlFor="email" className="text-[#6b5d54] text-sm font-medium">
           ایمیل
         </Label>
-        <div className="relative">
-          <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-5 h-5" />
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="admin@kpi.com"
-            required
-            disabled={isLoading}
-            className="pr-10 bg-white/10 border-white/20 text-white placeholder:text-purple-300 focus:bg-white/20 focus:border-purple-400 h-12 rounded-xl"
-          />
-        </div>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="نام@example.com"
+          required
+          disabled={isLoading}
+          className="h-12 bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl transition-all"
+        />
       </div>
 
+      {/* Password */}
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-white text-sm font-medium">
+        <Label htmlFor="password" className="text-[#6b5d54] text-sm font-medium">
           رمز عبور
         </Label>
         <div className="relative">
-          <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-300 w-5 h-5" />
           <Input
             id="password"
             name="password"
-            type="password"
-            placeholder="••••••••"
+            type={showPassword ? "text" : "password"}
+            placeholder="رمز عبور خود را وارد کنید"
             required
             disabled={isLoading}
-            className="pr-10 bg-white/10 border-white/20 text-white placeholder:text-purple-300 focus:bg-white/20 focus:border-purple-400 h-12 rounded-xl"
+            className="h-12 bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl pr-4 pl-12 transition-all"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#b5a59a] hover:text-[#6b5d54] transition-colors"
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
+          </button>
         </div>
       </div>
 
+      {/* Remember & Forgot */}
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 cursor-pointer group">
+          <input 
+            type="checkbox" 
+            className="w-4 h-4 rounded border-[#d4c5b9] text-[#9b8b7e] focus:ring-[#d4c5b9]" 
+          />
+          <span className="text-sm text-[#8a7a6f]">مرا به خاطر بسپار</span>
+        </label>
+        <a href="#" className="text-sm text-[#9b8b7e] hover:text-[#6b5d54] font-medium transition-colors">
+          فراموشی رمز عبور؟
+        </a>
+      </div>
+
+      {/* Submit Button */}
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/50 hover:shadow-purple-500/75 transition-all duration-300 transform hover:scale-105"
+        className="w-full h-12 bg-[#9b8b7e] hover:bg-[#8a7a6f] text-white font-medium rounded-xl shadow-lg shadow-[#9b8b7e]/20 hover:shadow-[#9b8b7e]/30 transition-all duration-300"
       >
         {isLoading ? (
-          <>
-            <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-            در حال ورود...
-          </>
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>در حال ورود...</span>
+          </div>
         ) : (
-          <>
-            <ArrowRight className="ml-2 h-5 w-5" />
-            ورود به سیستم
-          </>
+          <span>ورود به سیستم</span>
         )}
       </Button>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-white/20" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-transparent px-2 text-purple-200">
-            ورود امن با رمزنگاری
-          </span>
-        </div>
-      </div>
     </form>
   )
 }

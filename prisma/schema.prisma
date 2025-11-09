@@ -17,12 +17,56 @@ enum EvaluationStatus {
   COMPLETED
 }
 
+enum GoalType {
+  INDIVIDUAL_BLOGGER
+  INDIVIDUAL_BUSINESS
+  TEAM
+  COMPANY
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CommentType {
+  STRATEGIST_EVALUATION
+  WRITER_EVALUATION
+  WRITER_FEEDBACK
+}
+
+enum PointTransactionType {
+  EVALUATION_COMPLETED
+  TASK_COMPLETED
+  GOAL_ACHIEVED
+  FEEDBACK_GIVEN
+  BONUS
+  PENALTY
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
   firstName String
   lastName  String
+  image     String?  // Profile picture URL
   
   isAdmin           Boolean  @default(false)
   isTechnicalDeputy Boolean  @default(false)
@@ -37,8 +81,18 @@ model User {
   writerEvaluations         WriterEvaluation[]     @relation("EvaluatedWriter")
   strategistAsEvaluator     WriterEvaluation[]     @relation("StrategistEvaluator")
   writerFeedbacks           WriterFeedback[]
+  goals                     Goal[]                 @relation("UserGoals")
+  assignedGoals             Goal[]                 @relation("AssignedByUser")
+  assignedTasks             Task[]                 @relation("AssignedTasks")
+  createdTasks              Task[]                 @relation("CreatedTasks")
+  comments                  Comment[]
+  pointTransactions         PointTransaction[]
+  totalPoints               Int                    @default(0)
+  sentMessages              Message[]              @relation("SentMessages")
+  receivedMessages          Message[]              @relation("ReceivedMessages")
 
   @@index([email])
+  @@index([totalPoints])
 }
 
 model Workgroup {
@@ -49,9 +103,11 @@ model Workgroup {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members           WorkgroupMember[]
-  writerEvaluations WriterEvaluation[]
-  writerFeedbacks   WriterFeedback[]
+  members            WorkgroupMember[]
+  writerEvaluations  WriterEvaluation[]
+  writerFeedbacks    WriterFeedback[]
+  goals              Goal[]
+  tasks              Task[]
 
   @@index([name])
 }
@@ -63,8 +119,8 @@ model WorkgroupMember {
   role        WorkgroupRole
   createdAt   DateTime      @default(now())
 
-  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
 
   @@unique([workgroupId, userId, role])
   @@index([workgroupId])
@@ -78,20 +134,20 @@ model StrategistEvaluation {
   month        Int
   year         Int
   status       EvaluationStatus @default(PENDING)
-  
-  ideation           Int
-  avgViews           Int
-  qualityControl     Int
-  teamRelations      Int
-  clientRelations    Int
-  responsiveness     Int
+
+  ideation          Int
+  avgViews          Int
+  qualityControl    Int
+  teamRelations     Int
+  clientRelations   Int
+  responsiveness    Int
   clientSatisfaction Int
-  
-  strengths      String?
-  improvements   String?
-  suggestions    String?
-  evaluatorNotes String?
-  
+
+  strengths       String?
+  improvements    String?
+  suggestions     String?
+  evaluatorNotes  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -105,26 +161,26 @@ model StrategistEvaluation {
 }
 
 model WriterEvaluation {
-  id            String           @id @default(cuid())
-  writerId      String
-  strategistId  String
-  workgroupId   String
-  month         Int
-  year          Int
-  status        EvaluationStatus @default(PENDING)
-  
-  responsibility         Int
-  strategistSatisfaction Int
-  meetingEngagement      Int
-  scenarioPerformance    Int
-  clientSatisfaction     Int
-  brandAlignment         Int
-  
-  strengths      String?
-  improvements   String?
-  suggestions    String?
-  evaluatorNotes String?
-  
+  id           String           @id @default(cuid())
+  writerId     String
+  strategistId String
+  workgroupId  String
+  month        Int
+  year         Int
+  status       EvaluationStatus @default(PENDING)
+
+  responsibility            Int
+  strategistSatisfaction    Int
+  meetingEngagement         Int
+  scenarioPerformance       Int
+  clientSatisfaction        Int
+  brandAlignment            Int
+
+  strengths       String?
+  improvements    String?
+  suggestions     String?
+  evaluatorNotes  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -166,4 +222,119 @@ model WriterFeedback {
   @@index([strategistId])
   @@index([workgroupId])
   @@index([month, year])
+}
+
+model Goal {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  type        GoalType
+  status      GoalStatus @default(NOT_STARTED)
+  
+  targetValue    Float
+  currentValue   Float      @default(0)
+  unit           String     // e.g., "views", "posts", "revenue"
+  
+  startDate   DateTime
+  endDate     DateTime
+  
+  userId      String?    // For individual goals
+  workgroupId String?    // For team goals
+  assignedBy  String     // Admin who created the goal
+  
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user       User?      @relation("UserGoals", fields: [userId], references: [id])
+  workgroup  Workgroup? @relation(fields: [workgroupId], references: [id])
+  assigner   User       @relation("AssignedByUser", fields: [assignedBy], references: [id])
+
+  @@index([userId])
+  @@index([workgroupId])
+  @@index([status])
+  @@index([type])
+  @@index([startDate, endDate])
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus   @default(PENDING)
+  
+  dueDate     DateTime?
+  
+  assignedTo  String       // Writer who should do the task
+  createdBy   String       // Strategist who created the task
+  workgroupId String?      // Optional workgroup context
+  
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  writer    User       @relation("AssignedTasks", fields: [assignedTo], references: [id])
+  creator   User       @relation("CreatedTasks", fields: [createdBy], references: [id])
+  workgroup Workgroup? @relation(fields: [workgroupId], references: [id])
+
+  @@index([assignedTo])
+  @@index([createdBy])
+  @@index([workgroupId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Comment {
+  id        String      @id @default(cuid())
+  content   String
+  type      CommentType
+  
+  // Reference to the evaluation/feedback
+  evaluationId String    // Can be strategist eval, writer eval, or feedback ID
+  
+  authorId  String      // User who wrote the comment
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  author    User        @relation(fields: [authorId], references: [id])
+
+  @@index([evaluationId])
+  @@index([authorId])
+  @@index([type])
+}
+
+model PointTransaction {
+  id          String                @id @default(cuid())
+  userId      String
+  type        PointTransactionType
+  points      Int                   // Can be positive or negative
+  description String
+  
+  createdAt   DateTime              @default(now())
+
+  user        User                  @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  
+  senderId   String
+  receiverId String
+  
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([isRead])
+  @@index([createdAt])
 }

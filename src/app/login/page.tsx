@@ -2,60 +2,59 @@ import { LoginForm } from "@/components/auth/login-form"
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -inset-[10px] opacity-50">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen flex overflow-hidden bg-[#f5f1eb]">
+      {/* Left Side - Image Section */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        {/* Background Image - You can replace this URL with your own image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070')`,
+          }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#d4c5b9]/40 to-[#9b8b7e]/40" />
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md px-6">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-2xl shadow-purple-500/50 mb-6 transform hover:scale-110 transition-transform">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-            سیستم مدیریت KPI
-          </h1>
-          <p className="text-purple-200 text-lg">
-            پلتفرم ارزیابی عملکرد تیم محتوا
-          </p>
-        </div>
-
-        {/* Login Card */}
-        <div className="relative">
-          {/* Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-          
-          {/* Card */}
-          <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-8">
-            <LoginForm />
-            
-            {/* Footer */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-purple-200">
-                نسخه 1.0.0 | ساخته شده با ❤️
-              </p>
+        
+        {/* Minimal Logo */}
+        <div className="relative z-10 p-12">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+              <svg className="w-6 h-6 text-[#9b8b7e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
             </div>
+            <span className="text-white font-semibold text-lg">سیستم KPI</span>
           </div>
         </div>
-
-        {/* Bottom Text */}
-        <p className="text-center text-purple-200 text-sm mt-8">
-          برای ورود از اطلاعات کاربری خود استفاده کنید
-        </p>
       </div>
 
-      {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-20 h-20 border-2 border-purple-400/30 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-10 left-10 w-32 h-32 border-2 border-pink-400/30 rounded-full animate-pulse animation-delay-1000"></div>
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#f5f1eb]">
+        <div className="w-full max-w-md">
+          {/* Close button - top right */}
+          <div className="flex justify-end mb-8">
+            <button className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors shadow-sm">
+              <svg className="w-5 h-5 text-[#6b5d54]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Header */}
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-[#3d3530] mb-2">
+              خوش آمدید
+            </h1>
+            <p className="text-[#8a7a6f] text-lg">
+              برای ادامه وارد شوید
+            </p>
+          </div>
+
+          {/* Form */}
+          <LoginForm />
+        </div>
+      </div>
     </div>
   )
 }
