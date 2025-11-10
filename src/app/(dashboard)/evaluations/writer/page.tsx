@@ -2,8 +2,10 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreateWriterEvaluationDialog } from "@/components/evaluations/create-writer-evaluation-dialog"
 import { WriterEvaluationsTable } from "@/components/evaluations/writer-evaluations-table"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import Link from "next/link"
 
 export default async function WriterEvaluationPage() {
   const session = await auth()
@@ -62,7 +64,12 @@ export default async function WriterEvaluationPage() {
             ثبت و مشاهده ارزیابی‌های ماهانه نویسنده‌ها
           </p>
         </div>
-        <CreateWriterEvaluationDialog workgroups={strategistMemberships.map(m => m.workgroup)} />
+        <Link href="/evaluations/writer/new">
+          <Button className="bg-nude-600 hover:bg-nude-700 text-white">
+            <Plus className="h-4 w-4 ml-2" />
+            ارزیابی جدید
+          </Button>
+        </Link>
       </div>
 
       <Card>
