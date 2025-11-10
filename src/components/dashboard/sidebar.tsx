@@ -104,14 +104,11 @@ export async function Sidebar() {
                 نویسنده
               </div>
             </div>
-            <NavLink href="/my-tasks" icon={<CheckSquare size={20} />}>
+            <NavLink href="/tasks" icon={<CheckSquare size={20} />}>
               وظایف من
             </NavLink>
             <NavLink href="/feedback/send" icon={<MessageSquare size={20} />}>
               ارسال بازخورد
-            </NavLink>
-            <NavLink href="/my-performance" icon={<TrendingUp size={20} />}>
-              عملکرد من
             </NavLink>
           </>
         )}

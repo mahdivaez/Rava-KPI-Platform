@@ -11,7 +11,6 @@ import {
   Target,
   ListTodo,
   MessageSquareText,
-  Trophy,
   User,
   PieChart,
   Goal,
@@ -31,7 +30,7 @@ export default async function DashboardPage() {
   // Get user data
   const currentUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { totalPoints: true, image: true },
+    select: { image: true },
   })
 
   // Get user's goals
@@ -112,18 +111,11 @@ export default async function DashboardPage() {
               </p>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-6">
-            <div className="text-center">
-              <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-1" />
-              <p className="text-2xl font-bold text-nude-900">{currentUser?.totalPoints || 0}</p>
-              <p className="text-xs text-nude-600">امتیاز</p>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Personal Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Link href="/goals">
           <Card className="card-nude card-hover border-nude-200 cursor-pointer">
             <CardContent className="pt-6">
@@ -166,15 +158,15 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/leaderboard">
+        <Link href="/profile">
           <Card className="card-nude card-hover border-nude-200 cursor-pointer">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-nude-600 mb-1">امتیاز من</p>
-                  <p className="text-3xl font-bold text-success">{currentUser?.totalPoints || 0}</p>
+                  <p className="text-sm text-nude-600 mb-1">پروفایل من</p>
+                  <p className="text-3xl font-bold text-nude-500"><User className="w-8 h-8" /></p>
                 </div>
-                <Trophy className="w-10 h-10 text-success" />
+                <User className="w-10 h-10 text-nude-500" />
               </div>
             </CardContent>
           </Card>
@@ -309,34 +301,29 @@ export default async function DashboardPage() {
               )}
             </Link>
 
-            {/* Leaderboard */}
-            <Link href="/leaderboard" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <Trophy className="w-6 h-6 text-success" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-nude-900">رتبه‌بندی</p>
-              <p className="text-xs text-nude-600 mt-1">{currentUser?.totalPoints || 0} امتیاز</p>
-            </Link>
+            {/* Evaluations - Only for Deputy/Admin */}
+            {(session.user.isTechnicalDeputy || session.user.isAdmin) && (
+              <Link href="/evaluations/strategist" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+                <div className="flex items-center justify-between mb-2">
+                  <TrendingUp className="w-6 h-6 text-nude-500" />
+                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="font-semibold text-nude-900">ارزیابی استراتژیست</p>
+                <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
+              </Link>
+            )}
 
-            {/* Evaluations */}
-            <Link href="/evaluations/strategist" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <TrendingUp className="w-6 h-6 text-nude-500" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-nude-900">ارزیابی استراتژیست</p>
-              <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
-            </Link>
-
-            <Link href="/evaluations/writer" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <CheckCircle2 className="w-6 h-6 text-nude-500" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-nude-900">ارزیابی نویسنده</p>
-              <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
-            </Link>
+            {/* Writer Evaluation - Only for Strategists/Admin */}
+            {(isStrategist || session.user.isAdmin) && (
+              <Link href="/evaluations/writer" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+                <div className="flex items-center justify-between mb-2">
+                  <CheckCircle2 className="w-6 h-6 text-nude-500" />
+                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="font-semibold text-nude-900">ارزیابی نویسنده</p>
+                <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
+              </Link>
+            )}
 
             {/* Feedback for Strategists */}
             {isStrategist && (
