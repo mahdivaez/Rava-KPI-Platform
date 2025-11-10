@@ -2,8 +2,10 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreateStrategistEvaluationDialog } from "@/components/evaluations/create-strategist-evaluation-dialog"
 import { StrategistEvaluationsTable } from "@/components/evaluations/strategist-evaluations-table"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import Link from "next/link"
 
 export default async function StrategistEvaluationPage() {
   const session = await auth()
@@ -46,7 +48,12 @@ export default async function StrategistEvaluationPage() {
             ثبت و مشاهده ارزیابی‌های ماهانه استراتژیست‌ها
           </p>
         </div>
-        <CreateStrategistEvaluationDialog strategists={strategists} />
+        <Link href="/evaluations/strategist/new">
+          <Button className="bg-nude-600 hover:bg-nude-700 text-white">
+            <Plus className="h-4 w-4 ml-2" />
+            ارزیابی جدید
+          </Button>
+        </Link>
       </div>
 
       <Card>
