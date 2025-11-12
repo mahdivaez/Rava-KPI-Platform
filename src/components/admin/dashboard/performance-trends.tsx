@@ -144,7 +144,8 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
     value,
   }))
 
-  const COLORS = ['#a78b71', '#8d7a68', '#c4a88a', '#9a8474']
+  // Beautiful color palette for charts
+  const COLORS = ['#14b8a6', '#f43f5e', '#8b5cf6', '#f59e0b']
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -165,23 +166,26 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
               <Line 
                 type="monotone" 
                 dataKey="استراتژیست‌ها" 
-                stroke="#a78b71" 
+                stroke="#14b8a6" 
                 strokeWidth={3}
-                dot={{ fill: '#a78b71', r: 5 }}
+                dot={{ fill: '#14b8a6', r: 6 }}
+                activeDot={{ r: 8 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="نویسندگان" 
-                stroke="#8d7a68" 
+                stroke="#8b5cf6" 
                 strokeWidth={3}
-                dot={{ fill: '#8d7a68', r: 5 }}
+                dot={{ fill: '#8b5cf6', r: 6 }}
+                activeDot={{ r: 8 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="بازخوردها" 
-                stroke="#c4a88a" 
+                stroke="#f59e0b" 
                 strokeWidth={3}
-                dot={{ fill: '#c4a88a', r: 5 }}
+                dot={{ fill: '#f59e0b', r: 6 }}
+                activeDot={{ r: 8 }}
               />
             </LineChart>
           </ResponsiveContainer>

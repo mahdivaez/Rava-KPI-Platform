@@ -70,12 +70,12 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={120} />
-              <YAxis yAxisId="left" orientation="left" stroke="#a78b71" />
-              <YAxis yAxisId="right" orientation="right" stroke="#8d7a68" />
+              <YAxis yAxisId="left" orientation="left" stroke="#14b8a6" />
+              <YAxis yAxisId="right" orientation="right" stroke="#8b5cf6" />
               <Tooltip />
               <Legend />
-              <Bar yAxisId="left" dataKey="میانگین امتیاز" fill="#a78b71" radius={[8, 8, 0, 0]} />
-              <Bar yAxisId="right" dataKey="تعداد اعضا" fill="#8d7a68" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="left" dataKey="میانگین امتیاز" fill="#14b8a6" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="right" dataKey="تعداد اعضا" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
