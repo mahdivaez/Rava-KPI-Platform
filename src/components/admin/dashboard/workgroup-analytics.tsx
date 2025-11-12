@@ -60,22 +60,22 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
   return (
     <div className="grid gap-6">
       {/* Workgroup Performance Chart */}
-      <Card className="col-span-full">
-        <CardHeader>
-          <CardTitle>📊 عملکرد کارگروه‌ها</CardTitle>
-          <CardDescription>مقایسه میانگین امتیازات و تعداد اعضا</CardDescription>
+      <Card className="col-span-full border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📊 عملکرد کارگروه‌ها</CardTitle>
+          <CardDescription className="text-nude-600">مقایسه میانگین امتیازات و تعداد اعضا</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={120} />
-              <YAxis yAxisId="left" orientation="left" stroke="#3b82f6" />
-              <YAxis yAxisId="right" orientation="right" stroke="#8b5cf6" />
+              <YAxis yAxisId="left" orientation="left" stroke="#a78b71" />
+              <YAxis yAxisId="right" orientation="right" stroke="#8d7a68" />
               <Tooltip />
               <Legend />
-              <Bar yAxisId="left" dataKey="میانگین امتیاز" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-              <Bar yAxisId="right" dataKey="تعداد اعضا" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="left" dataKey="میانگین امتیاز" fill="#a78b71" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="right" dataKey="تعداد اعضا" fill="#8d7a68" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

@@ -145,12 +145,17 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-4xl font-bold text-slate-900">📊 داشبورد جامع مدیریت</h1>
-        <p className="text-slate-600 mt-2 text-lg">
-          تحلیل کامل عملکرد، آمار و گزارشات سیستم
-        </p>
+    <div className="space-y-8 p-6 bg-gradient-to-br from-nude-50 via-white to-nude-100 min-h-screen">
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/20">
+          <span className="text-3xl">📊</span>
+        </div>
+        <div>
+          <h1 className="text-4xl font-bold text-nude-900">داشبورد جامع مدیریت</h1>
+          <p className="text-nude-600 mt-1 text-lg">
+            تحلیل کامل عملکرد، آمار و گزارشات سیستم
+          </p>
+        </div>
       </div>
 
       {/* Main Overview Stats */}
@@ -158,20 +163,20 @@ export default async function AdminDashboardPage() {
 
       {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 h-auto">
-          <TabsTrigger value="overview" className="py-3">
+        <TabsList className="grid w-full grid-cols-5 h-auto bg-white border-2 border-nude-200 p-2 rounded-xl shadow-sm">
+          <TabsTrigger value="overview" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             📈 نمای کلی
           </TabsTrigger>
-          <TabsTrigger value="performance" className="py-3">
+          <TabsTrigger value="performance" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             🎯 روند عملکرد
           </TabsTrigger>
-          <TabsTrigger value="workgroups" className="py-3">
+          <TabsTrigger value="workgroups" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             👥 کارگروه‌ها
           </TabsTrigger>
-          <TabsTrigger value="users" className="py-3">
+          <TabsTrigger value="users" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             👤 کاربران
           </TabsTrigger>
-          <TabsTrigger value="activity" className="py-3">
+          <TabsTrigger value="activity" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             ⚡ فعالیت‌ها
           </TabsTrigger>
         </TabsList>

@@ -144,15 +144,15 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
     value,
   }))
 
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+  const COLORS = ['#a78b71', '#8d7a68', '#c4a88a', '#9a8474']
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Performance Trends Line Chart */}
-      <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>📈 روند عملکرد ماهانه</CardTitle>
-          <CardDescription>مقایسه میانگین امتیازات در طول زمان</CardDescription>
+      <Card className="col-span-2 border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📈 روند عملکرد ماهانه</CardTitle>
+          <CardDescription className="text-nude-600">مقایسه میانگین امتیازات در طول زمان</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={350}>
@@ -165,23 +165,23 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
               <Line 
                 type="monotone" 
                 dataKey="استراتژیست‌ها" 
-                stroke="#3b82f6" 
-                strokeWidth={2}
-                dot={{ fill: '#3b82f6' }}
+                stroke="#a78b71" 
+                strokeWidth={3}
+                dot={{ fill: '#a78b71', r: 5 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="نویسندگان" 
-                stroke="#8b5cf6" 
-                strokeWidth={2}
-                dot={{ fill: '#8b5cf6' }}
+                stroke="#8d7a68" 
+                strokeWidth={3}
+                dot={{ fill: '#8d7a68', r: 5 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="بازخوردها" 
-                stroke="#10b981" 
-                strokeWidth={2}
-                dot={{ fill: '#10b981' }}
+                stroke="#c4a88a" 
+                strokeWidth={3}
+                dot={{ fill: '#c4a88a', r: 5 }}
               />
             </LineChart>
           </ResponsiveContainer>
