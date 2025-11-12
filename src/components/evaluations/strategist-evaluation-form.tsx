@@ -181,7 +181,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
           <CardContent className="p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/30">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -203,7 +203,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-8 shadow-lg shadow-blue-500/30"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-8 shadow-lg shadow-nude-500/30"
                 >
                   <Save className="w-4 h-4 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
@@ -215,11 +215,11 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-gradient-to-br from-nude-50 to-nude-100/50 rounded-xl border border-nude-200">
               <div className="space-y-2">
                 <Label htmlFor="strategistId" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   نام استراتژیست:
                 </Label>
                 <Select name="strategistId" required>
-                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
                     <SelectValue placeholder="انتخاب کنید" />
                   </SelectTrigger>
                   <SelectContent>
@@ -234,11 +234,11 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
 
               <div className="space-y-2">
                 <Label htmlFor="month" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   ماه:
                 </Label>
                 <Select name="month" defaultValue={currentMonth.toString()} required>
-                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -253,7 +253,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
 
               <div className="space-y-2">
                 <Label htmlFor="year" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   سال:
                 </Label>
                 <Input
@@ -263,17 +263,17 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                   min="2020"
                   max="2100"
                   defaultValue={currentYear}
-                  className="h-12 border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 bg-white"
+                  className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   بازهٔ زمانی ارزیابی:
                 </Label>
-                <div className="h-12 flex items-center px-4 bg-blue-50 border-2 border-blue-200 rounded-lg text-sm text-blue-700 font-bold">
+                <div className="h-12 flex items-center px-4 bg-nude-100 border-2 border-nude-300 rounded-lg text-sm text-nude-700 font-bold">
                   ماهانه
                 </div>
               </div>
@@ -286,14 +286,14 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gradient-to-l from-blue-500 to-blue-600">
-                  <th className="text-right p-5 text-white font-bold border-l border-blue-400 text-base w-[22%]">
+                <tr className="bg-gradient-to-l from-nude-500 to-nude-600">
+                  <th className="text-right p-5 text-white font-bold border-l border-nude-400 text-base w-[22%]">
                     شاخص ارزیابی
                   </th>
-                  <th className="text-right p-5 text-white font-bold border-l border-blue-400 text-base w-[38%]">
+                  <th className="text-right p-5 text-white font-bold border-l border-nude-400 text-base w-[38%]">
                     توضیح
                   </th>
-                  <th className="text-center p-5 text-white font-bold border-l border-blue-400 text-base w-[15%]">
+                  <th className="text-center p-5 text-white font-bold border-l border-nude-400 text-base w-[15%]">
                     امتیاز از 1 تا 5
                   </th>
                   <th className="text-right p-5 text-white font-bold text-base w-[25%]">
@@ -307,7 +307,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                     key={metric.key}
                     className={`${
                       index % 2 === 0 ? 'bg-nude-50/50' : 'bg-white'
-                    } hover:bg-blue-50/50 transition-all duration-200`}
+                    } hover:bg-nude-100/50 transition-all duration-200`}
                   >
                     <td className="p-5 border-l border-t border-nude-200">
                       <span className="font-bold text-nude-900 text-base leading-relaxed block">
@@ -326,7 +326,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                         max="5"
                         value={scores[metric.key] || ''}
                         onChange={(e) => handleScoreChange(metric.key, e.target.value)}
-                        className="w-24 mx-auto text-center font-bold text-xl h-14 border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500"
+                        className="w-24 mx-auto text-center font-bold text-xl h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
                         placeholder="1-5"
                         required
                       />
@@ -371,24 +371,24 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-blue-300 bg-gradient-to-br from-white to-blue-50 shadow-lg">
+          <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-nude-50 shadow-lg">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-700 font-bold text-base mb-2">میانگین نهایی:</p>
-                  <p className="text-5xl font-bold text-blue-900 mb-2">
+                <div className="w-full">
+                  <p className="text-nude-700 font-bold text-base mb-2">میانگین نهایی:</p>
+                  <p className="text-5xl font-bold text-nude-900 mb-2">
                     {averageScore}
                   </p>
-                  <p className="text-blue-600 font-semibold">از 5 امتیاز</p>
+                  <p className="text-nude-600 font-semibold">از 5 امتیاز</p>
                   {/* Progress bar */}
-                  <div className="mt-4 w-full bg-blue-200 rounded-full h-3 overflow-hidden">
+                  <div className="mt-4 w-full bg-nude-200 rounded-full h-3 overflow-hidden">
                     <div 
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${scorePercentage}%` }}
                     ></div>
                   </div>
                 </div>
-                <TrendingUp className="w-16 h-16 text-blue-500" />
+                <TrendingUp className="w-16 h-16 text-nude-500 ml-4" />
               </div>
             </CardContent>
           </Card>
@@ -429,14 +429,14 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
 
             <div className="space-y-3">
               <Label htmlFor="suggestions" className="text-nude-900 font-bold text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                 پیشنهادات:
               </Label>
               <Textarea 
                 id="suggestions" 
                 name="suggestions" 
                 rows={4}
-                className="border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 resize-none text-base"
+                className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 resize-none text-base"
                 placeholder="پیشنهادات خود برای بهبود عملکرد را بنویسید..."
               />
             </div>
@@ -464,7 +464,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-l from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-10 h-12 shadow-lg shadow-blue-500/30"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-10 h-12 shadow-lg shadow-nude-500/30"
                 >
                   <Save className="w-5 h-5 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
