@@ -10,6 +10,9 @@ import { WorkgroupAnalytics } from "@/components/admin/dashboard/workgroup-analy
 import { TopPerformers } from "@/components/admin/dashboard/top-performers"
 import { RecentActivity } from "@/components/admin/dashboard/recent-activity"
 import { EvaluationDistribution } from "@/components/admin/dashboard/evaluation-distribution"
+import { PerformanceInsights } from "@/components/admin/dashboard/performance-insights"
+import { TeamLeaderboard } from "@/components/admin/dashboard/team-leaderboard"
+import { PerformanceAlerts } from "@/components/admin/dashboard/performance-alerts"
 
 export default async function AdminDashboardPage() {
   const session = await auth()
@@ -124,6 +127,16 @@ export default async function AdminDashboardPage() {
     },
   })
 
+  // Get all users for alerts component
+  const allUsers = await prisma.user.findMany({
+    where: {
+      OR: [
+        { role: 'STRATEGIST' },
+        { role: 'WRITER' }
+      ]
+    }
+  })
+
   const stats = {
     totalUsers,
     activeUsers,
@@ -163,18 +176,21 @@ export default async function AdminDashboardPage() {
 
       {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 h-auto bg-white border-2 border-nude-200 p-2 rounded-xl shadow-sm">
+        <TabsList className="grid w-full grid-cols-6 h-auto bg-white border-2 border-nude-200 p-2 rounded-xl shadow-sm">
           <TabsTrigger value="overview" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             📈 نمای کلی
           </TabsTrigger>
           <TabsTrigger value="performance" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             🎯 روند عملکرد
           </TabsTrigger>
+          <TabsTrigger value="leaderboard" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
+            🏆 رتبه‌بندی
+          </TabsTrigger>
+          <TabsTrigger value="alerts" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
+            ⚠️ هشدارها
+          </TabsTrigger>
           <TabsTrigger value="workgroups" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             👥 کارگروه‌ها
-          </TabsTrigger>
-          <TabsTrigger value="users" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            👤 کاربران
           </TabsTrigger>
           <TabsTrigger value="activity" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
             ⚡ فعالیت‌ها
@@ -195,6 +211,13 @@ export default async function AdminDashboardPage() {
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-6 mt-6">
+          {/* Performance Insights - Month over Month Growth */}
+          <PerformanceInsights 
+            strategistEvaluations={strategistEvaluations}
+            writerEvaluations={writerEvaluations}
+          />
+          
+          {/* Performance Trends Charts */}
           <PerformanceTrends 
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
@@ -202,18 +225,24 @@ export default async function AdminDashboardPage() {
           />
         </TabsContent>
 
-        <TabsContent value="workgroups" className="space-y-6 mt-6">
-          <WorkgroupAnalytics workgroups={workgroups} />
+        <TabsContent value="leaderboard" className="space-y-6 mt-6">
+          <TeamLeaderboard 
+            strategistEvaluations={strategistEvaluations}
+            writerEvaluations={writerEvaluations}
+            workgroups={workgroups}
+          />
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-6 mt-6">
-          <UserActivity 
-            users={recentUsers}
-            totalUsers={totalUsers}
-            activeUsers={activeUsers}
-            strategists={totalStrategists}
-            writers={totalWriters}
+        <TabsContent value="alerts" className="space-y-6 mt-6">
+          <PerformanceAlerts 
+            strategistEvaluations={strategistEvaluations}
+            writerEvaluations={writerEvaluations}
+            users={allUsers}
           />
+        </TabsContent>
+
+        <TabsContent value="workgroups" className="space-y-6 mt-6">
+          <WorkgroupAnalytics workgroups={workgroups} />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-6 mt-6">
