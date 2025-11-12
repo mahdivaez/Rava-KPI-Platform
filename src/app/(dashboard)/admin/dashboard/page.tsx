@@ -128,12 +128,10 @@ export default async function AdminDashboardPage() {
   })
 
   // Get all users for alerts component
+  // We get all users and the alerts component will filter based on evaluations
   const allUsers = await prisma.user.findMany({
     where: {
-      OR: [
-        { role: 'STRATEGIST' },
-        { role: 'WRITER' }
-      ]
+      isActive: true
     }
   })
 
