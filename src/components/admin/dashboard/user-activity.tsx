@@ -48,9 +48,9 @@ export function UserActivity({ users, totalUsers, activeUsers, strategists, writ
     <div className="grid gap-6 md:grid-cols-3">
       {/* User Statistics Cards */}
       <Card className="md:col-span-3">
-        <CardHeader>
-          <CardTitle>📊 آمار کاربران سیستم</CardTitle>
-          <CardDescription>توزیع و وضعیت کاربران</CardDescription>
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📊 آمار کاربران سیستم</CardTitle>
+          <CardDescription className="text-nude-600">توزیع و وضعیت کاربران</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -99,9 +99,9 @@ export function UserActivity({ users, totalUsers, activeUsers, strategists, writ
 
       {/* Recent Users List */}
       <Card className="md:col-span-3">
-        <CardHeader>
-          <CardTitle>👥 کاربران اخیر</CardTitle>
-          <CardDescription>10 کاربر آخر ثبت‌نام شده</CardDescription>
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">👥 کاربران اخیر</CardTitle>
+          <CardDescription className="text-nude-600">10 کاربر آخر ثبت‌نام شده</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -129,7 +129,7 @@ export function UserActivity({ users, totalUsers, activeUsers, strategists, writ
                 <div className="flex items-center gap-2">
                   {getUserRoleBadges(user)}
                   {user.isActive ? (
-                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                    <Badge variant="outline" className="bg-nude-50 text-nude-700">
                       فعال
                     </Badge>
                   ) : (

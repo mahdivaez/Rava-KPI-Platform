@@ -90,13 +90,13 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
   return (
     <>
       {/* Top Strategists */}
-      <Card>
-        <CardHeader>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
           <CardTitle className="flex items-center gap-2">
             <Award className="h-5 w-5 text-yellow-500" />
             🏆 برترین استراتژیست‌ها
           </CardTitle>
-          <CardDescription>افراد با بالاترین میانگین امتیاز</CardDescription>
+          <CardDescription className="text-nude-600">افراد با بالاترین میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -144,13 +144,13 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
       </Card>
 
       {/* Top Writers */}
-      <Card>
-        <CardHeader>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
           <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-purple-500" />
+            <Star className="h-5 w-5 text-nude-500" />
             ⭐ برترین نویسندگان
           </CardTitle>
-          <CardDescription>افراد با بالاترین میانگین امتیاز</CardDescription>
+          <CardDescription className="text-nude-600">افراد با بالاترین میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

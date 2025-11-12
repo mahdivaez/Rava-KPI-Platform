@@ -80,10 +80,10 @@ export function EvaluationDistribution({ strategistEvaluations, writerEvaluation
   return (
     <>
       {/* Strategist Metrics Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📊 تحلیل معیارهای استراتژیست‌ها</CardTitle>
-          <CardDescription>میانگین امتیاز هر معیار (از 10)</CardDescription>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📊 تحلیل معیارهای استراتژیست‌ها</CardTitle>
+          <CardDescription className="text-nude-600">میانگین امتیاز هر معیار (از 10)</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -92,14 +92,14 @@ export function EvaluationDistribution({ strategistEvaluations, writerEvaluation
               <XAxis type="category" dataKey="metric" angle={-45} textAnchor="end" height={100} />
               <YAxis type="number" domain={[0, 10]} />
               <Tooltip />
-              <Bar dataKey="score" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="score" fill="#a78b71" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium">وضعیت ارزیابی‌ها</p>
               <div className="flex gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700">
+                <Badge variant="outline" className="bg-nude-50 text-nude-700">
                   تکمیل شده: {completedStrategist}
                 </Badge>
                 <Badge variant="outline" className="bg-orange-50 text-orange-700">
@@ -112,10 +112,10 @@ export function EvaluationDistribution({ strategistEvaluations, writerEvaluation
       </Card>
 
       {/* Writer Metrics Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📝 تحلیل معیارهای نویسندگان</CardTitle>
-          <CardDescription>میانگین امتیاز هر معیار (از 10)</CardDescription>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📝 تحلیل معیارهای نویسندگان</CardTitle>
+          <CardDescription className="text-nude-600">میانگین امتیاز هر معیار (از 10)</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -124,14 +124,14 @@ export function EvaluationDistribution({ strategistEvaluations, writerEvaluation
               <XAxis type="category" dataKey="metric" angle={-45} textAnchor="end" height={100} />
               <YAxis type="number" domain={[0, 10]} />
               <Tooltip />
-              <Bar dataKey="score" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="score" fill="#8d7a68" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium">وضعیت ارزیابی‌ها</p>
               <div className="flex gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700">
+                <Badge variant="outline" className="bg-nude-50 text-nude-700">
                   تکمیل شده: {completedWriter}
                 </Badge>
                 <Badge variant="outline" className="bg-orange-50 text-orange-700">

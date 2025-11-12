@@ -51,8 +51,8 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
   }))
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "bg-green-100 text-green-800"
-    if (score >= 6) return "bg-blue-100 text-blue-800"
+    if (score >= 8) return "bg-nude-100 text-nude-800"
+    if (score >= 6) return "bg-nude-100 text-nude-800"
     if (score >= 4) return "bg-orange-100 text-orange-800"
     return "bg-red-100 text-red-800"
   }
@@ -85,7 +85,7 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {sortedWorkgroups.map((wg, index) => (
           <Card key={wg.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
+            <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -94,7 +94,7 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
                   </CardTitle>
                   <CardDescription className="mt-1">
                     {wg.isActive ? (
-                      <Badge variant="outline" className="bg-green-50 text-green-700">فعال</Badge>
+                      <Badge variant="outline" className="bg-nude-50 text-nude-700">فعال</Badge>
                     ) : (
                       <Badge variant="outline" className="bg-slate-100 text-slate-600">غیرفعال</Badge>
                     )}
@@ -113,14 +113,14 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
               
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600">استراتژیست‌ها</span>
-                <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                <Badge variant="outline" className="bg-nude-50 text-nude-700">
                   {wg.strategistCount}
                 </Badge>
               </div>
               
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600">نویسندگان</span>
-                <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                <Badge variant="outline" className="bg-nude-50 text-nude-700">
                   {wg.writerCount}
                 </Badge>
               </div>
@@ -153,7 +153,7 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
       </div>
 
       {workgroupData.length === 0 && (
-        <Card>
+        <Card className="border-2 border-nude-200 shadow-lg bg-white">
           <CardContent className="py-12">
             <p className="text-center text-slate-500">
               هنوز کارگروهی ایجاد نشده است

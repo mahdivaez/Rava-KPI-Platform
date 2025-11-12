@@ -20,7 +20,7 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
   const getStatusBadge = (status: string) => {
     if (status === 'COMPLETED') {
       return (
-        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+        <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-300">
           تکمیل شده
         </Badge>
       )
@@ -48,8 +48,8 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
 
   const getScoreColor = (score: string) => {
     const num = parseFloat(score)
-    if (num >= 8) return "bg-green-100 text-green-800"
-    if (num >= 6) return "bg-blue-100 text-blue-800"
+    if (num >= 8) return "bg-nude-100 text-nude-800"
+    if (num >= 6) return "bg-nude-100 text-nude-800"
     if (num >= 4) return "bg-orange-100 text-orange-800"
     return "bg-red-100 text-red-800"
   }
@@ -58,9 +58,9 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
     <div className="grid gap-6 md:grid-cols-2">
       {/* Recent Evaluations */}
       <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle>⚡ ارزیابی‌های اخیر</CardTitle>
-          <CardDescription>آخرین ارزیابی‌های ثبت شده استراتژیست‌ها</CardDescription>
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">⚡ ارزیابی‌های اخیر</CardTitle>
+          <CardDescription className="text-nude-600">آخرین ارزیابی‌های ثبت شده استراتژیست‌ها</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -71,7 +71,7 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
               >
                 <div className="flex items-center gap-4">
                   <Avatar>
-                    <AvatarFallback className="bg-blue-100 text-blue-700">
+                    <AvatarFallback className="bg-nude-100 text-nude-700">
                       {getInitials(evaluation.strategist.firstName, evaluation.strategist.lastName)}
                     </AvatarFallback>
                   </Avatar>
@@ -109,9 +109,9 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
 
       {/* Activity Timeline */}
       <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle>📅 تایم‌لاین فعالیت‌ها</CardTitle>
-          <CardDescription>خلاصه فعالیت‌های اخیر سیستم</CardDescription>
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📅 تایم‌لاین فعالیت‌ها</CardTitle>
+          <CardDescription className="text-nude-600">خلاصه فعالیت‌های اخیر سیستم</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -119,8 +119,8 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
             {recentEvaluations.slice(0, 5).map((evaluation, index) => (
               <div key={`eval-${evaluation.id}`} className="flex gap-4">
                 <div className="relative">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                    <ClipboardCheck className="h-5 w-5 text-blue-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-nude-100">
+                    <ClipboardCheck className="h-5 w-5 text-nude-600" />
                   </div>
                   {index < recentEvaluations.slice(0, 5).length - 1 && (
                     <div className="absolute top-10 left-5 w-0.5 h-8 bg-slate-200" />
@@ -145,8 +145,8 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
             {recentUsers.slice(0, 3).map((user, index) => (
               <div key={`user-${user.id}`} className="flex gap-4">
                 <div className="relative">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
-                    <User className="h-5 w-5 text-green-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-nude-100">
+                    <User className="h-5 w-5 text-nude-600" />
                   </div>
                   {index < recentUsers.slice(0, 3).length - 1 && (
                     <div className="absolute top-10 left-5 w-0.5 h-8 bg-slate-200" />

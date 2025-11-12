@@ -189,10 +189,10 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
       </Card>
 
       {/* Strategist Score Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle>🎯 توزیع امتیازات استراتژیست‌ها</CardTitle>
-          <CardDescription>تعداد افراد در هر دسته امتیاز</CardDescription>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">🎯 توزیع امتیازات استراتژیست‌ها</CardTitle>
+          <CardDescription className="text-nude-600">تعداد افراد در هر دسته امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -229,10 +229,10 @@ export function PerformanceTrends({ strategistEvaluations, writerEvaluations, fe
       </Card>
 
       {/* Writer Score Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📝 توزیع امتیازات نویسندگان</CardTitle>
-          <CardDescription>تعداد افراد در هر دسته امتیاز</CardDescription>
+      <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+          <CardTitle className="text-nude-900 text-xl font-bold">📝 توزیع امتیازات نویسندگان</CardTitle>
+          <CardDescription className="text-nude-600">تعداد افراد در هر دسته امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>

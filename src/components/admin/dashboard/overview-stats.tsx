@@ -38,16 +38,16 @@ interface OverviewStatsProps {
 export function OverviewStats({ stats }: OverviewStatsProps) {
   const getScoreColor = (score: string) => {
     const num = parseFloat(score)
-    if (num >= 8) return "text-green-600 bg-green-50"
-    if (num >= 6) return "text-blue-600 bg-blue-50"
+    if (num >= 8) return "text-nude-600 bg-nude-50"
+    if (num >= 6) return "text-nude-600 bg-nude-50"
     if (num >= 4) return "text-orange-600 bg-orange-50"
     return "text-red-600 bg-red-50"
   }
 
   const getRateColor = (rate: string) => {
     const num = parseFloat(rate)
-    if (num >= 80) return "text-green-600"
-    if (num >= 60) return "text-blue-600"
+    if (num >= 80) return "text-nude-600"
+    if (num >= 60) return "text-nude-600"
     if (num >= 40) return "text-orange-600"
     return "text-red-600"
   }
@@ -63,7 +63,7 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
         <CardContent>
           <div className="text-3xl font-bold">{stats.totalUsers}</div>
           <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
               <UserCheck className="h-3 w-3 mr-1" />
               {stats.activeUsers} فعال
             </Badge>
@@ -86,7 +86,7 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
         <CardContent>
           <div className="text-3xl font-bold">{stats.totalWorkgroups}</div>
           <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
               {stats.activeWorkgroups} فعال
             </Badge>
             <Badge variant="outline" className="bg-slate-50 text-slate-600">
@@ -108,7 +108,7 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
         <CardContent>
           <div className="text-3xl font-bold">{stats.totalEvaluations}</div>
           <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
               <CheckCircle2 className="h-3 w-3 mr-1" />
               {stats.completedEvaluations}
             </Badge>
@@ -146,7 +146,7 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       <Card className="hover:shadow-lg transition-shadow md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">میانگین امتیاز استراتژیست‌ها</CardTitle>
-          <Award className="h-4 w-4 text-blue-600" />
+          <Award className="h-4 w-4 text-nude-600" />
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -169,7 +169,7 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       <Card className="hover:shadow-lg transition-shadow md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">میانگین امتیاز نویسندگان</CardTitle>
-          <Target className="h-4 w-4 text-purple-600" />
+          <Target className="h-4 w-4 text-nude-600" />
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">

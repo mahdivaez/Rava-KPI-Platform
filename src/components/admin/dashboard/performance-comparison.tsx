@@ -54,11 +54,11 @@ export function PerformanceComparison({ monthlyData }: PerformanceComparisonProp
 
   return (
     <Card className="border-nude-200">
-      <CardHeader>
+      <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-nude-900">مقایسه عملکرد ماهانه</CardTitle>
-            <CardDescription>روند تغییرات عملکرد در طول زمان</CardDescription>
+            <CardDescription className="text-nude-600">روند تغییرات عملکرد در طول زمان</CardDescription>
           </div>
           <div className="flex gap-2">
             <Select value={metric} onValueChange={(v) => setMetric(v as any)}>
