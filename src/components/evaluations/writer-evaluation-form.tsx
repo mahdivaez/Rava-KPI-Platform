@@ -218,7 +218,7 @@ export function WriterEvaluationForm({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 p-6 bg-gradient-to-br from-nude-50 to-nude-100/50 rounded-xl border border-nude-200">
               <div className="space-y-2">
                 <Label htmlFor="workgroupId" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-1000"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   کارگروه:
                 </Label>
                 <Select
