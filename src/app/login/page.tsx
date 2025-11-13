@@ -8,8 +8,8 @@ export default function LoginPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
-            alt="Login Background"
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
+            alt="Team Collaboration"
             className="w-full h-full object-cover"
           />
           {/* Overlay */}
