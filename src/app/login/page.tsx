@@ -1,5 +1,4 @@
 import { LoginForm } from "@/components/auth/login-form"
-import Image from "next/image"
 
 export default function LoginPage() {
   return (
@@ -8,12 +7,10 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <Image
+          <img
             src="/image2.jpg"
             alt="Login Background"
-            fill
-            className="object-cover"
-            priority
+            className="w-full h-full object-cover"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#d4c5b9]/40 to-[#9b8b7e]/40 z-10" />
