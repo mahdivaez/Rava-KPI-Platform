@@ -5,11 +5,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex overflow-hidden bg-[#f5f1eb]">
       {/* Left Side - Image Section */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        {/* Background Image - You can replace this URL with your own image */}
+        {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070')`,
+            backgroundImage: `url('/image2.jpg')`,
           }}
         >
           {/* Overlay */}
