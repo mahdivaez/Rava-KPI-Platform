@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/login-form"
+import Image from "next/image"
 
 export default function LoginPage() {
   return (
@@ -6,18 +7,20 @@ export default function LoginPage() {
       {/* Left Side - Image Section */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('/image2.jpg')`,
-          }}
-        >
+        <div className="absolute inset-0">
+          <Image
+            src="/image2.jpg"
+            alt="Login Background"
+            fill
+            className="object-cover"
+            priority
+          />
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#d4c5b9]/40 to-[#9b8b7e]/40" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#d4c5b9]/40 to-[#9b8b7e]/40 z-10" />
         </div>
         
         {/* Minimal Logo */}
-        <div className="relative z-10 p-12">
+        <div className="relative z-20 p-12">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-[#9b8b7e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
