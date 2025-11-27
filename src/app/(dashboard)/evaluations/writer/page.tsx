@@ -56,30 +56,30 @@ export default async function WriterEvaluationPage() {
   })
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">ارزیابی نویسنده‌ها</h1>
-          <p className="text-slate-600 mt-1">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">ارزیابی نویسنده‌ها</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">
             ثبت و مشاهده ارزیابی‌های ماهانه نویسنده‌ها
           </p>
         </div>
-        <Link href="/evaluations/writer/new">
-          <Button className="bg-nude-600 hover:bg-nude-700 text-white">
+        <Link href="/evaluations/writer/new" className="flex-shrink-0">
+          <Button className="bg-nude-600 hover:bg-nude-700 text-white w-full sm:w-auto text-sm sm:text-base">
             <Plus className="h-4 w-4 ml-2" />
             ارزیابی جدید
           </Button>
         </Link>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>لیست ارزیابی‌ها</CardTitle>
-          <CardDescription>
+      <Card className="overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">لیست ارزیابی‌ها</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             تعداد کل: {evaluations.length} ارزیابی
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           <WriterEvaluationsTable evaluations={evaluations} />
         </CardContent>
       </Card>

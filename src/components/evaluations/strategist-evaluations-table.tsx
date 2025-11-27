@@ -36,8 +36,8 @@ export function StrategistEvaluationsTable({
           <TableHead>استراتژیست</TableHead>
           <TableHead>دوره</TableHead>
           <TableHead>ارزیاب</TableHead>
-          <TableHead>میانگین امتیاز</TableHead>
-          <TableHead>وضعیت</TableHead>
+          <TableHead className="text-center">میانگین امتیاز</TableHead>
+          <TableHead className="text-center">وضعیت</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -64,19 +64,23 @@ export function StrategistEvaluationsTable({
                 {evaluation.evaluator.firstName} {evaluation.evaluator.lastName}
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                >
-                  {avgScore}/10
-                </Badge>
+                <div className="flex justify-center">
+                  <Badge
+                    variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
+                  >
+                    {avgScore}/10
+                  </Badge>
+                </div>
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
-                  className={evaluation.status === "COMPLETED" ? "bg-green-500" : ""}
-                >
-                  {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                </Badge>
+                <div className="flex justify-center">
+                  <Badge
+                    variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
+                    className={evaluation.status === "COMPLETED" ? "bg-green-500" : ""}
+                  >
+                    {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
+                  </Badge>
+                </div>
               </TableCell>
             </TableRow>
           )

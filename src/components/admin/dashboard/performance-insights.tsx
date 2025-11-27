@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import moment from 'moment-jalaali'
 
 interface PerformanceInsightsProps {
   strategistEvaluations: any[]
@@ -10,10 +11,10 @@ interface PerformanceInsightsProps {
 
 export function PerformanceInsights({ strategistEvaluations, writerEvaluations }: PerformanceInsightsProps) {
   // Get current month and previous month data
-  const now = new Date()
-  const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
-  const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1
+  const currentPersian = moment()
+  const currentMonth = currentPersian.jMonth() + 1
+  const currentYear = currentPersian.jYear()
+  const previousMonth = currentMonth === 1 ? 11 : currentMonth - 1 // since we have 11 months, max 11
   const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear
 
   // Filter evaluations by month
@@ -69,7 +70,7 @@ export function PerformanceInsights({ strategistEvaluations, writerEvaluations }
       let month = currentMonth - i
       let year = currentYear
       while (month <= 0) {
-        month += 12
+        month += 11 // since we have 11 months
         year -= 1
       }
       months.push({ month, year })

@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
-import { Calculator, TrendingUp, ChevronRight, Save, X } from "lucide-react"
+import { Calculator, TrendingUp, ChevronRight, Save, X, Search } from "lucide-react"
 import Link from "next/link"
+import moment from 'moment-jalaali'
 
 // Evaluation metrics
 const STRATEGIST_METRICS = [
@@ -66,14 +67,41 @@ const STRATEGIST_METRICS = [
 ]
 
 export function StrategistEvaluationForm({ strategists }: { strategists: User[] }) {
+  const currentPersian = moment()
+  const currentPersianMonth = currentPersian.jMonth() + 1
+  const currentPersianYear = currentPersian.jYear()
+  const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+
   const [loading, setLoading] = useState(false)
+  const [selectedYear, setSelectedYear] = useState(currentPersianYear)
   const [scores, setScores] = useState<Record<string, number>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
+  const [strategistSearch, setStrategistSearch] = useState("")
   const router = useRouter()
 
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth() + 1
-  const currentYear = currentDate.getFullYear()
+  // Persian month names
+  const persianMonths = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
+  ]
+
+  // Available months based on selected year
+  const getAvailableMonths = (selectedYear: number) => {
+    if (selectedYear < currentPersianYear) {
+      return persianMonths.map((name, i) => ({ name, value: i + 1 }))
+    } else if (selectedYear === currentPersianYear) {
+      return persianMonths.slice(0, effectiveCurrentMonth).map((name, i) => ({ name, value: i + 1 }))
+    }
+    return []
+  }
+
+  // Get available months for the selected year
+  const availableMonths = getAvailableMonths(selectedYear)
+
+  // Filter strategists based on search
+  const filteredStrategists = strategists.filter((strategist) =>
+    `${strategist.firstName} ${strategist.lastName}`.toLowerCase().includes(strategistSearch.toLowerCase())
+  )
 
   // Calculate total and average
   const totalScore = Object.values(scores).reduce((sum, score) => sum + (score || 0), 0)
@@ -218,18 +246,34 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   نام استراتژیست:
                 </Label>
-                <Select name="strategistId" required>
-                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
-                    <SelectValue placeholder="انتخاب کنید" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {strategists.map((strategist) => (
-                      <SelectItem key={strategist.id} value={strategist.id}>
+                <div className="relative">
+                  <select
+                    name="strategistId"
+                    required
+                    className="w-full h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white rounded-md px-3 text-sm"
+                    style={{ appearance: 'none' }}
+                  >
+                    <option value="">استراتژیست را انتخاب کنید</option>
+                    {filteredStrategists.map((strategist) => (
+                      <option key={strategist.id} value={strategist.id}>
                         {strategist.firstName} {strategist.lastName}
-                      </SelectItem>
+                      </option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  {strategists.length > 5 && (
+                    <div className="mt-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-nude-400" />
+                        <Input
+                          placeholder="جستجوی استراتژیست..."
+                          value={strategistSearch}
+                          onChange={(e) => setStrategistSearch(e.target.value)}
+                          className="pl-9 h-9 border-nude-300 focus:border-nude-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -237,14 +281,14 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   ماه:
                 </Label>
-                <Select name="month" defaultValue={currentMonth.toString()} required>
+                <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
                   <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[...Array(12)].map((_, i) => (
-                      <SelectItem key={i + 1} value={(i + 1).toString()}>
-                        {i + 1}
+                    {availableMonths.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -260,9 +304,10 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                   id="year"
                   name="year"
                   type="number"
-                  min="2020"
-                  max="2100"
-                  defaultValue={currentYear}
+                  min="1400"
+                  max="1410"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value) || currentPersianYear)}
                   className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white"
                   required
                 />

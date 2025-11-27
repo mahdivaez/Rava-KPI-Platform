@@ -22,6 +22,7 @@ interface OverviewStatsProps {
     inactiveUsers: number
     totalWorkgroups: number
     activeWorkgroups: number
+    inactiveWorkgroups: number
     totalStrategists: number
     totalWriters: number
     totalEvaluations: number

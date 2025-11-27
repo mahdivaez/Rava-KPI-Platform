@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { formatPersianDateTime } from "@/lib/utils"
 
 type FeedbackWithRelations = WriterFeedback & {
   writer: User
@@ -125,8 +126,8 @@ export function FeedbackReport({
                   {/* Metadata */}
                   <div className="text-xs text-slate-500 pt-4 border-t">
                     <div className="flex gap-6">
-                      <span>تاریخ ارسال: {new Date(feedback.createdAt).toLocaleDateString('fa-IR')}</span>
-                      <span>آخرین بروزرسانی: {new Date(feedback.updatedAt).toLocaleDateString('fa-IR')}</span>
+                      <span>تاریخ ارسال: {formatPersianDateTime(feedback.createdAt)}</span>
+                      <span>آخرین بروزرسانی: {formatPersianDateTime(feedback.updatedAt)}</span>
                     </div>
                   </div>
                 </div>

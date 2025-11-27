@@ -229,39 +229,78 @@
   }
   
   .btn-primary {
-    @apply bg-gradient-to-r from-nude-500 to-nude-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-nude-500/25 hover:shadow-nude-500/40 transition-all duration-300 hover:-translate-y-0.5;
+    @apply bg-gradient-to-r from-nude-500 to-nude-600 text-white font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl shadow-lg shadow-nude-500/25 hover:shadow-nude-500/40 transition-all duration-300 hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply bg-white text-nude-700 border-1.5 border-nude-300 font-medium px-6 py-3 rounded-xl hover:bg-nude-50 hover:border-nude-500 transition-all duration-300;
+    @apply bg-white text-nude-700 border-1.5 border-nude-300 font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-nude-50 hover:border-nude-500 transition-all duration-300;
   }
   
   .btn-ghost {
-    @apply bg-transparent text-nude-700 font-medium px-6 py-3 rounded-xl hover:bg-nude-50 transition-all duration-300;
+    @apply bg-transparent text-nude-700 font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-nude-50 transition-all duration-300;
   }
   
   .input-nude {
-    @apply w-full bg-nude-50 border-1.5 border-nude-200 rounded-xl px-4 py-3 text-nude-900 placeholder:text-nude-400 focus:bg-white focus:border-nude-500 focus:ring-2 focus:ring-nude-500/20 transition-all;
+    @apply w-full bg-nude-50 border-1.5 border-nude-200 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-nude-900 placeholder:text-nude-400 focus:bg-white focus:border-nude-500 focus:ring-2 focus:ring-nude-500/20 transition-all;
   }
   
   .card-nude {
-    @apply bg-white border border-nude-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-nude-300 transition-all duration-300;
+    @apply bg-white border border-nude-200 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-nude-300 transition-all duration-300;
   }
   
   .badge-success {
-    @apply bg-success/10 text-success border border-success/30 px-3 py-1 rounded-lg text-sm font-medium;
+    @apply bg-success/10 text-success border border-success/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
   }
   
   .badge-warning {
-    @apply bg-warning/10 text-warning border border-warning/30 px-3 py-1 rounded-lg text-sm font-medium;
+    @apply bg-warning/10 text-warning border border-warning/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
   }
   
   .badge-error {
-    @apply bg-destructive/10 text-destructive border border-destructive/30 px-3 py-1 rounded-lg text-sm font-medium;
+    @apply bg-destructive/10 text-destructive border border-destructive/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
   }
   
   .badge-neutral {
-    @apply bg-nude-100 text-nude-700 border border-nude-300 px-3 py-1 rounded-lg text-sm font-medium;
+    @apply bg-nude-100 text-nude-700 border border-nude-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
+  }
+  
+  /* Responsive Table */
+  .table-responsive {
+    @apply w-full overflow-x-auto;
+  }
+  
+  .table-responsive table {
+    @apply min-w-full;
+  }
+  
+  /* Mobile Card for Tables */
+  .mobile-card {
+    @apply md:hidden bg-white border border-nude-200 rounded-lg p-4 space-y-2;
+  }
+  
+  /* Hide on Mobile */
+  .hide-mobile {
+    @apply hidden md:block;
+  }
+  
+  /* Show only on Mobile */
+  .show-mobile {
+    @apply block md:hidden;
+  }
+  
+  /* Responsive Container */
+  .container-responsive {
+    @apply w-full px-4 sm:px-6 lg:px-8 mx-auto;
+  }
+  
+  /* Responsive Grid Gaps */
+  .gap-responsive {
+    @apply gap-3 sm:gap-4 lg:gap-6;
+  }
+  
+  /* Responsive Text Truncate */
+  .truncate-mobile {
+    @apply truncate sm:whitespace-normal;
   }
 }
 

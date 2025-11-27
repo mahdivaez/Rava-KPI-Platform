@@ -6,8 +6,8 @@ import { z } from "zod"
 const evaluationSchema = z.object({
   writerId: z.string(),
   workgroupId: z.string(),
-  month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2020),
+  month: z.number().int().min(1).max(11),
+  year: z.number().int().min(1400),
   responsibility: z.number().int().min(1).max(10),
   strategistSatisfaction: z.number().int().min(1).max(10),
   meetingEngagement: z.number().int().min(1).max(10),

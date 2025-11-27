@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Plus } from "lucide-react"
+import moment from 'moment-jalaali'
 
 type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
@@ -39,9 +40,28 @@ export function CreateFeedbackDialog({
   const [selectedWorkgroup, setSelectedWorkgroup] = useState("")
   const router = useRouter()
 
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth() + 1
-  const currentYear = currentDate.getFullYear()
+  const currentPersian = moment()
+  const currentPersianMonth = currentPersian.jMonth() + 1
+  const currentPersianYear = currentPersian.jYear()
+  const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+
+  // Persian month names
+  const persianMonths = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
+  ]
+
+  // Available months based on selected year
+  const getAvailableMonths = (selectedYear: number) => {
+    if (selectedYear < currentPersianYear) {
+      return persianMonths.map((name, i) => ({ name, value: i + 1 }))
+    } else if (selectedYear === currentPersianYear) {
+      return persianMonths.slice(0, effectiveCurrentMonth).map((name, i) => ({ name, value: i + 1 }))
+    }
+    return []
+  }
+
+  const availableMonths = getAvailableMonths(currentPersianYear)
 
   const strategists = selectedWorkgroup
     ? workgroups.find((w) => w.id === selectedWorkgroup)?.members.map((m) => m.user) || []
@@ -146,15 +166,18 @@ export function CreateFeedbackDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="month">ماه</Label>
-              <Input
-                id="month"
-                name="month"
-                type="number"
-                min="1"
-                max="12"
-                defaultValue={currentMonth}
-                required
-              />
+              <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableMonths.map((month) => (
+                    <SelectItem key={month.value} value={month.value.toString()}>
+                      {month.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="year">سال</Label>
@@ -162,9 +185,9 @@ export function CreateFeedbackDialog({
                 id="year"
                 name="year"
                 type="number"
-                min="2020"
-                max="2100"
-                defaultValue={currentYear}
+                min="1400"
+                max="1410"
+                defaultValue={currentPersianYear}
                 required
               />
             </div>

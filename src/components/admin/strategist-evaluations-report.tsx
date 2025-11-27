@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { formatPersianDateTime } from "@/lib/utils"
 
 type EvaluationWithRelations = StrategistEvaluation & {
   strategist: User
@@ -145,8 +146,8 @@ export function StrategistEvaluationsReport({
                   {/* Metadata */}
                   <div className="text-xs text-slate-500 pt-4 border-t">
                     <div className="flex gap-6">
-                      <span>تاریخ ایجاد: {new Date(evaluation.createdAt).toLocaleDateString('fa-IR')}</span>
-                      <span>آخرین بروزرسانی: {new Date(evaluation.updatedAt).toLocaleDateString('fa-IR')}</span>
+                      <span>تاریخ ایجاد: {formatPersianDateTime(evaluation.createdAt)}</span>
+                      <span>آخرین بروزرسانی: {formatPersianDateTime(evaluation.updatedAt)}</span>
                     </div>
                   </div>
                 </div>

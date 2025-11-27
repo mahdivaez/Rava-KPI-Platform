@@ -47,8 +47,8 @@ export function UsersTable({ users }: { users: User[] }) {
           <TableRow>
             <TableHead>نام</TableHead>
             <TableHead>ایمیل</TableHead>
-            <TableHead>نقش</TableHead>
-            <TableHead>وضعیت</TableHead>
+            <TableHead className="text-center">نقش</TableHead>
+            <TableHead className="text-center">وضعیت</TableHead>
             <TableHead className="text-left">عملیات</TableHead>
           </TableRow>
         </TableHeader>
@@ -60,7 +60,7 @@ export function UsersTable({ users }: { users: User[] }) {
               </TableCell>
               <TableCell className="text-slate-600">{user.email}</TableCell>
               <TableCell>
-                <div className="flex gap-1 flex-wrap">
+                <div className="flex justify-center gap-1 flex-wrap">
                   {user.isAdmin && <Badge className="badge-error">مدیر</Badge>}
                   {user.isTechnicalDeputy && (
                     <Badge className="badge-neutral">معاون فنی</Badge>
@@ -71,11 +71,13 @@ export function UsersTable({ users }: { users: User[] }) {
                 </div>
               </TableCell>
               <TableCell>
-                {user.isActive ? (
-                  <Badge variant="default" className="bg-green-500">فعال</Badge>
-                ) : (
-                  <Badge variant="destructive">غیرفعال</Badge>
-                )}
+                <div className="flex justify-center">
+                  {user.isActive ? (
+                    <Badge variant="default" className="bg-green-500">فعال</Badge>
+                  ) : (
+                    <Badge variant="destructive">غیرفعال</Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-left">
                 <div className="flex gap-2 justify-end">

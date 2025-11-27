@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatPersianDate } from "@/lib/utils"
 
 type FeedbackWithRelations = WriterFeedback & {
   workgroup: Workgroup
@@ -34,7 +35,7 @@ export function FeedbackTable({
         <TableRow>
           <TableHead>کارگروه</TableHead>
           <TableHead>دوره</TableHead>
-          <TableHead>میانگین امتیاز</TableHead>
+          <TableHead className="text-center">میانگین امتیاز</TableHead>
           <TableHead>تاریخ ارسال</TableHead>
         </TableRow>
       </TableHeader>
@@ -56,14 +57,16 @@ export function FeedbackTable({
                 {feedback.month}/{feedback.year}
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                >
-                  {avgScore}/10
-                </Badge>
+                <div className="flex justify-center">
+                  <Badge
+                    variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
+                  >
+                    {avgScore}/10
+                  </Badge>
+                </div>
               </TableCell>
               <TableCell className="text-slate-600">
-                {new Date(feedback.createdAt).toLocaleDateString('fa-IR')}
+                {formatPersianDate(feedback.createdAt)}
               </TableCell>
             </TableRow>
           )

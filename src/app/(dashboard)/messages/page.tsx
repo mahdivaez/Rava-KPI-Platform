@@ -76,8 +76,8 @@ export default async function MessagesPage() {
   })
 
   return (
-    <div className="h-[calc(100vh-8rem)]">
-      <Card className="h-full border-nude-200">
+    <div className="h-[calc(100vh-10rem)] sm:h-[calc(100vh-9rem)] lg:h-[calc(100vh-8rem)]">
+      <Card className="h-full border-nude-200 overflow-hidden">
         <MessagesInterface
           currentUserId={session.user.id}
           conversations={conversationsWithUnread}

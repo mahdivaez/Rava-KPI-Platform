@@ -156,14 +156,14 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div className="space-y-8 p-6 bg-gradient-to-br from-nude-50 via-white to-nude-100 min-h-screen">
-      <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/20">
-          <span className="text-3xl">📊</span>
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-nude-50 via-white to-nude-100 min-h-screen">
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/20">
+          <span className="text-2xl sm:text-3xl">📊</span>
         </div>
-        <div>
-          <h1 className="text-4xl font-bold text-nude-900">داشبورد جامع مدیریت</h1>
-          <p className="text-nude-600 mt-1 text-lg">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-nude-900 truncate">داشبورد جامع مدیریت</h1>
+          <p className="text-nude-600 mt-1 text-sm sm:text-base lg:text-lg">
             تحلیل کامل عملکرد، آمار و گزارشات سیستم
           </p>
         </div>
@@ -174,29 +174,31 @@ export default async function AdminDashboardPage() {
 
       {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 h-auto bg-white border-2 border-nude-200 p-2 rounded-xl shadow-sm">
-          <TabsTrigger value="overview" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            📈 نمای کلی
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            🎯 روند عملکرد
-          </TabsTrigger>
-          <TabsTrigger value="leaderboard" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            🏆 رتبه‌بندی
-          </TabsTrigger>
-          <TabsTrigger value="alerts" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            ⚠️ هشدارها
-          </TabsTrigger>
-          <TabsTrigger value="workgroups" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            👥 کارگروه‌ها
-          </TabsTrigger>
-          <TabsTrigger value="activity" className="py-4 px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all">
-            ⚡ فعالیت‌ها
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto pb-2">
+          <TabsList className="inline-flex w-full min-w-max lg:grid lg:grid-cols-6 h-auto bg-white border-2 border-nude-200 p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-sm">
+            <TabsTrigger value="overview" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              📈 نمای کلی
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              🎯 روند عملکرد
+            </TabsTrigger>
+            <TabsTrigger value="leaderboard" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              🏆 رتبه‌بندی
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              ⚠️ هشدارها
+            </TabsTrigger>
+            <TabsTrigger value="workgroups" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              👥 کارگروه‌ها
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+              ⚡ فعالیت‌ها
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="overview" className="space-y-6 mt-6">
-          <div className="grid gap-6 md:grid-cols-2">
+        <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             <EvaluationDistribution 
               strategistEvaluations={strategistEvaluations}
               writerEvaluations={writerEvaluations}
@@ -208,7 +210,7 @@ export default async function AdminDashboardPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-6 mt-6">
+        <TabsContent value="performance" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           {/* Performance Insights - Month over Month Growth */}
           <PerformanceInsights 
             strategistEvaluations={strategistEvaluations}
@@ -223,7 +225,7 @@ export default async function AdminDashboardPage() {
           />
         </TabsContent>
 
-        <TabsContent value="leaderboard" className="space-y-6 mt-6">
+        <TabsContent value="leaderboard" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <TeamLeaderboard 
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
@@ -231,7 +233,7 @@ export default async function AdminDashboardPage() {
           />
         </TabsContent>
 
-        <TabsContent value="alerts" className="space-y-6 mt-6">
+        <TabsContent value="alerts" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <PerformanceAlerts 
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
@@ -239,11 +241,11 @@ export default async function AdminDashboardPage() {
           />
         </TabsContent>
 
-        <TabsContent value="workgroups" className="space-y-6 mt-6">
+        <TabsContent value="workgroups" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <WorkgroupAnalytics workgroups={workgroups} />
         </TabsContent>
 
-        <TabsContent value="activity" className="space-y-6 mt-6">
+        <TabsContent value="activity" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <RecentActivity 
             recentEvaluations={recentEvaluations}
             recentUsers={recentUsers}

@@ -14,10 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { Calculator, FileText, ChevronRight, Save, X } from "lucide-react"
 import Link from "next/link"
+import moment from 'moment-jalaali'
 
 type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
@@ -68,19 +70,46 @@ export function WriterEvaluationForm({
 }: {
   workgroups: WorkgroupWithMembers[]
 }) {
+  const currentPersian = moment()
+  const currentPersianMonth = currentPersian.jMonth() + 1
+  const currentPersianYear = currentPersian.jYear()
+  const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+
   const [loading, setLoading] = useState(false)
   const [selectedWorkgroup, setSelectedWorkgroup] = useState("")
+  const [selectedYear, setSelectedYear] = useState(currentPersianYear)
   const [scores, setScores] = useState<Record<string, number>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
+  const [writerSearch, setWriterSearch] = useState("")
   const router = useRouter()
 
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth() + 1
-  const currentYear = currentDate.getFullYear()
+  // Persian month names
+  const persianMonths = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
+  ]
+
+  // Available months based on selected year
+  const getAvailableMonths = (selectedYear: number) => {
+    if (selectedYear < currentPersianYear) {
+      return persianMonths.map((name, i) => ({ name, value: i + 1 }))
+    } else if (selectedYear === currentPersianYear) {
+      return persianMonths.slice(0, effectiveCurrentMonth).map((name, i) => ({ name, value: i + 1 }))
+    }
+    return []
+  }
 
   const writers = selectedWorkgroup
     ? workgroups.find((w) => w.id === selectedWorkgroup)?.members.map((m) => m.user) || []
     : []
+
+  // Filter writers based on search
+  const filteredWriters = writers.filter((writer) =>
+    `${writer.firstName} ${writer.lastName}`.toLowerCase().includes(writerSearch.toLowerCase())
+  )
+
+  // Get available months for the selected year
+  const availableMonths = getAvailableMonths(selectedYear)
 
   // Calculate total and average
   const totalScore = Object.values(scores).reduce((sum, score) => sum + (score || 0), 0)
@@ -242,36 +271,55 @@ export function WriterEvaluationForm({
 
               <div className="space-y-2">
                 <Label htmlFor="writerId" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2  rounded-full bg-nude-1000"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   نام نویسنده:
                 </Label>
-                <Select name="writerId" required disabled={!selectedWorkgroup}>
-                  <SelectTrigger className="h-12 border-2  border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
-                    <SelectValue placeholder="ابتدا کارگروه را انتخاب کنید" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {writers.map((writer) => (
-                      <SelectItem key={writer.id} value={writer.id}>
+                <div className="relative">
+                  <select
+                    name="writerId"
+                    required
+                    disabled={!selectedWorkgroup}
+                    className="w-full h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white rounded-md px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ appearance: 'none' }}
+                  >
+                    <option value="">
+                      {selectedWorkgroup ? "نویسنده را انتخاب کنید" : "ابتدا کارگروه را انتخاب کنید"}
+                    </option>
+                    {filteredWriters.map((writer) => (
+                      <option key={writer.id} value={writer.id}>
                         {writer.firstName} {writer.lastName}
-                      </SelectItem>
+                      </option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  {selectedWorkgroup && writers.length > 5 && (
+                    <div className="mt-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-nude-400" />
+                        <Input
+                          placeholder="جستجوی نویسنده..."
+                          value={writerSearch}
+                          onChange={(e) => setWriterSearch(e.target.value)}
+                          className="pl-9 h-9 border-nude-300 focus:border-nude-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="month" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-1000"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   ماه:
                 </Label>
-                <Select name="month" defaultValue={currentMonth.toString()} required>
+                <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
                   <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[...Array(12)].map((_, i) => (
-                      <SelectItem key={i + 1} value={(i + 1).toString()}>
-                        {i + 1}
+                    {availableMonths.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -280,16 +328,17 @@ export function WriterEvaluationForm({
 
               <div className="space-y-2">
                 <Label htmlFor="year" className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-1000"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   سال:
                 </Label>
                 <Input
                   id="year"
                   name="year"
                   type="number"
-                  min="2020"
-                  max="2100"
-                  defaultValue={currentYear}
+                  min="1400"
+                  max="1410"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value) || currentPersianYear)}
                   className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white"
                   required
                 />
@@ -297,7 +346,7 @@ export function WriterEvaluationForm({
 
               <div className="space-y-2">
                 <Label className="text-nude-900 font-bold text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-1000"></span>
+                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   بازهٔ زمانی ارزیابی:
                 </Label>
                 <div className="h-12 flex items-center px-4 bg-nude-100 border-2 border-nude-200 rounded-lg text-sm text-nude-700 font-bold">
@@ -426,7 +475,7 @@ export function WriterEvaluationForm({
             
             <div className="space-y-3">
               <Label htmlFor="strengths" className="text-nude-900 font-bold text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-nude-1000"></span>
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 نقاط قوت:
               </Label>
               <Textarea 

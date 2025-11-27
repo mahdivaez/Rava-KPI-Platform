@@ -35,7 +35,7 @@ export default async function NewWriterEvaluationPage() {
   const workgroups = strategistMemberships.map(m => m.workgroup)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-nude-50 via-white to-nude-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-nude-50 via-white to-nude-100 py-4 sm:py-6 lg:py-8">
       <WriterEvaluationForm workgroups={workgroups} />
     </div>
   )

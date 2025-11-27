@@ -15,18 +15,24 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
     const strategistCount = wg.members.filter((m: any) => m.role === 'STRATEGIST').length
     const writerCount = wg.members.filter((m: any) => m.role === 'WRITER').length
     const totalMembers = wg.members.length
-    
+
+    // Get member names with roles
+    const members = wg.members.map((m: any) => ({
+      name: `${m.user.firstName} ${m.user.lastName}`,
+      role: m.role === 'STRATEGIST' ? 'استراتژیست' : 'نویسنده'
+    }))
+
     // Calculate average evaluation scores
     let avgScore = 0
     if (wg.writerEvaluations.length > 0) {
       const totalScore = wg.writerEvaluations.reduce((sum: number, evaluation: any) => {
-        const score = (evaluation.responsibility + evaluation.strategistSatisfaction + evaluation.meetingEngagement + 
+        const score = (evaluation.responsibility + evaluation.strategistSatisfaction + evaluation.meetingEngagement +
                       evaluation.scenarioPerformance + evaluation.clientSatisfaction + evaluation.brandAlignment) / 6
         return sum + score
       }, 0)
       avgScore = totalScore / wg.writerEvaluations.length
     }
-    
+
     return {
       id: wg.id,
       name: wg.name,
@@ -34,6 +40,7 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
       strategistCount,
       writerCount,
       totalMembers,
+      members,
       evaluationsCount: wg.writerEvaluations.length,
       feedbacksCount: wg.writerFeedbacks.length,
       avgScore: avgScore,
@@ -124,6 +131,23 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
                   {wg.writerCount}
                 </Badge>
               </div>
+
+              {/* Members List */}
+              {wg.members.length > 0 && (
+                <div className="pt-3 border-t">
+                  <div className="text-sm font-medium text-slate-700 mb-2">اعضا:</div>
+                  <div className="space-y-1">
+                    {wg.members.map((member: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600">{member.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {member.role}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="pt-3 border-t space-y-2">
                 <div className="flex items-center justify-between text-sm">

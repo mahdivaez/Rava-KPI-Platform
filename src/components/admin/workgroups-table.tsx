@@ -60,8 +60,8 @@ export function WorkgroupsTable({
           <TableRow>
             <TableHead>نام کارگروه</TableHead>
             <TableHead>توضیحات</TableHead>
-            <TableHead>تعداد اعضا</TableHead>
-            <TableHead>وضعیت</TableHead>
+            <TableHead className="text-center">تعداد اعضا</TableHead>
+            <TableHead className="text-center">وضعیت</TableHead>
             <TableHead className="text-left">عملیات</TableHead>
           </TableRow>
         </TableHeader>
@@ -73,14 +73,18 @@ export function WorkgroupsTable({
                 {workgroup.description || "-"}
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{workgroup._count.members} نفر</Badge>
+                <div className="flex justify-center">
+                  <Badge variant="outline">{workgroup._count.members} نفر</Badge>
+                </div>
               </TableCell>
               <TableCell>
-                {workgroup.isActive ? (
-                  <Badge variant="default" className="bg-green-500">فعال</Badge>
-                ) : (
-                  <Badge variant="destructive">غیرفعال</Badge>
-                )}
+                <div className="flex justify-center">
+                  {workgroup.isActive ? (
+                    <Badge variant="default" className="bg-green-500">فعال</Badge>
+                  ) : (
+                    <Badge variant="destructive">غیرفعال</Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-left">
                 <div className="flex gap-2 justify-end">

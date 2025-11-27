@@ -6,8 +6,8 @@ import { z } from "zod"
 const feedbackSchema = z.object({
   strategistId: z.string(),
   workgroupId: z.string(),
-  month: z.number().int().min(1).max(12),
-  year: z.number().int().min(2020),
+  month: z.number().int().min(1).max(11),
+  year: z.number().int().min(1400),
   communication: z.number().int().min(1).max(10),
   supportLevel: z.number().int().min(1).max(10),
   clarityOfTasks: z.number().int().min(1).max(10),

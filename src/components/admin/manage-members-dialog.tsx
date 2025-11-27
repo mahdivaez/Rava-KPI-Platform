@@ -117,7 +117,7 @@ export function ManageMembersDialog({
                   <SelectTrigger>
                     <SelectValue placeholder="انتخاب کاربر" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60">
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.firstName} {user.lastName}

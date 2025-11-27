@@ -72,7 +72,7 @@ export default async function ReportsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">کاربران</CardTitle>
@@ -99,7 +99,7 @@ export default async function ReportsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">ارزیابی استراتژیست‌ها</CardTitle>
+            <CardTitle className="text-sm">ارزیابی های معاون فنی</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.strategistEvaluations}</div>
@@ -109,13 +109,21 @@ export default async function ReportsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">ارزیابی نویسنده‌ها</CardTitle>
+            <CardTitle className="text-sm">ارزیابی های استراتژیست</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.writerEvaluations}</div>
-            <p className="text-xs text-slate-600 mt-1">
-              + {stats.writerFeedbacks} بازخورد
-            </p>
+            <p className="text-xs text-slate-600 mt-1">تعداد کل</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">ارزیابی های نویسنده</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.writerFeedbacks}</div>
+            <p className="text-xs text-slate-600 mt-1">تعداد کل</p>
           </CardContent>
         </Card>
       </div>
@@ -124,13 +132,13 @@ export default async function ReportsPage() {
       <Tabs defaultValue="strategist" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="strategist">
-            ارزیابی استراتژیست‌ها ({strategistEvaluations.length})
+          ارزیابی‌های معاون فنی ({strategistEvaluations.length})
           </TabsTrigger>
           <TabsTrigger value="writer">
-            ارزیابی نویسنده‌ها ({writerEvaluations.length})
+            ارزیابی های استراتژیست ({writerEvaluations.length})
           </TabsTrigger>
           <TabsTrigger value="feedback">
-            بازخوردها ({writerFeedbacks.length})
+           ارزیابی های نویسنده({writerFeedbacks.length})
           </TabsTrigger>
         </TabsList>
 

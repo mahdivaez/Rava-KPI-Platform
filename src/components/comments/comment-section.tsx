@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card"
 import { MessageSquare, Send, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { formatPersianDateTime } from "@/lib/utils"
 
 interface Comment {
   id: string
@@ -100,13 +101,7 @@ export function CommentSection({
                     {comment.author.firstName} {comment.author.lastName}
                   </span>
                   <span className="text-xs text-nude-500">
-                    {new Date(comment.createdAt).toLocaleDateString('fa-IR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatPersianDateTime(comment.createdAt, 'yyyy/MM/dd HH:mm')}
                   </span>
                 </div>
                 <p className="text-nude-700 text-sm leading-relaxed whitespace-pre-wrap">

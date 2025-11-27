@@ -50,7 +50,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
       {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-[#6b5d54] text-sm font-medium">
@@ -63,7 +63,7 @@ export function LoginForm() {
           placeholder="نام@example.com"
           required
           disabled={isLoading}
-          className="h-12 bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl transition-all"
+          className="h-11 sm:h-12 text-sm sm:text-base bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl transition-all"
         />
       </div>
 
@@ -80,33 +80,33 @@ export function LoginForm() {
             placeholder="رمز عبور خود را وارد کنید"
             required
             disabled={isLoading}
-            className="h-12 bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl pr-4 pl-12 transition-all"
+            className="h-11 sm:h-12 text-sm sm:text-base bg-white/80 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl pr-4 pl-12 transition-all"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#b5a59a] hover:text-[#6b5d54] transition-colors"
+            className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-[#b5a59a] hover:text-[#6b5d54] transition-colors"
             tabIndex={-1}
           >
             {showPassword ? (
-              <EyeOff className="w-5 h-5" />
+              <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
             ) : (
-              <Eye className="w-5 h-5" />
+              <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
             )}
           </button>
         </div>
       </div>
 
       {/* Remember & Forgot */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
         <label className="flex items-center gap-2 cursor-pointer group">
           <input 
             type="checkbox" 
             className="w-4 h-4 rounded border-[#d4c5b9] text-[#9b8b7e] focus:ring-[#d4c5b9]" 
           />
-          <span className="text-sm text-[#8a7a6f]">مرا به خاطر بسپار</span>
+          <span className="text-xs sm:text-sm text-[#8a7a6f]">مرا به خاطر بسپار</span>
         </label>
-        <a href="#" className="text-sm text-[#9b8b7e] hover:text-[#6b5d54] font-medium transition-colors">
+        <a href="#" className="text-xs sm:text-sm text-[#9b8b7e] hover:text-[#6b5d54] font-medium transition-colors">
           فراموشی رمز عبور؟
         </a>
       </div>
@@ -115,11 +115,11 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-12 bg-[#9b8b7e] hover:bg-[#8a7a6f] text-white font-medium rounded-xl shadow-lg shadow-[#9b8b7e]/20 hover:shadow-[#9b8b7e]/30 transition-all duration-300"
+        className="w-full h-11 sm:h-12 text-sm sm:text-base bg-[#9b8b7e] hover:bg-[#8a7a6f] text-white font-medium rounded-xl shadow-lg shadow-[#9b8b7e]/20 hover:shadow-[#9b8b7e]/30 transition-all duration-300"
       >
         {isLoading ? (
           <div className="flex items-center gap-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
             <span>در حال ورود...</span>
           </div>
         ) : (

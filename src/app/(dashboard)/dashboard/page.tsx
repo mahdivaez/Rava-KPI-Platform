@@ -4,16 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
-import { 
-  Users, 
-  FolderKanban, 
-  TrendingUp, 
-  Target,
-  ListTodo,
+import {
+  Users,
+  FolderKanban,
+  TrendingUp,
   MessageSquareText,
   User,
   PieChart,
-  Goal,
   UserRoundCog,
   BarChart3,
   ArrowRight,
@@ -33,18 +30,6 @@ export default async function DashboardPage() {
     select: { image: true },
   })
 
-  // Get user's goals
-  const myGoals = await prisma.goal.count({
-    where: { userId: session.user.id, isActive: true },
-  })
-
-  // Get user's tasks
-  const myTasks = await prisma.task.count({
-    where: { 
-      assignedTo: session.user.id,
-      status: { not: 'COMPLETED' },
-    },
-  })
 
   // Get unread messages
   const unreadMessages = await prisma.message.count({
@@ -77,8 +62,6 @@ export default async function DashboardPage() {
   if (session.user.isAdmin) {
     adminStats = {
       totalUsers: await prisma.user.count(),
-      totalGoals: await prisma.goal.count({ where: { isActive: true } }),
-      totalTasks: await prisma.task.count(),
       totalMessages: await prisma.message.count(),
     }
   }
@@ -88,26 +71,26 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Welcome Header with Profile */}
-      <div className="bg-gradient-to-br from-nude-50 to-white border border-nude-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-gradient-to-br from-nude-50 to-white border border-nude-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-4 border-nude-200">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Avatar className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 border-2 sm:border-4 border-nude-200">
               <AvatarImage src={currentUser?.image || undefined} />
-              <AvatarFallback className="bg-nude-200 text-nude-700 text-xl font-bold">
+              <AvatarFallback className="bg-nude-200 text-nude-700 text-base sm:text-lg lg:text-xl font-bold">
                 {getInitials(session.user.name || '')}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-3xl font-bold text-nude-900 mb-1">
-                خوش آمدید، {session.user.firstName} 👋
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 mb-1">
+                خوش آمدید، {session.user.name?.split(' ')[0]} 👋
               </h1>
-              <p className="text-nude-600 flex items-center gap-2">
-                {session.user.isAdmin && <Badge className="badge-error">مدیر سیستم</Badge>}
-                {session.user.isTechnicalDeputy && <Badge className="badge-neutral">معاون فنی</Badge>}
-                {isStrategist && <Badge className="bg-info/10 text-info border border-info/30">استراتژیست</Badge>}
-                {writerGroups.length > 0 && <Badge className="badge-success">نویسنده</Badge>}
+              <p className="text-nude-600 flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                {session.user.isAdmin && <Badge className="badge-error text-xs">مدیر سیستم</Badge>}
+                {session.user.isTechnicalDeputy && <Badge className="badge-neutral text-xs">معاون فنی</Badge>}
+                {isStrategist && <Badge className="bg-info/10 text-info border border-info/30 text-xs">استراتژیست</Badge>}
+                {writerGroups.length > 0 && <Badge className="badge-success text-xs">نویسنده</Badge>}
               </p>
             </div>
           </div>
@@ -115,58 +98,30 @@ export default async function DashboardPage() {
       </div>
 
       {/* Personal Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Link href="/goals">
-          <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-nude-600 mb-1">اهداف من</p>
-                  <p className="text-3xl font-bold text-nude-900">{myGoals}</p>
-                </div>
-                <Target className="w-10 h-10 text-nude-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/tasks">
-          <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-nude-600 mb-1">وظایف فعال</p>
-                  <p className="text-3xl font-bold text-warning">{myTasks}</p>
-                </div>
-                <ListTodo className="w-10 h-10 text-warning" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <Link href="/messages">
           <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-6">
+            <CardContent className="pt-4 sm:pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-nude-600 mb-1">پیام‌های جدید</p>
-                  <p className="text-3xl font-bold text-info">{unreadMessages}</p>
+                  <p className="text-xs sm:text-sm text-nude-600 mb-1">پیام‌های جدید</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-info">{unreadMessages}</p>
                 </div>
-                <MessageSquareText className="w-10 h-10 text-info" />
+                <MessageSquareText className="w-8 h-8 sm:w-10 sm:h-10 text-info" />
               </div>
             </CardContent>
           </Card>
         </Link>
 
-        <Link href="/profile">
+        <Link href="/profile" className="col-span-2 lg:col-span-1">
           <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-6">
+            <CardContent className="pt-4 sm:pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-nude-600 mb-1">پروفایل من</p>
-                  <p className="text-3xl font-bold text-nude-500"><User className="w-8 h-8" /></p>
+                  <p className="text-xs sm:text-sm text-nude-600 mb-1">پروفایل من</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-nude-500"><User className="w-7 h-7 sm:w-8 sm:h-8" /></p>
                 </div>
-                <User className="w-10 h-10 text-nude-500" />
+                <User className="w-8 h-8 sm:w-10 sm:h-10 text-nude-500" />
               </div>
             </CardContent>
           </Card>
@@ -176,66 +131,52 @@ export default async function DashboardPage() {
       {/* Admin Quick Access */}
       {session.user.isAdmin && adminStats && (
         <Card className="border-nude-200 bg-gradient-to-br from-nude-50 to-white">
-          <CardHeader>
+          <CardHeader className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-nude-900 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-nude-500" />
+                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-nude-500" />
                   پنل مدیریت
                 </CardTitle>
-                <CardDescription>دسترسی سریع به امکانات مدیریتی</CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">دسترسی سریع به امکانات مدیریتی</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-4 mb-4">
-              <div className="p-4 bg-white rounded-xl border border-nude-200">
-                <Users className="w-8 h-8 text-nude-500 mb-2" />
-                <p className="text-2xl font-bold text-nude-900">{adminStats.totalUsers}</p>
-                <p className="text-sm text-nude-600">کاربران</p>
+          <CardContent className="p-4 sm:p-6">
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-4">
+              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
+                <p className="text-xl sm:text-2xl font-bold text-nude-900">{adminStats.totalUsers}</p>
+                <p className="text-xs sm:text-sm text-nude-600">کاربران</p>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-nude-200">
-                <Goal className="w-8 h-8 text-nude-500 mb-2" />
-                <p className="text-2xl font-bold text-nude-900">{adminStats.totalGoals}</p>
-                <p className="text-sm text-nude-600">اهداف فعال</p>
+              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
+                <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
+                <p className="text-xl sm:text-2xl font-bold text-nude-900">{adminStats.totalMessages}</p>
+                <p className="text-xs sm:text-sm text-nude-600">پیام‌ها</p>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-nude-200">
-                <ListTodo className="w-8 h-8 text-nude-500 mb-2" />
-                <p className="text-2xl font-bold text-nude-900">{adminStats.totalTasks}</p>
-                <p className="text-sm text-nude-600">وظایف</p>
-              </div>
-              <div className="p-4 bg-white rounded-xl border border-nude-200">
-                <Mail className="w-8 h-8 text-nude-500 mb-2" />
-                <p className="text-2xl font-bold text-nude-900">{adminStats.totalMessages}</p>
-                <p className="text-sm text-nude-600">پیام‌ها</p>
+              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
+                <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
+                <p className="text-xl sm:text-2xl font-bold text-nude-900">گزارشات</p>
+                <p className="text-xs sm:text-sm text-nude-600">آمار کامل</p>
               </div>
             </div>
             
-            <div className="grid gap-3 md:grid-cols-3">
-              <Link href="/admin/dashboard" className="p-4 bg-white rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
+            <div className="grid gap-3 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
+              <Link href="/admin/dashboard" className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
                 <div className="flex items-center justify-between mb-2">
-                  <PieChart className="w-6 h-6 text-nude-500" />
+                  <PieChart className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
                   <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="font-semibold text-nude-900">داشبورد تحلیلی</p>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">داشبورد تحلیلی</p>
                 <p className="text-xs text-nude-600 mt-1">آمار و نمودارها</p>
               </Link>
 
-              <Link href="/admin/goals" className="p-4 bg-white rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
+              <Link href="/admin/roles" className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
                 <div className="flex items-center justify-between mb-2">
-                  <Goal className="w-6 h-6 text-nude-500" />
+                  <UserRoundCog className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
                   <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="font-semibold text-nude-900">مدیریت اهداف</p>
-                <p className="text-xs text-nude-600 mt-1">تعیین و پیگیری اهداف</p>
-              </Link>
-
-              <Link href="/admin/roles" className="p-4 bg-white rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <UserRoundCog className="w-6 h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-nude-900">ویرایش نقش‌ها</p>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">ویرایش نقش‌ها</p>
                 <p className="text-xs text-nude-600 mt-1">مدیریت دسترسی‌ها</p>
               </Link>
             </div>
@@ -245,57 +186,38 @@ export default async function DashboardPage() {
 
       {/* My Features - Universal Section */}
       <Card className="border-nude-200">
-        <CardHeader>
-          <CardTitle className="text-nude-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-nude-500" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-nude-500" />
             امکانات من
           </CardTitle>
-          <CardDescription>دسترسی سریع به ویژگی‌های شما</CardDescription>
+          <CardDescription className="text-xs sm:text-sm mt-1">دسترسی سریع به ویژگی‌های شما</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {/* Profile */}
-            <Link href="/profile" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+            <Link href="/profile" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
               <div className="flex items-center justify-between mb-2">
-                <User className="w-6 h-6 text-nude-500" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
               </div>
-              <p className="font-semibold text-nude-900">پروفایل</p>
+              <p className="font-semibold text-sm sm:text-base text-nude-900">پروفایل</p>
               <p className="text-xs text-nude-600 mt-1">مشاهده و ویرایش</p>
             </Link>
 
-            {/* Goals */}
-            <Link href="/goals" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <Target className="w-6 h-6 text-nude-500" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-nude-900">اهداف من</p>
-              <p className="text-xs text-nude-600 mt-1">{myGoals} هدف فعال</p>
-            </Link>
-
-            {/* Tasks */}
-            <Link href="/tasks" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <ListTodo className="w-6 h-6 text-warning" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-nude-900">وظایف</p>
-              <p className="text-xs text-nude-600 mt-1">{myTasks} وظیفه در انتظار</p>
-            </Link>
 
             {/* Messages */}
-            <Link href="/messages" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group relative">
+            <Link href="/messages" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group relative">
               <div className="flex items-center justify-between mb-2">
-                <MessageSquareText className="w-6 h-6 text-info" />
-                <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                <MessageSquareText className="w-5 h-5 sm:w-6 sm:h-6 text-info" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
               </div>
-              <p className="font-semibold text-nude-900">پیام‌ها</p>
+              <p className="font-semibold text-sm sm:text-base text-nude-900">پیام‌ها</p>
               <p className="text-xs text-nude-600 mt-1">
                 {unreadMessages > 0 ? `${unreadMessages} پیام جدید` : 'پیام‌های من'}
               </p>
               {unreadMessages > 0 && (
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-destructive rounded-full flex items-center justify-center text-white text-xs font-bold">
+                <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-destructive rounded-full flex items-center justify-center text-white text-xs font-bold">
                   {unreadMessages}
                 </div>
               )}
@@ -303,36 +225,36 @@ export default async function DashboardPage() {
 
             {/* Evaluations - Only for Deputy/Admin */}
             {(session.user.isTechnicalDeputy || session.user.isAdmin) && (
-              <Link href="/evaluations/strategist" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+              <Link href="/evaluations/strategist" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
                 <div className="flex items-center justify-between mb-2">
-                  <TrendingUp className="w-6 h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="font-semibold text-nude-900">ارزیابی استراتژیست</p>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی استراتژیست</p>
                 <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
               </Link>
             )}
 
             {/* Writer Evaluation - Only for Strategists/Admin */}
             {(isStrategist || session.user.isAdmin) && (
-              <Link href="/evaluations/writer" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+              <Link href="/evaluations/writer" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
                 <div className="flex items-center justify-between mb-2">
-                  <CheckCircle2 className="w-6 h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="font-semibold text-nude-900">ارزیابی نویسنده</p>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی نویسنده</p>
                 <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
               </Link>
             )}
 
             {/* Feedback for Strategists */}
             {isStrategist && (
-              <Link href="/feedback/send" className="p-4 bg-nude-50 rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+              <Link href="/feedback/send" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
                 <div className="flex items-center justify-between mb-2">
-                  <MessageSquareText className="w-6 h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                  <MessageSquareText className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="font-semibold text-nude-900">ارسال بازخورد</p>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">ارسال بازخورد</p>
                 <p className="text-xs text-nude-600 mt-1">به نویسندگان</p>
               </Link>
             )}
@@ -342,27 +264,27 @@ export default async function DashboardPage() {
 
       {/* My Workgroups */}
       {(strategistGroups.length > 0 || writerGroups.length > 0) && (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Strategist Workgroups */}
           {strategistGroups.length > 0 && (
             <Card className="border-nude-200">
-              <CardHeader>
-                <CardTitle className="text-nude-900 flex items-center gap-2">
-                  <FolderKanban className="w-5 h-5 text-info" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
+                  <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-info" />
                   کارگروه‌های استراتژیست
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-4 sm:p-6">
+                <div className="space-y-2 sm:space-y-3">
                   {strategistGroups.map((group) => (
-                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-xl border border-nude-200">
-                      <div>
-                        <p className="font-semibold text-nude-900">{group.name}</p>
+                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
+                      <div className="flex-1 min-w-0 mr-3">
+                        <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
                         {group.description && (
-                          <p className="text-sm text-nude-600 mt-1">{group.description}</p>
+                          <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
                         )}
                       </div>
-                      <Badge className={group.isActive ? "badge-success" : "badge-neutral"}>
+                      <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap`}>
                         {group.isActive ? 'فعال' : 'غیرفعال'}
                       </Badge>
                     </div>
@@ -375,23 +297,23 @@ export default async function DashboardPage() {
           {/* Writer Workgroups */}
           {writerGroups.length > 0 && (
             <Card className="border-nude-200">
-              <CardHeader>
-                <CardTitle className="text-nude-900 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-success" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
                   کارگروه‌های نویسنده
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-4 sm:p-6">
+                <div className="space-y-2 sm:space-y-3">
                   {writerGroups.map((group) => (
-                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-xl border border-nude-200">
-                      <div>
-                        <p className="font-semibold text-nude-900">{group.name}</p>
+                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
+                      <div className="flex-1 min-w-0 mr-3">
+                        <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
                         {group.description && (
-                          <p className="text-sm text-nude-600 mt-1">{group.description}</p>
+                          <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
                         )}
                       </div>
-                      <Badge className={group.isActive ? "badge-success" : "badge-neutral"}>
+                      <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap`}>
                         {group.isActive ? 'فعال' : 'غیرفعال'}
                       </Badge>
                     </div>

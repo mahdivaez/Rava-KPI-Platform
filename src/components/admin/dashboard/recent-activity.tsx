@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ClipboardCheck, Clock, Calendar, User } from "lucide-react"
-import { format } from "date-fns"
-import { faIR } from 'date-fns/locale'
+import { formatPersianDateTime } from "@/lib/utils"
 
 interface RecentActivityProps {
   recentEvaluations: any[]
@@ -33,11 +32,7 @@ export function RecentActivity({ recentEvaluations, recentUsers }: RecentActivit
   }
 
   const formatDate = (date: Date) => {
-    try {
-      return format(new Date(date), 'yyyy/MM/dd HH:mm', { locale: faIR })
-    } catch {
-      return 'نامشخص'
-    }
+    return formatPersianDateTime(date)
   }
 
   const calculateAverage = (evaluation: any) => {

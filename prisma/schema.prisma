@@ -17,33 +17,6 @@ enum EvaluationStatus {
   COMPLETED
 }
 
-enum GoalType {
-  INDIVIDUAL_BLOGGER
-  INDIVIDUAL_BUSINESS
-  TEAM
-  COMPANY
-}
-
-enum GoalStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
-  OVERDUE
-}
-
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
 
 enum CommentType {
   STRATEGIST_EVALUATION
@@ -53,8 +26,6 @@ enum CommentType {
 
 enum PointTransactionType {
   EVALUATION_COMPLETED
-  TASK_COMPLETED
-  GOAL_ACHIEVED
   FEEDBACK_GIVEN
   BONUS
   PENALTY
@@ -81,10 +52,6 @@ model User {
   writerEvaluations         WriterEvaluation[]     @relation("EvaluatedWriter")
   strategistAsEvaluator     WriterEvaluation[]     @relation("StrategistEvaluator")
   writerFeedbacks           WriterFeedback[]
-  goals                     Goal[]                 @relation("UserGoals")
-  assignedGoals             Goal[]                 @relation("AssignedByUser")
-  assignedTasks             Task[]                 @relation("AssignedTasks")
-  createdTasks              Task[]                 @relation("CreatedTasks")
   comments                  Comment[]
   pointTransactions         PointTransaction[]
   totalPoints               Int                    @default(0)
@@ -106,8 +73,6 @@ model Workgroup {
   members            WorkgroupMember[]
   writerEvaluations  WriterEvaluation[]
   writerFeedbacks    WriterFeedback[]
-  goals              Goal[]
-  tasks              Task[]
 
   @@index([name])
 }
@@ -186,7 +151,7 @@ model WriterEvaluation {
 
   writer     User      @relation("EvaluatedWriter", fields: [writerId], references: [id])
   strategist User      @relation("StrategistEvaluator", fields: [strategistId], references: [id])
-  workgroup  Workgroup @relation(fields: [workgroupId], references: [id])
+  workgroup  Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
 
   @@unique([writerId, strategistId, workgroupId, month, year])
   @@index([writerId])
@@ -216,7 +181,7 @@ model WriterFeedback {
   updatedAt DateTime @updatedAt
 
   writer    User      @relation(fields: [writerId], references: [id])
-  workgroup Workgroup @relation(fields: [workgroupId], references: [id])
+  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
 
   @@unique([writerId, strategistId, workgroupId, month, year])
   @@index([strategistId])
@@ -224,66 +189,6 @@ model WriterFeedback {
   @@index([month, year])
 }
 
-model Goal {
-  id          String     @id @default(cuid())
-  title       String
-  description String?
-  type        GoalType
-  status      GoalStatus @default(NOT_STARTED)
-  
-  targetValue    Float
-  currentValue   Float      @default(0)
-  unit           String     // e.g., "views", "posts", "revenue"
-  
-  startDate   DateTime
-  endDate     DateTime
-  
-  userId      String?    // For individual goals
-  workgroupId String?    // For team goals
-  assignedBy  String     // Admin who created the goal
-  
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  user       User?      @relation("UserGoals", fields: [userId], references: [id])
-  workgroup  Workgroup? @relation(fields: [workgroupId], references: [id])
-  assigner   User       @relation("AssignedByUser", fields: [assignedBy], references: [id])
-
-  @@index([userId])
-  @@index([workgroupId])
-  @@index([status])
-  @@index([type])
-  @@index([startDate, endDate])
-}
-
-model Task {
-  id          String       @id @default(cuid())
-  title       String
-  description String?
-  priority    TaskPriority @default(MEDIUM)
-  status      TaskStatus   @default(PENDING)
-  
-  dueDate     DateTime?
-  
-  assignedTo  String       // Writer who should do the task
-  createdBy   String       // Strategist who created the task
-  workgroupId String?      // Optional workgroup context
-  
-  completedAt DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  writer    User       @relation("AssignedTasks", fields: [assignedTo], references: [id])
-  creator   User       @relation("CreatedTasks", fields: [createdBy], references: [id])
-  workgroup Workgroup? @relation(fields: [workgroupId], references: [id])
-
-  @@index([assignedTo])
-  @@index([createdBy])
-  @@index([workgroupId])
-  @@index([status])
-  @@index([dueDate])
-}
 
 model Comment {
   id        String      @id @default(cuid())
