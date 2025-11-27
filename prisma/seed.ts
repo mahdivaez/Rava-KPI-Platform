@@ -6,24 +6,29 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
+  // Clear all existing users first
+  await prisma.user.deleteMany({})
+  console.log('🗑️  Cleared all existing users')
+
   const hashedPassword = await bcrypt.hash('Admin@123', 10)
-  
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@kpi.com' },
-    update: {},
-    create: {
+
+  const admin = await prisma.user.create({
+    data: {
       email: 'admin@kpi.com',
       password: hashedPassword,
-      firstName: 'مدیر',
+      firstName: 'مدیر ارشد',
       lastName: 'سیستم',
       isAdmin: true,
+      isTechnicalDeputy: true,
       isActive: true,
+      totalPoints: 0,
     },
   })
 
-  console.log('✅ Admin user created')
+  console.log('✅ High-level admin user created')
   console.log('📧 Email: admin@kpi.com')
   console.log('🔑 Password: Admin@123')
+  console.log('👑 Role: Administrator + Technical Deputy')
 }
 
 main()
