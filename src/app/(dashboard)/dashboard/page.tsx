@@ -255,7 +255,7 @@ export default async function DashboardPage() {
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
                 </div>
                 <p className="font-semibold text-sm sm:text-base text-nude-900">ارسال بازخورد</p>
-                <p className="text-xs text-nude-600 mt-1">به نویسندگان</p>
+                <p className="text-xs text-nude-600 mt-1">به استراتژیست‌ها</p>
               </Link>
             )}
           </div>

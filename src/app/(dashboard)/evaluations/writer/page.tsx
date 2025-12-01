@@ -32,13 +32,13 @@ export default async function WriterEvaluationPage() {
     },
   })
 
-  if (strategistMemberships.length === 0 && !session?.user?.isAdmin) {
+  if (strategistMemberships.length === 0 && !session?.user?.isAdmin && !session?.user?.isTechnicalDeputy) {
     redirect('/dashboard')
   }
 
   // Get all writer evaluations for workgroups where user is strategist
   const evaluations = await prisma.writerEvaluation.findMany({
-    where: session?.user?.isAdmin
+    where: session?.user?.isAdmin && !session?.user?.isTechnicalDeputy
       ? {}
       : {
           strategistId: session?.user?.id,

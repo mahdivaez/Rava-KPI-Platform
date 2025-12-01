@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -88,8 +88,10 @@ export function MessagesInterface({ currentUserId, conversations, allUsers }: Me
     }
   }
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault()
+    }
     if (!newMessage.trim() || !selectedUser) return
 
     setIsSending(true)
@@ -113,6 +115,11 @@ export function MessagesInterface({ currentUserId, conversations, allUsers }: Me
     } finally {
       setIsSending(false)
     }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter creates new line (default behavior)
+    // No special handling needed - let the default textarea behavior work
   }
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -250,18 +257,22 @@ export function MessagesInterface({ currentUserId, conversations, allUsers }: Me
 
             {/* Message Input */}
             <form onSubmit={handleSend} className="p-4 border-t border-nude-200">
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="پیام خود را بنویسید..."
-                  className="bg-nude-50 border-nude-200"
-                  disabled={isSending}
-                />
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <Textarea
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="پیام خود را بنویسید... (Enter برای خط جدید، روی ارسال کلیک کنید)"
+                    className="bg-nude-50 border-nude-200 resize-none min-h-[60px] max-h-[120px]"
+                    disabled={isSending}
+                    rows={1}
+                  />
+                </div>
                 <Button
                   type="submit"
                   disabled={isSending || !newMessage.trim()}
-                  className="bg-nude-500 hover:bg-nude-600 text-white"
+                  className="bg-nude-500 hover:bg-nude-600 text-white h-[60px] px-4"
                 >
                   {isSending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

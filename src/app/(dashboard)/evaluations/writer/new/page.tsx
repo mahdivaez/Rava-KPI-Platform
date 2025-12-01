@@ -28,7 +28,7 @@ export default async function NewWriterEvaluationPage() {
     },
   })
 
-  if (strategistMemberships.length === 0 && !session?.user?.isAdmin) {
+  if (strategistMemberships.length === 0 && !session?.user?.isAdmin && !session?.user?.isTechnicalDeputy) {
     redirect('/dashboard')
   }
 

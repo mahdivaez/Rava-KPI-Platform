@@ -51,12 +51,13 @@ export function CreateFeedbackDialog({
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
   ]
 
-  // Available months based on selected year
+  // Available months based on selected year (only current month and year allowed)
   const getAvailableMonths = (selectedYear: number) => {
-    if (selectedYear < currentPersianYear) {
-      return persianMonths.map((name, i) => ({ name, value: i + 1 }))
-    } else if (selectedYear === currentPersianYear) {
-      return persianMonths.slice(0, effectiveCurrentMonth).map((name, i) => ({ name, value: i + 1 }))
+    if (selectedYear === currentPersianYear) {
+      return [{
+        name: persianMonths[effectiveCurrentMonth - 1],
+        value: effectiveCurrentMonth
+      }]
     }
     return []
   }
@@ -167,7 +168,7 @@ export function CreateFeedbackDialog({
             <div className="space-y-2">
               <Label htmlFor="month">ماه</Label>
               <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -185,9 +186,9 @@ export function CreateFeedbackDialog({
                 id="year"
                 name="year"
                 type="number"
-                min="1400"
-                max="1410"
-                defaultValue={currentPersianYear}
+                value={currentPersianYear}
+                readOnly
+                className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50 text-nude-700 font-bold"
                 required
               />
             </div>
