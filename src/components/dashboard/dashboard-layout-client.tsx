@@ -23,8 +23,10 @@ export default function DashboardLayoutClient({
       <SidebarContent session={session} memberships={memberships} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden w-full lg:w-auto">
         <NavbarContent session={session} onMenuClick={() => setSidebarOpen(true)} signOutAction={handleSignOut} />
-        <main className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-4 lg:p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

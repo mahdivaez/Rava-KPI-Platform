@@ -16,37 +16,40 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#d4c5b9]/40 to-[#9b8b7e]/40 z-10" />
         </div>
         
-        {/* Minimal Logo */}
+        {/* Logo */}
         <div className="relative z-20 p-8 sm:p-12">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <svg className="w-6 h-6 text-[#9b8b7e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+              <svg className="w-7 h-7 text-[#9b8b7e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <span className="text-white font-semibold text-lg">سیستم KPI</span>
+            <div>
+              <span className="text-white font-bold text-xl">سیستم KPI</span>
+              <p className="text-white/80 text-sm font-medium">مدیریت عملکرد هوشمند</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#f5f1eb]">
-        <div className="w-full max-w-md">
-          {/* Logo for Mobile - Shows only on small screens */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-[#f5f1eb]">
+        <div className="w-full max-w-md mx-auto">
+          {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-white shadow-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-[#9b8b7e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <span className="text-[#6b5d54] font-semibold text-lg">سیستم KPI</span>
+              <span className="text-[#6b5d54] font-bold text-lg">سیستم KPI</span>
             </div>
           </div>
 
-          {/* Close button - top right - Hidden on mobile */}
-          <div className="hidden lg:flex justify-end mb-8">
-            <button className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors shadow-sm">
+          {/* Desktop Close Button */}
+          <div className="hidden lg:flex justify-end mb-6">
+            <button className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors shadow-md">
               <svg className="w-5 h-5 text-[#6b5d54]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -54,12 +57,12 @@ export default function LoginPage() {
           </div>
 
           {/* Header */}
-          <div className="mb-6 sm:mb-8 lg:mb-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#3d3530] mb-2">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#3d3530] mb-3 leading-tight">
               خوش آمدید
             </h1>
-            <p className="text-[#8a7a6f] text-base sm:text-lg">
-              برای ادامه وارد شوید
+            <p className="text-[#8a7a6f] text-base font-medium">
+              برای ادامه وارد حساب کاربری خود شوید
             </p>
           </div>
 
