@@ -2,6 +2,7 @@
 
 import { WriterEvaluation, User, Workgroup } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -31,18 +32,70 @@ export function WriterEvaluationsTable({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>نویسنده</TableHead>
-          <TableHead>کارگروه</TableHead>
-          <TableHead>دوره</TableHead>
-          <TableHead>استراتژیست</TableHead>
-          <TableHead className="text-center">میانگین امتیاز</TableHead>
-          <TableHead className="text-center">وضعیت</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-right">نویسنده</TableHead>
+              <TableHead className="text-right">کارگروه</TableHead>
+              <TableHead className="text-right">دوره</TableHead>
+              <TableHead className="text-right">استراتژیست</TableHead>
+              <TableHead className="text-center">میانگین امتیاز</TableHead>
+              <TableHead className="text-center">وضعیت</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {evaluations.map((evaluation) => {
+              const avgScore = Math.round(
+                (evaluation.responsibility +
+                  evaluation.strategistSatisfaction +
+                  evaluation.meetingEngagement +
+                  evaluation.scenarioPerformance +
+                  evaluation.clientSatisfaction +
+                  evaluation.brandAlignment) / 6
+              )
+
+              return (
+                <TableRow key={evaluation.id}>
+                  <TableCell className="font-medium text-sm">
+                    {evaluation.writer.firstName} {evaluation.writer.lastName}
+                  </TableCell>
+                  <TableCell className="text-slate-600 text-sm">
+                    {evaluation.workgroup.name}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {evaluation.month}/{evaluation.year}
+                  </TableCell>
+                  <TableCell className="text-slate-600 text-sm">
+                    {evaluation.strategist.firstName} {evaluation.strategist.lastName}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge
+                      variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
+                      className="text-xs"
+                    >
+                      {avgScore}/10
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge
+                      variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
+                      className={evaluation.status === "COMPLETED" ? "bg-green-500 text-xs" : "text-xs"}
+                    >
+                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
         {evaluations.map((evaluation) => {
           const avgScore = Math.round(
             (evaluation.responsibility +
@@ -54,43 +107,46 @@ export function WriterEvaluationsTable({
           )
 
           return (
-            <TableRow key={evaluation.id}>
-              <TableCell className="font-medium">
-                {evaluation.writer.firstName} {evaluation.writer.lastName}
-              </TableCell>
-              <TableCell className="text-slate-600">
-                {evaluation.workgroup.name}
-              </TableCell>
-              <TableCell>
-                {evaluation.month}/{evaluation.year}
-              </TableCell>
-              <TableCell className="text-slate-600">
-                {evaluation.strategist.firstName} {evaluation.strategist.lastName}
-              </TableCell>
-              <TableCell>
-                <div className="flex justify-center">
-                  <Badge
-                    variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                  >
-                    {avgScore}/10
-                  </Badge>
+            <Card key={evaluation.id} className="border border-slate-200">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-slate-900">
+                      {evaluation.writer.firstName} {evaluation.writer.lastName}
+                    </h3>
+                    <p className="text-xs text-slate-600 mt-1">
+                      کارگروه: {evaluation.workgroup.name}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      استراتژیست: {evaluation.strategist.firstName} {evaluation.strategist.lastName}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      دوره: {evaluation.month}/{evaluation.year}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end space-y-2">
+                    <Badge
+                      variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
+                      className="text-xs"
+                    >
+                      {avgScore}/10
+                    </Badge>
+                    <Badge
+                      variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
+                      className={`text-xs ${
+                        evaluation.status === "COMPLETED" ? "bg-green-500" : ""
+                      }`}
+                    >
+                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
+                    </Badge>
+                  </div>
                 </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex justify-center">
-                  <Badge
-                    variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
-                    className={evaluation.status === "COMPLETED" ? "bg-green-500" : ""}
-                  >
-                    {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                  </Badge>
-                </div>
-              </TableCell>
-            </TableRow>
+              </CardContent>
+            </Card>
           )
         })}
-      </TableBody>
-    </Table>
+      </div>
+    </>
   )
 }
 

@@ -66,10 +66,10 @@ export function EditUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-[95vw] sm:max-w-md mx-2 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle>ویرایش کاربر</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base sm:text-lg">ویرایش کاربر</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             اطلاعات کاربر را ویرایش کنید
           </DialogDescription>
         </DialogHeader>
@@ -78,7 +78,7 @@ export function EditUserDialog({
             <Label htmlFor="email">ایمیل</Label>
             <Input id="email" name="email" type="email" defaultValue={user.email} required />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">نام</Label>
               <Input id="firstName" name="firstName" defaultValue={user.firstName} required />

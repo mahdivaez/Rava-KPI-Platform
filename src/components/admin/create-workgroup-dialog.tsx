@@ -57,15 +57,15 @@ export function CreateWorkgroupDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <Plus className="h-4 w-4 ml-2" />
-          کارگروه جدید
+          <span className="text-xs sm:text-sm">کارگروه جدید</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-[95vw] sm:max-w-md mx-2 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle>ایجاد کارگروه جدید</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base sm:text-lg">ایجاد کارگروه جدید</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             اطلاعات کارگروه جدید را وارد کنید
           </DialogDescription>
         </DialogHeader>

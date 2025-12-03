@@ -194,40 +194,41 @@ export function WriterEvaluationForm({
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6">
       {/* Breadcrumb */}
-      <div className="mb-6 flex items-center gap-2 text-sm text-nude-600">
-        <Link href="/dashboard" className="hover:text-nude-900 transition-colors">
+      <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-nude-600">
+        <Link href="/dashboard" className="hover:text-nude-900 transition-colors truncate">
           داشبورد
         </Link>
-        <ChevronRight className="w-4 h-4" />
-        <Link href="/evaluations/writer" className="hover:text-nude-900 transition-colors">
+        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+        <Link href="/evaluations/writer" className="hover:text-nude-900 transition-colors truncate">
           ارزیابی نویسنده‌ها
         </Link>
-        <ChevronRight className="w-4 h-4" />
-        <span className="text-nude-900 font-semibold">ارزیابی جدید</span>
+        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+        <span className="text-nude-900 font-semibold truncate">ارزیابی جدید</span>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Page Header */}
         <Card className="border-2 border-nude-200 shadow-xl bg-white">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/30">
-                  <FileText className="w-8 h-8 text-white" />
+          <CardContent className="p-4 sm:p-6 lg:p-8">
+            {/* Mobile-first header layout */}
+            <div className="flex flex-col space-y-4 mb-6 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/30">
+                  <FileText className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-nude-900">ارزیابی عملکرد تیم نویسندگان</h1>
-                  <p className="text-nude-600 text-base mt-1">فرم ارزیابی ماهانه عملکرد و شاخص‌های کلیدی</p>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 leading-tight">ارزیابی عملکرد تیم نویسندگان</h1>
+                  <p className="text-nude-600 text-xs sm:text-sm lg:text-base mt-1">فرم ارزیابی ماهانه عملکرد و شاخص‌های کلیدی</p>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <Link href="/evaluations/writer">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <Link href="/evaluations/writer" className="order-2 sm:order-1">
                   <Button 
                     type="button" 
                     variant="outline"
-                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-6"
+                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-4 sm:px-6 w-full sm:w-auto text-sm"
                   >
                     <X className="w-4 h-4 ml-2" />
                     انصراف
@@ -236,7 +237,7 @@ export function WriterEvaluationForm({
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-8 shadow-lg shadow-nude-500/30"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-8 w-full sm:w-auto shadow-lg shadow-nude-500/30 text-sm"
                 >
                   <Save className="w-4 h-4 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
@@ -244,10 +245,11 @@ export function WriterEvaluationForm({
               </div>
             </div>
 
-            {/* Metadata Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 p-6 bg-gradient-to-br from-nude-50 to-nude-100/50 rounded-xl border border-nude-200">
+            {/* Metadata Section - Mobile-first responsive grid for 5 items */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 bg-gradient-to-br from-nude-50 to-nude-100/50 rounded-xl border border-nude-200">
+              {/* Workgroup Selection */}
               <div className="space-y-2">
-                <Label htmlFor="workgroupId" className="text-nude-900 font-bold text-sm flex items-center gap-2">
+                <Label htmlFor="workgroupId" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   کارگروه:
                 </Label>
@@ -257,7 +259,7 @@ export function WriterEvaluationForm({
                   onValueChange={setSelectedWorkgroup}
                   required
                 >
-                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
+                  <SelectTrigger className="h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white">
                     <SelectValue placeholder="انتخاب کنید" />
                   </SelectTrigger>
                   <SelectContent>
@@ -270,8 +272,9 @@ export function WriterEvaluationForm({
                 </Select>
               </div>
 
+              {/* Writer Selection */}
               <div className="space-y-2">
-                <Label htmlFor="writerId" className="text-nude-900 font-bold text-sm flex items-center gap-2">
+                <Label htmlFor="writerId" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   نام نویسنده:
                 </Label>
@@ -280,7 +283,7 @@ export function WriterEvaluationForm({
                     name="writerId"
                     required
                     disabled={!selectedWorkgroup}
-                    className="w-full h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white rounded-md px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white rounded-md px-3 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ appearance: 'none' }}
                   >
                     <option value="">
@@ -295,12 +298,12 @@ export function WriterEvaluationForm({
                   {selectedWorkgroup && writers.length > 5 && (
                     <div className="mt-2">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-nude-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-nude-400" />
                         <Input
                           placeholder="جستجوی نویسنده..."
                           value={writerSearch}
                           onChange={(e) => setWriterSearch(e.target.value)}
-                          className="pl-9 h-9 border-nude-300 focus:border-nude-500"
+                          className="pl-8 sm:pl-9 h-8 sm:h-9 border-nude-300 focus:border-nude-500 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
@@ -308,13 +311,14 @@ export function WriterEvaluationForm({
                 </div>
               </div>
 
+              {/* Month Selection */}
               <div className="space-y-2">
-                <Label htmlFor="month" className="text-nude-900 font-bold text-sm flex items-center gap-2">
+                <Label htmlFor="month" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   ماه:
                 </Label>
                 <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
-                  <SelectTrigger className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50">
+                  <SelectTrigger className="h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -327,8 +331,9 @@ export function WriterEvaluationForm({
                 </Select>
               </div>
 
+              {/* Year Input */}
               <div className="space-y-2">
-                <Label htmlFor="year" className="text-nude-900 font-bold text-sm flex items-center gap-2">
+                <Label htmlFor="year" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   سال:
                 </Label>
@@ -338,17 +343,18 @@ export function WriterEvaluationForm({
                   type="number"
                   value={currentPersianYear}
                   readOnly
-                  className="h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50 text-nude-700 font-bold"
+                  className="h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50 text-nude-700 font-bold text-xs sm:text-sm"
                   required
                 />
               </div>
 
+              {/* Evaluation Period */}
               <div className="space-y-2">
-                <Label className="text-nude-900 font-bold text-sm flex items-center gap-2">
+                <Label className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-nude-500"></span>
                   بازهٔ زمانی ارزیابی:
                 </Label>
-                <div className="h-12 flex items-center px-4 bg-nude-100 border-2 border-nude-200 rounded-lg text-sm text-nude-700 font-bold">
+                <div className="h-10 sm:h-12 flex items-center px-3 sm:px-4 bg-nude-100 border-2 border-nude-200 rounded-lg text-xs sm:text-sm text-nude-700 font-bold">
                   ماهانه
                 </div>
               </div>
@@ -358,20 +364,21 @@ export function WriterEvaluationForm({
 
         {/* Evaluation Table */}
         <Card className="border-2 border-nude-200 shadow-xl overflow-hidden bg-white">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gradient-to-l from-nude-500 to-nude-600">
-                  <th className="text-right p-5 text-white font-bold border-l border-nude-400 text-base w-[22%]">
+                  <th className="text-right p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[22%]">
                     شاخص ارزیابی
                   </th>
-                  <th className="text-right p-5 text-white font-bold border-l border-nude-400 text-base w-[38%]">
+                  <th className="text-right p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[38%]">
                     توضیح
                   </th>
-                  <th className="text-center p-5 text-white font-bold border-l border-nude-400 text-base w-[15%]">
+                  <th className="text-center p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[15%]">
                     امتیاز از 1 تا 5
                   </th>
-                  <th className="text-right p-5 text-white font-bold text-base w-[25%]">
+                  <th className="text-right p-3 lg:p-5 text-white font-bold text-sm lg:text-base w-[25%]">
                     یادداشت ارزیاب
                   </th>
                 </tr>
@@ -384,34 +391,34 @@ export function WriterEvaluationForm({
                       index % 2 === 0 ? 'bg-nude-50/50' : 'bg-white'
                     } hover:bg-nude-100/50 transition-all duration-200`}
                   >
-                    <td className="p-5 border-l border-t border-nude-200">
-                      <span className="font-bold text-nude-900 text-base leading-relaxed block">
+                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
+                      <span className="font-bold text-nude-900 text-sm lg:text-base leading-relaxed block">
                         {metric.title}
                       </span>
                     </td>
-                    <td className="p-5 border-l border-t border-nude-200">
-                      <span className="text-nude-700 text-sm leading-relaxed block">
+                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
+                      <span className="text-nude-700 text-xs lg:text-sm leading-relaxed block">
                         {metric.description}
                       </span>
                     </td>
-                    <td className="p-5 border-l border-t border-nude-200">
+                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
                       <Input
                         type="number"
                         min="1"
                         max="5"
                         value={scores[metric.key] || ''}
                         onChange={(e) => handleScoreChange(metric.key, e.target.value)}
-                        className="w-24 mx-auto text-center font-bold text-xl h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
+                        className="w-20 lg:w-24 mx-auto text-center font-bold text-lg lg:text-xl h-12 lg:h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
                         placeholder="1-5"
                         required
                       />
                     </td>
-                    <td className="p-5 border-t border-nude-200">
+                    <td className="p-3 lg:p-5 border-t border-nude-200">
                       <Input
                         type="text"
                         value={notes[metric.key] || ''}
                         onChange={(e) => handleNoteChange(metric.key, e.target.value)}
-                        className="w-full border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 text-sm h-12"
+                        className="w-full border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 text-xs lg:text-sm h-10 lg:h-12"
                         placeholder="یادداشت (اختیاری)"
                       />
                     </td>
@@ -420,48 +427,93 @@ export function WriterEvaluationForm({
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden p-4 space-y-4">
+            {WRITER_METRICS.map((metric, index) => (
+              <Card key={metric.key} className="border border-nude-200">
+                <CardContent className="p-4 space-y-4">
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-nude-900 text-sm leading-tight">{metric.title}</h3>
+                    <p className="text-nude-700 text-xs leading-relaxed">{metric.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <Label className="text-nude-900 font-bold text-xs mb-2 block">
+                        امتیاز از 1 تا 5:
+                      </Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="5"
+                        value={scores[metric.key] || ''}
+                        onChange={(e) => handleScoreChange(metric.key, e.target.value)}
+                        className="w-20 text-center font-bold text-lg h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
+                        placeholder="1-5"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-nude-900 font-bold text-xs mb-2 block">
+                        یادداشت ارزیاب:
+                      </Label>
+                      <Input
+                        type="text"
+                        value={notes[metric.key] || ''}
+                        onChange={(e) => handleNoteChange(metric.key, e.target.value)}
+                        className="w-full border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 text-sm h-12"
+                        placeholder="یادداشت (اختیاری)"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </Card>
 
         {/* Score Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-nude-50 shadow-lg">
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-nude-700 font-bold text-base mb-2">امتیاز کل نویسنده:</p>
-                  <p className="text-5xl font-bold text-nude-900 mb-2">
+                <div className="flex-1">
+                  <p className="text-nude-700 font-bold text-sm sm:text-base mb-2">امتیاز کل نویسنده:</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-nude-900 mb-2">
                     {totalScore}
                   </p>
-                  <p className="text-nude-600 font-semibold">از {maxTotalScore} امتیاز</p>
-                  <div className="mt-4 w-full bg-nude-200 rounded-full h-3 overflow-hidden">
+                  <p className="text-nude-600 font-semibold text-xs sm:text-sm">از {maxTotalScore} امتیاز</p>
+                  <div className="mt-3 sm:mt-4 w-full bg-nude-200 rounded-full h-2 sm:h-3 overflow-hidden">
                     <div 
                       className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${scorePercentage}%` }}
                     ></div>
                   </div>
                 </div>
-                <Calculator className="w-16 h-16 text-nude-500" />
+                <Calculator className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-nude-500 ml-3 sm:ml-4 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-green-50 shadow-lg">
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-nude-700 font-bold text-base mb-2">میانگین نهایی:</p>
-                  <p className="text-5xl font-bold text-nude-900 mb-2">
+                <div className="flex-1">
+                  <p className="text-nude-700 font-bold text-sm sm:text-base mb-2">میانگین نهایی:</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-nude-900 mb-2">
                     {averageScore}
                   </p>
-                  <p className="text-nude-600 font-semibold">از 5 امتیاز</p>
-                  <div className="mt-4 w-full bg-green-200 rounded-full h-3 overflow-hidden">
+                  <p className="text-nude-600 font-semibold text-xs sm:text-sm">از 5 امتیاز</p>
+                  <div className="mt-3 sm:mt-4 w-full bg-green-200 rounded-full h-2 sm:h-3 overflow-hidden">
                     <div 
                       className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${scorePercentage}%` }}
                     ></div>
                   </div>
                 </div>
-                <FileText className="w-16 h-16 text-nude-500" />
+                <FileText className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-nude-500 ml-3 sm:ml-4 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
@@ -469,47 +521,47 @@ export function WriterEvaluationForm({
 
         {/* Additional Notes */}
         <Card className="border-2 border-nude-200 shadow-xl bg-white">
-          <CardContent className="p-8 space-y-6">
-            <h3 className="text-xl font-bold text-nude-900 mb-4">توضیحات تکمیلی</h3>
+          <CardContent className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+            <h3 className="text-lg sm:text-xl font-bold text-nude-900 mb-4">توضیحات تکمیلی</h3>
             
             <div className="space-y-3">
-              <Label htmlFor="strengths" className="text-nude-900 font-bold text-base flex items-center gap-2">
+              <Label htmlFor="strengths" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 نقاط قوت:
               </Label>
               <Textarea 
                 id="strengths" 
                 name="strengths" 
-                rows={4}
-                className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 resize-none text-base"
+                rows={3}
+                className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 resize-none text-sm sm:text-base"
                 placeholder="نقاط قوت نویسنده را به تفصیل شرح دهید..."
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="improvements" className="text-nude-900 font-bold text-base flex items-center gap-2">
+              <Label htmlFor="improvements" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-orange-500"></span>
                 نقاط قابل بهبود:
               </Label>
               <Textarea 
                 id="improvements" 
                 name="improvements" 
-                rows={4}
-                className="border-2 border-nude-300 focus:border-orange-500 focus:ring-orange-500 resize-none text-base"
+                rows={3}
+                className="border-2 border-nude-300 focus:border-orange-500 focus:ring-orange-500 resize-none text-sm sm:text-base"
                 placeholder="نقاط قابل بهبود را با پیشنهادات مشخص ذکر کنید..."
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="suggestions" className="text-nude-900 font-bold text-base flex items-center gap-2">
+              <Label htmlFor="suggestions" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                 پیشنهادات:
               </Label>
               <Textarea 
                 id="suggestions" 
                 name="suggestions" 
-                rows={4}
-                className="border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 resize-none text-base"
+                rows={3}
+                className="border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 resize-none text-sm sm:text-base"
                 placeholder="پیشنهادات خود برای بهبود عملکرد را بنویسید..."
               />
             </div>
@@ -518,28 +570,28 @@ export function WriterEvaluationForm({
 
         {/* Bottom Actions */}
         <Card className="border-2 border-nude-200 shadow-xl bg-gradient-to-r from-nude-50 to-white">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <p className="text-nude-700 text-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+              <p className="text-nude-700 text-xs sm:text-sm order-2 sm:order-1">
                 همه فیلدهای ستاره‌دار (*) الزامی هستند
               </p>
-              <div className="flex gap-4">
-                <Link href="/evaluations/writer">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 order-1 sm:order-2">
+                <Link href="/evaluations/writer" className="order-2 sm:order-1">
                   <Button 
                     type="button" 
                     variant="outline"
-                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-8 h-12"
+                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-6 sm:px-8 w-full sm:w-auto h-10 sm:h-12 text-sm"
                   >
-                    <X className="w-5 h-5 ml-2" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                     انصراف
                   </Button>
                 </Link>
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-10 h-12 shadow-lg shadow-nude-500/30"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-10 h-10 sm:h-12 shadow-lg shadow-nude-500/30 w-full sm:w-auto text-sm"
                 >
-                  <Save className="w-5 h-5 ml-2" />
+                  <Save className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
                 </Button>
               </div>

@@ -126,7 +126,7 @@ export function CreateFeedbackDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="workgroupId">کارگروه</Label>
               <Select
@@ -164,7 +164,7 @@ export function CreateFeedbackDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="month">ماه</Label>
               <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
@@ -194,7 +194,7 @@ export function CreateFeedbackDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="communication">ارتباطات (1-10)</Label>
               <Input

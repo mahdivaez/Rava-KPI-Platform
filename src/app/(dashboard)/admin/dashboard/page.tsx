@@ -174,24 +174,24 @@ export default async function AdminDashboardPage() {
 
       {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="inline-flex w-full min-w-max lg:grid lg:grid-cols-6 h-auto bg-white border-2 border-nude-200 p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-sm">
-            <TabsTrigger value="overview" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+        <div className="w-full overflow-x-auto pb-2 -mx-3 sm:mx-0 px-3 sm:px-0">
+          <TabsList className="inline-flex w-full min-w-max lg:grid lg:grid-cols-6 h-auto bg-white border-2 border-nude-200 p-1 sm:p-1.5 lg:p-2 rounded-lg sm:rounded-xl shadow-sm">
+            <TabsTrigger value="overview" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               📈 نمای کلی
             </TabsTrigger>
-            <TabsTrigger value="performance" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+            <TabsTrigger value="performance" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               🎯 روند عملکرد
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+            <TabsTrigger value="leaderboard" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               🏆 رتبه‌بندی
             </TabsTrigger>
-            <TabsTrigger value="alerts" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+            <TabsTrigger value="alerts" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               ⚠️ هشدارها
             </TabsTrigger>
-            <TabsTrigger value="workgroups" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+            <TabsTrigger value="workgroups" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               👥 کارگروه‌ها
             </TabsTrigger>
-            <TabsTrigger value="activity" className="py-2 px-3 sm:py-3 sm:px-4 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap">
+            <TabsTrigger value="activity" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
               ⚡ فعالیت‌ها
             </TabsTrigger>
           </TabsList>

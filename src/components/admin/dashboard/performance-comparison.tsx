@@ -55,14 +55,14 @@ export function PerformanceComparison({ monthlyData }: PerformanceComparisonProp
   return (
     <Card className="border-nude-200">
       <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
           <div>
-            <CardTitle className="text-nude-900">مقایسه عملکرد ماهانه</CardTitle>
-            <CardDescription className="text-nude-600">روند تغییرات عملکرد در طول زمان</CardDescription>
+            <CardTitle className="text-lg sm:text-xl text-nude-900">مقایسه عملکرد ماهانه</CardTitle>
+            <CardDescription className="text-sm sm:text-base text-nude-600">روند تغییرات عملکرد در طول زمان</CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Select value={metric} onValueChange={(v) => setMetric(v as any)}>
-              <SelectTrigger className="w-[150px] bg-nude-50 border-nude-200">
+              <SelectTrigger className="w-full sm:w-[150px] bg-nude-50 border-nude-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -71,7 +71,7 @@ export function PerformanceComparison({ monthlyData }: PerformanceComparisonProp
               </SelectContent>
             </Select>
             <Select value={chartType} onValueChange={(v) => setChartType(v as any)}>
-              <SelectTrigger className="w-[120px] bg-nude-50 border-nude-200">
+              <SelectTrigger className="w-full sm:w-[120px] bg-nude-50 border-nude-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -84,32 +84,32 @@ export function PerformanceComparison({ monthlyData }: PerformanceComparisonProp
       </CardHeader>
       <CardContent>
         {/* Trend Indicators */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-4 bg-nude-50 rounded-xl border border-nude-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="p-3 sm:p-4 bg-nude-50 rounded-xl border border-nude-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-nude-600">عملکرد استراتژیست‌ها</span>
+              <span className="text-xs sm:text-sm text-nude-600">عملکرد استراتژیست‌ها</span>
               {getTrendIcon(strategistTrend)}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-nude-900">
+              <span className="text-xl sm:text-2xl font-bold text-nude-900">
                 {latestMonth?.strategistAvg.toFixed(2) || '-'}
               </span>
-              <span className={`text-sm font-medium ${getTrendColor(strategistTrend)}`}>
+              <span className={`text-xs sm:text-sm font-medium ${getTrendColor(strategistTrend)}`}>
                 {strategistTrend > 0 && '+'}{strategistTrend.toFixed(1)}%
               </span>
             </div>
           </div>
 
-          <div className="p-4 bg-nude-50 rounded-xl border border-nude-200">
+          <div className="p-3 sm:p-4 bg-nude-50 rounded-xl border border-nude-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-nude-600">عملکرد نویسندگان</span>
+              <span className="text-xs sm:text-sm text-nude-600">عملکرد نویسندگان</span>
               {getTrendIcon(writerTrend)}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-nude-900">
+              <span className="text-xl sm:text-2xl font-bold text-nude-900">
                 {latestMonth?.writerAvg.toFixed(2) || '-'}
               </span>
-              <span className={`text-sm font-medium ${getTrendColor(writerTrend)}`}>
+              <span className={`text-xs sm:text-sm font-medium ${getTrendColor(writerTrend)}`}>
                 {writerTrend > 0 && '+'}{writerTrend.toFixed(1)}%
               </span>
             </div>
@@ -117,7 +117,7 @@ export function PerformanceComparison({ monthlyData }: PerformanceComparisonProp
         </div>
 
         {/* Chart */}
-        <div className="h-[400px]">
+        <div className="h-[300px] sm:h-[350px] lg:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'line' ? (
               <LineChart data={monthlyData}>

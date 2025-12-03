@@ -134,47 +134,47 @@ export function PerformanceInsights({ strategistEvaluations, writerEvaluations }
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
       {/* Strategist Performance */}
       <Card className="border-2 border-teal-200 bg-gradient-to-br from-white to-teal-50 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-teal-900 text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="w-6 h-6" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-teal-900 text-lg sm:text-xl font-bold flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
             عملکرد استراتژیست‌ها
           </CardTitle>
-          <CardDescription className="text-teal-600">تحلیل روند و رشد ماهانه</CardDescription>
+          <CardDescription className="text-teal-600 text-xs sm:text-sm">تحلیل روند و رشد ماهانه</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           {/* Current vs Previous Month */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-teal-200">
-            <div>
-              <p className="text-sm text-slate-600 mb-1">میانگین این ماه</p>
-              <p className="text-3xl font-bold text-teal-900">{currentStrategistAvg.toFixed(2)}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl border border-teal-200">
+            <div className="text-center sm:text-right">
+              <p className="text-xs sm:text-sm text-slate-600 mb-1">میانگین این ماه</p>
+              <p className="text-2xl sm:text-3xl font-bold text-teal-900">{currentStrategistAvg.toFixed(2)}</p>
             </div>
             <div className="text-center">
               {parseFloat(strategistGrowth) > 0 ? (
                 <div className="flex flex-col items-center gap-1">
-                  <TrendingUp className="w-8 h-8 text-green-600" />
-                  <span className="text-2xl font-bold text-green-600">+{strategistGrowth}%</span>
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-green-600">+{strategistGrowth}%</span>
                   <span className="text-xs text-slate-600">رشد</span>
                 </div>
               ) : parseFloat(strategistGrowth) < 0 ? (
                 <div className="flex flex-col items-center gap-1">
-                  <TrendingDown className="w-8 h-8 text-red-600" />
-                  <span className="text-2xl font-bold text-red-600">{strategistGrowth}%</span>
+                  <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-red-600">{strategistGrowth}%</span>
                   <span className="text-xs text-slate-600">کاهش</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-1">
-                  <Minus className="w-8 h-8 text-amber-600" />
-                  <span className="text-2xl font-bold text-amber-600">{strategistGrowth}%</span>
+                  <Minus className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-amber-600">{strategistGrowth}%</span>
                   <span className="text-xs text-slate-600">ثابت</span>
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-600 mb-1">میانگین ماه قبل</p>
-              <p className="text-2xl font-bold text-slate-700">{previousStrategistAvg.toFixed(2)}</p>
+            <div className="text-center sm:text-right">
+              <p className="text-xs sm:text-sm text-slate-600 mb-1">میانگین ماه قبل</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-700">{previousStrategistAvg.toFixed(2)}</p>
             </div>
           </div>
 
@@ -188,14 +188,14 @@ export function PerformanceInsights({ strategistEvaluations, writerEvaluations }
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-teal-50 rounded-lg border border-teal-200">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="p-2 sm:p-3 bg-teal-50 rounded-lg border border-teal-200">
               <p className="text-xs text-teal-600 mb-1">ارزیابی‌های این ماه</p>
-              <p className="text-xl font-bold text-teal-900">{currentMonthStrategist.length}</p>
+              <p className="text-lg sm:text-xl font-bold text-teal-900">{currentMonthStrategist.length}</p>
             </div>
-            <div className="p-3 bg-teal-50 rounded-lg border border-teal-200">
+            <div className="p-2 sm:p-3 bg-teal-50 rounded-lg border border-teal-200">
               <p className="text-xs text-teal-600 mb-1">ارزیابی‌های ماه قبل</p>
-              <p className="text-xl font-bold text-teal-900">{previousMonthStrategist.length}</p>
+              <p className="text-lg sm:text-xl font-bold text-teal-900">{previousMonthStrategist.length}</p>
             </div>
           </div>
         </CardContent>
@@ -203,44 +203,44 @@ export function PerformanceInsights({ strategistEvaluations, writerEvaluations }
 
       {/* Writer Performance */}
       <Card className="border-2 border-purple-200 bg-gradient-to-br from-white to-purple-50 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-purple-900 text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="w-6 h-6" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-purple-900 text-base sm:text-lg lg:text-xl font-bold flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
             عملکرد نویسندگان
           </CardTitle>
-          <CardDescription className="text-purple-600">تحلیل روند و رشد ماهانه</CardDescription>
+          <CardDescription className="text-purple-600 text-xs sm:text-sm">تحلیل روند و رشد ماهانه</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           {/* Current vs Previous Month */}
-          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-purple-200">
-            <div>
-              <p className="text-sm text-slate-600 mb-1">میانگین این ماه</p>
-              <p className="text-3xl font-bold text-purple-900">{currentWriterAvg.toFixed(2)}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl border border-purple-200">
+            <div className="text-center sm:text-right">
+              <p className="text-xs sm:text-sm text-slate-600 mb-1">میانگین این ماه</p>
+              <p className="text-2xl sm:text-3xl font-bold text-purple-900">{currentWriterAvg.toFixed(2)}</p>
             </div>
             <div className="text-center">
               {parseFloat(writerGrowth) > 0 ? (
                 <div className="flex flex-col items-center gap-1">
-                  <TrendingUp className="w-8 h-8 text-green-600" />
-                  <span className="text-2xl font-bold text-green-600">+{writerGrowth}%</span>
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-green-600">+{writerGrowth}%</span>
                   <span className="text-xs text-slate-600">رشد</span>
                 </div>
               ) : parseFloat(writerGrowth) < 0 ? (
                 <div className="flex flex-col items-center gap-1">
-                  <TrendingDown className="w-8 h-8 text-red-600" />
-                  <span className="text-2xl font-bold text-red-600">{writerGrowth}%</span>
+                  <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-red-600">{writerGrowth}%</span>
                   <span className="text-xs text-slate-600">کاهش</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-1">
-                  <Minus className="w-8 h-8 text-amber-600" />
-                  <span className="text-2xl font-bold text-amber-600">{writerGrowth}%</span>
+                  <Minus className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                  <span className="text-xl sm:text-2xl font-bold text-amber-600">{writerGrowth}%</span>
                   <span className="text-xs text-slate-600">ثابت</span>
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-600 mb-1">میانگین ماه قبل</p>
-              <p className="text-2xl font-bold text-slate-700">{previousWriterAvg.toFixed(2)}</p>
+            <div className="text-center sm:text-right">
+              <p className="text-xs sm:text-sm text-slate-600 mb-1">میانگین ماه قبل</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-700">{previousWriterAvg.toFixed(2)}</p>
             </div>
           </div>
 
@@ -254,14 +254,14 @@ export function PerformanceInsights({ strategistEvaluations, writerEvaluations }
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="p-2 sm:p-3 bg-purple-50 rounded-lg border border-purple-200">
               <p className="text-xs text-purple-600 mb-1">ارزیابی‌های این ماه</p>
-              <p className="text-xl font-bold text-purple-900">{currentMonthWriter.length}</p>
+              <p className="text-lg sm:text-xl font-bold text-purple-900">{currentMonthWriter.length}</p>
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="p-2 sm:p-3 bg-purple-50 rounded-lg border border-purple-200">
               <p className="text-xs text-purple-600 mb-1">ارزیابی‌های ماه قبل</p>
-              <p className="text-xl font-bold text-purple-900">{previousMonthWriter.length}</p>
+              <p className="text-lg sm:text-xl font-bold text-purple-900">{previousMonthWriter.length}</p>
             </div>
           </div>
         </CardContent>

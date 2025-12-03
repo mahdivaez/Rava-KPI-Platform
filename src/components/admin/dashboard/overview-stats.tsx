@@ -54,21 +54,21 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Users Card */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">کاربران سیستم</CardTitle>
-          <Users className="h-4 w-4 text-slate-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">کاربران سیستم</CardTitle>
+          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{stats.totalUsers}</div>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
-              <UserCheck className="h-3 w-3 mr-1" />
+        <CardContent className="p-3 sm:p-4">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.totalUsers}</div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mt-2">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200 text-xs">
+              <UserCheck className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               {stats.activeUsers} فعال
             </Badge>
-            <Badge variant="outline" className="bg-slate-50 text-slate-600">
+            <Badge variant="outline" className="bg-slate-50 text-slate-600 text-xs">
               {stats.inactiveUsers} غیرفعال
             </Badge>
           </div>
@@ -81,16 +81,16 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       {/* Workgroups Card */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">کارگروه‌ها</CardTitle>
-          <Briefcase className="h-4 w-4 text-slate-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">کارگروه‌ها</CardTitle>
+          <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{stats.totalWorkgroups}</div>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
+        <CardContent className="p-3 sm:p-4">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.totalWorkgroups}</div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mt-2">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200 text-xs">
               {stats.activeWorkgroups} فعال
             </Badge>
-            <Badge variant="outline" className="bg-slate-50 text-slate-600">
+            <Badge variant="outline" className="bg-slate-50 text-slate-600 text-xs">
               {stats.inactiveWorkgroups} غیرفعال
             </Badge>
           </div>
@@ -103,18 +103,18 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       {/* Evaluations Card */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">ارزیابی‌ها</CardTitle>
-          <ClipboardList className="h-4 w-4 text-slate-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">ارزیابی‌ها</CardTitle>
+          <ClipboardList className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{stats.totalEvaluations}</div>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
+        <CardContent className="p-3 sm:p-4">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.totalEvaluations}</div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mt-2">
+            <Badge variant="outline" className="bg-nude-50 text-nude-700 border-green-200 text-xs">
+              <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               {stats.completedEvaluations}
             </Badge>
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-              <Clock className="h-3 w-3 mr-1" />
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-xs">
+              <Clock className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               {stats.pendingEvaluations}
             </Badge>
           </div>
@@ -127,13 +127,13 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       {/* Feedbacks Card */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">بازخوردها</CardTitle>
-          <MessageSquare className="h-4 w-4 text-slate-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">بازخوردها</CardTitle>
+          <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{stats.totalFeedbacks}</div>
+        <CardContent className="p-3 sm:p-4">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.totalFeedbacks}</div>
           <div className={`mt-2 px-2 py-1 rounded-md inline-block ${getScoreColor(stats.avgFeedbackScore)}`}>
-            <span className="text-sm font-medium">
+            <span className="text-xs sm:text-sm font-medium">
               میانگین: {stats.avgFeedbackScore}/10
             </span>
           </div>
@@ -146,20 +146,20 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
       {/* Average Scores Row */}
       <Card className="hover:shadow-lg transition-shadow md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">میانگین امتیاز استراتژیست‌ها</CardTitle>
-          <Award className="h-4 w-4 text-nude-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">میانگین امتیاز استراتژیست‌ها</CardTitle>
+          <Award className="h-3 w-3 sm:h-4 sm:w-4 text-nude-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{stats.avgStrategistScore}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{stats.avgStrategistScore}</div>
               <p className="text-xs text-slate-500 mt-1">از 10</p>
             </div>
-            <div className={`px-4 py-2 rounded-lg ${getScoreColor(stats.avgStrategistScore)}`}>
-              <TrendingUp className="h-8 w-8" />
+            <div className={`p-2 sm:px-4 sm:py-2 rounded-lg ${getScoreColor(stats.avgStrategistScore)}`}>
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8" />
             </div>
           </div>
-          <div className="mt-3 space-y-1">
+          <div className="mt-2 sm:mt-3 space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-slate-600">ایده‌پردازی، کیفیت، روابط و پاسخگویی</span>
             </div>
@@ -169,20 +169,20 @@ export function OverviewStats({ stats }: OverviewStatsProps) {
 
       <Card className="hover:shadow-lg transition-shadow md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">میانگین امتیاز نویسندگان</CardTitle>
-          <Target className="h-4 w-4 text-nude-600" />
+          <CardTitle className="text-xs sm:text-sm font-medium">میانگین امتیاز نویسندگان</CardTitle>
+          <Target className="h-3 w-3 sm:h-4 sm:w-4 text-nude-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{stats.avgWriterScore}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{stats.avgWriterScore}</div>
               <p className="text-xs text-slate-500 mt-1">از 10</p>
             </div>
-            <div className={`px-4 py-2 rounded-lg ${getScoreColor(stats.avgWriterScore)}`}>
-              <TrendingUp className="h-8 w-8" />
+            <div className={`p-2 sm:px-4 sm:py-2 rounded-lg ${getScoreColor(stats.avgWriterScore)}`}>
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8" />
             </div>
           </div>
-          <div className="mt-3 space-y-1">
+          <div className="mt-2 sm:mt-3 space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-slate-600">مسئولیت‌پذیری، مشارکت، عملکرد و هماهنگی</span>
             </div>

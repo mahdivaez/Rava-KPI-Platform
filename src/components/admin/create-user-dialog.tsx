@@ -59,15 +59,15 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <Plus className="h-4 w-4 ml-2" />
-          کاربر جدید
+          <span className="text-xs sm:text-sm">کاربر جدید</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-[95vw] sm:max-w-md mx-2 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle>ایجاد کاربر جدید</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base sm:text-lg">ایجاد کاربر جدید</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             اطلاعات کاربر جدید را وارد کنید
           </DialogDescription>
         </DialogHeader>
@@ -76,7 +76,7 @@ export function CreateUserDialog() {
             <Label htmlFor="email">ایمیل</Label>
             <Input id="email" name="email" type="email" required />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">نام</Label>
               <Input id="firstName" name="firstName" required />

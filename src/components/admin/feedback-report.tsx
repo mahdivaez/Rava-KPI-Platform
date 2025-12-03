@@ -49,43 +49,43 @@ export function FeedbackReport({
         return (
           <Card key={feedback.id} className="overflow-hidden">
             <CardHeader 
-              className="cursor-pointer hover:bg-slate-50 transition-colors"
+              className="cursor-pointer hover:bg-slate-50 transition-colors p-4 sm:p-6"
               onClick={() => toggleExpand(feedback.id)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base sm:text-lg truncate">
                     بازخورد از: {feedback.writer.firstName} {feedback.writer.lastName}
                   </CardTitle>
-                  <div className="flex gap-4 mt-2 text-sm text-slate-600">
-                    <span>کارگروه: {feedback.workgroup.name}</span>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-slate-600">
+                    <span className="truncate">کارگروه: {feedback.workgroup.name}</span>
                     <span>دوره: {feedback.month}/{feedback.year}</span>
-                    <span className="text-orange-600">درباره استراتژیست (ID: {feedback.strategistId.slice(0, 8)}...)</span>
+                    <span className="text-orange-600 truncate">درباره استراتژیست (ID: {feedback.strategistId.slice(0, 8)}...)</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                   <Badge
                     variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                    className="text-base px-3 py-1"
+                    className="text-xs sm:text-base px-2 sm:px-3 py-1"
                   >
                     میانگین: {avgScore}/10
                   </Badge>
                   {isExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-slate-500" />
+                    <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500 flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-slate-500" />
+                    <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500 flex-shrink-0" />
                   )}
                 </div>
               </div>
             </CardHeader>
 
             {isExpanded && (
-              <CardContent className="border-t pt-6">
-                <div className="grid gap-6">
+              <CardContent className="border-t pt-4 sm:pt-6 p-4 sm:p-6">
+                <div className="grid gap-4 sm:gap-6">
                   {/* Scores Grid */}
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-3">امتیازات جزئی</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <h3 className="font-semibold text-sm sm:text-base text-slate-900 mb-3">امتیازات جزئی</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
                       <ScoreItem label="ارتباطات" score={feedback.communication} />
                       <ScoreItem label="سطح پشتیبانی" score={feedback.supportLevel} />
                       <ScoreItem label="وضوح وظایف" score={feedback.clarityOfTasks} />
@@ -94,11 +94,11 @@ export function FeedbackReport({
                   </div>
 
                   {/* Textual Feedback */}
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {feedback.positivePoints && (
                       <div>
-                        <h4 className="font-semibold text-green-700 mb-2">✨ نقاط مثبت</h4>
-                        <p className="text-slate-700 bg-green-50 p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-green-700 mb-2">✨ نقاط مثبت</h4>
+                        <p className="text-xs sm:text-sm text-slate-700 bg-green-50 p-2 sm:p-3 rounded-lg">
                           {feedback.positivePoints}
                         </p>
                       </div>
@@ -106,8 +106,8 @@ export function FeedbackReport({
 
                     {feedback.improvements && (
                       <div>
-                        <h4 className="font-semibold text-orange-700 mb-2">📈 نقاط قابل بهبود</h4>
-                        <p className="text-slate-700 bg-orange-50 p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-orange-700 mb-2">📈 نقاط قابل بهبود</h4>
+                        <p className="text-xs sm:text-sm text-slate-700 bg-orange-50 p-2 sm:p-3 rounded-lg">
                           {feedback.improvements}
                         </p>
                       </div>
@@ -115,8 +115,8 @@ export function FeedbackReport({
 
                     {feedback.suggestions && (
                       <div>
-                        <h4 className="font-semibold text-blue-700 mb-2">💡 پیشنهادات</h4>
-                        <p className="text-slate-700 bg-blue-50 p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-blue-700 mb-2">💡 پیشنهادات</h4>
+                        <p className="text-xs sm:text-sm text-slate-700 bg-blue-50 p-2 sm:p-3 rounded-lg">
                           {feedback.suggestions}
                         </p>
                       </div>
@@ -124,8 +124,8 @@ export function FeedbackReport({
                   </div>
 
                   {/* Metadata */}
-                  <div className="text-xs text-slate-500 pt-4 border-t">
-                    <div className="flex gap-6">
+                  <div className="text-xs text-slate-500 pt-3 sm:pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
                       <span>تاریخ ارسال: {formatPersianDateTime(feedback.createdAt)}</span>
                       <span>آخرین بروزرسانی: {formatPersianDateTime(feedback.updatedAt)}</span>
                     </div>
@@ -149,9 +149,9 @@ function ScoreItem({ label, score }: { label: string; score: number }) {
   }
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border">
-      <span className="text-sm text-slate-600">{label}</span>
-      <span className={`font-bold text-lg px-2 py-1 rounded ${getColor(score)}`}>
+    <div className="flex items-center justify-between p-2 sm:p-3 rounded-lg border">
+      <span className="text-xs sm:text-sm text-slate-600 truncate">{label}</span>
+      <span className={`font-bold text-base sm:text-lg px-2 py-1 rounded flex-shrink-0 ${getColor(score)}`}>
         {score}
       </span>
     </div>
