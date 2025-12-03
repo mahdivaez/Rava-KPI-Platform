@@ -51,6 +51,17 @@ export function NavbarContent({ session, onMenuClick, signOutAction }: NavbarCon
       
       {/* Right Section */}
       <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+        {/* Profile Link Button */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => window.location.href = '/profile'}
+          className="hover:bg-nude-50 rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-nude-600 hover:text-nude-900"
+          title="پروفایل"
+        >
+          <User className="h-4 w-4 sm:h-5 sm:w-5" />
+        </Button>
+
         {/* Search Button - Hidden on small mobile */}
         <Button 
           variant="ghost" 

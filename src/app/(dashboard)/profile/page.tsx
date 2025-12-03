@@ -3,10 +3,13 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProfileImageUpload } from "@/components/profile/profile-image-upload"
+import { ProfileEditForm } from "@/components/profile/profile-edit-form"
+import { PasswordChangeForm } from "@/components/profile/password-change-form"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { User, Mail, Shield, Calendar } from "lucide-react"
 import { formatPersianDate } from "@/lib/utils"
+import { Toaster } from "sonner"
 
 export default async function ProfilePage() {
   const session = await auth()
@@ -100,20 +103,31 @@ export default async function ProfilePage() {
         </Card>
       </div>
 
-      {/* Security Notice */}
-      <Card className="border-info/30 bg-info/5">
-        <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
-          <div className="flex gap-2.5 sm:gap-3">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-info mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="font-semibold text-sm sm:text-base text-info mb-1">نکته امنیتی</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                برای تغییر رمز عبور یا اطلاعات حساس، با مدیر سیستم تماس بگیرید.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+        {/* Profile Edit Form */}
+        <Card className="card-nude border-nude-200">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg text-nude-900">ویرایش اطلاعات شخصی</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">تغییر نام و ایمیل حساب کاربری شما</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6">
+            <ProfileEditForm
+              userId={user.id}
+              firstName={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Password Change Form - Takes full width on large screens */}
+        <div className="lg:col-span-2">
+          <PasswordChangeForm userId={user.id} />
+        </div>
+      </div>
+      
+      {/* Toast Notifications */}
+      <Toaster position="top-center" richColors />
     </div>
   )
 }
