@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET || "development-secret-key-please-change-in-production",
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       credentials: {
@@ -12,8 +12,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { type: "password" },
       },
       authorize: async (credentials) => {
+        // --- تغییرات پیشنهادی اعمال شد: استفاده از return null بجای throw new Error ---
+        
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("ایمیل و رمز عبور الزامی است")
+          // در صورت نقص اطلاعات، بجای پرتاب خطا، null برمی‌گرداند.
+          return null 
         }
 
         const user = await prisma.user.findUnique({
@@ -21,7 +24,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         })
 
         if (!user || !user.isActive) {
-          throw new Error("کاربر یافت نشد یا غیرفعال است")
+          // در صورت عدم وجود کاربر یا غیرفعال بودن، null برمی‌گرداند.
+          return null 
         }
 
         const isValidPassword = await bcrypt.compare(
@@ -30,9 +34,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         )
 
         if (!isValidPassword) {
-          throw new Error("رمز عبور اشتباه است")
+          // در صورت اشتباه بودن رمز عبور، null برمی‌گرداند.
+          return null 
         }
 
+        // --- در صورت موفقیت، شیء کاربر برگردانده می‌شود ---
         return {
           id: user.id,
           email: user.email,
@@ -68,4 +74,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
 })
-
