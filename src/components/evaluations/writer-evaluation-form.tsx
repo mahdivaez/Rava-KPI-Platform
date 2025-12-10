@@ -163,7 +163,8 @@ export function WriterEvaluationForm({
     try {
       // Create form data
       const formData = new FormData()
-      formData.append('image', file)
+      formData.append('file', file)
+      formData.append('userId', 'temp-user-id') // Temporary - would need proper user context
 
       // Upload to server
       const response = await fetch('/api/profile/upload-image', {

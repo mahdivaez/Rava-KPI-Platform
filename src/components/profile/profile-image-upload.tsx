@@ -39,32 +39,32 @@ export function ProfileImageUpload({ currentImage, userId }: ProfileImageUploadP
     setIsUploading(true)
 
     try {
-      // Convert to base64
-      const reader = new FileReader()
-      reader.onloadend = async () => {
-        const base64 = reader.result as string
+      // Create FormData
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('userId', userId)
 
-        const response = await fetch('/api/profile/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64, userId }),
-        })
+      const response = await fetch('/api/profile/upload-image', {
+        method: 'POST',
+        body: formData,
+      })
 
-        if (!response.ok) {
-          throw new Error('Upload failed')
-        }
-
-        toast.success("موفق", {
-          description: "تصویر پروفایل با موفقیت آپلود شد"
-        })
-        
-        router.refresh()
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Upload failed')
       }
 
-      reader.readAsDataURL(file)
+      const result = await response.json()
+      
+      toast.success("موفق", {
+        description: result.message || "تصویر پروفایل با موفقیت آپلود شد"
+      })
+      
+      router.refresh()
     } catch (error) {
+      console.error('Upload error:', error)
       toast.error("خطا", {
-        description: "خطا در آپلود تصویر"
+        description: error instanceof Error ? error.message : "خطا در آپلود تصویر"
       })
     } finally {
       setIsUploading(false)
