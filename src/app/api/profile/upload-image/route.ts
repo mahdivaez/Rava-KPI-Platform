@@ -46,8 +46,21 @@ export async function POST(req: Request) {
     // Generate unique filename
     const fileName = `${randomBytes(16).toString('hex')}.${fileExtension}`
     
+    // Determine upload directory based on context
+    let uploadDir: string
+    let imageUrl: string
+    
+    if (userId === 'evaluation-images') {
+      // Save evaluation images to evaluations directory
+      uploadDir = join(process.cwd(), 'public', 'uploads', 'evaluations')
+      imageUrl = `/uploads/evaluations/${fileName}`
+    } else {
+      // Save profile images to profiles directory
+      uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles')
+      imageUrl = `/uploads/profiles/${fileName}`
+    }
+    
     // Create upload directory if it doesn't exist
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles')
     await mkdir(uploadDir, { recursive: true })
 
     // Save file
@@ -56,14 +69,13 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(bytes)
     await writeFile(filePath, buffer)
 
-    // Generate public URL
-    const imageUrl = `/uploads/profiles/${fileName}`
-
-    // Update user image in database
-    await prisma.user.update({
-      where: { id: userId },
-      data: { image: imageUrl },
-    })
+    // Update user image in database only for profile images
+    if (userId !== 'evaluation-images') {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { image: imageUrl },
+      })
+    }
 
     return NextResponse.json({ 
       success: true, 

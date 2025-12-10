@@ -158,7 +158,7 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
       // Create form data
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('userId', 'temp-user-id') // Temporary - would need proper user context
+      formData.append('userId', 'evaluation-images') // Use fixed key for evaluation images
 
       // Upload to server
       const response = await fetch('/api/profile/upload-image', {
