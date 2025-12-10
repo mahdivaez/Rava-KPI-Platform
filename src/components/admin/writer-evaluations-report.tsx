@@ -11,6 +11,7 @@ type EvaluationWithRelations = WriterEvaluation & {
   writer: User
   strategist: User
   workgroup: Workgroup
+  imageUrl?: string
 }
 
 export function WriterEvaluationsReport({
@@ -142,6 +143,21 @@ export function WriterEvaluationsReport({
                       </div>
                     )}
                   </div>
+
+                  {/* Image Display */}
+                  {evaluation.imageUrl && (
+                    <div>
+                      <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر ارزیابی</h4>
+                      <div className="relative">
+                        <img
+                          src={evaluation.imageUrl}
+                          alt="تصویر ارزیابی"
+                          className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
+                          style={{ maxHeight: '400px', objectFit: 'contain' }}
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Metadata */}
                   <div className="text-xs text-slate-500 pt-3 sm:pt-4 border-t">

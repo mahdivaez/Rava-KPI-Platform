@@ -112,6 +112,7 @@ model StrategistEvaluation {
   improvements    String?
   suggestions     String?
   evaluatorNotes  String?
+  imageUrl        String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,6 +146,7 @@ model WriterEvaluation {
   improvements    String?
   suggestions     String?
   evaluatorNotes  String?
+  imageUrl        String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

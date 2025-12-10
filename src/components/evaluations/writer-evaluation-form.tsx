@@ -81,6 +81,9 @@ export function WriterEvaluationForm({
   const [scores, setScores] = useState<Record<string, number>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
   const [writerSearch, setWriterSearch] = useState("")
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imageUrl, setImageUrl] = useState<string>("")
+  const [uploadingImage, setUploadingImage] = useState(false)
   const router = useRouter()
 
   // Persian month names
@@ -137,6 +140,52 @@ export function WriterEvaluationForm({
     setNotes(prev => ({ ...prev, [key]: value }))
   }
 
+  // Handle image upload
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('لطفاً فایل تصویری انتخاب کنید')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('حجم تصویر نباید بیشتر از ۵ مگابایت باشد')
+      return
+    }
+
+    setImageFile(file)
+    setUploadingImage(true)
+
+    try {
+      // Create form data
+      const formData = new FormData()
+      formData.append('image', file)
+
+      // Upload to server
+      const response = await fetch('/api/profile/upload-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setImageUrl(result.imageUrl)
+        toast.success('تصویر با موفقیت آپلود شد')
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'خطا در آپلود تصویر')
+      }
+    } catch (error) {
+      toast.error('خطا در آپلود تصویر')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     
@@ -168,6 +217,7 @@ export function WriterEvaluationForm({
         const metric = WRITER_METRICS.find(m => m.key === key)
         return note ? `${metric?.title}: ${note}` : ''
       }).filter(Boolean).join('\n\n') || undefined,
+      imageUrl: imageUrl || undefined,
       status: "COMPLETED",
     }
 
@@ -564,6 +614,62 @@ export function WriterEvaluationForm({
                 className="border-2 border-nude-300 focus:border-blue-500 focus:ring-blue-500 resize-none text-sm sm:text-base"
                 placeholder="پیشنهادات خود برای بهبود عملکرد را بنویسید..."
               />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                تصویر ارزیابی (اختیاری):
+              </Label>
+              <div className="border-2 border-nude-300 rounded-lg p-4 bg-nude-50/50">
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload-writer"
+                    disabled={uploadingImage}
+                  />
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <label
+                      htmlFor="image-upload-writer"
+                      className={`cursor-pointer inline-flex items-center justify-center px-4 py-2 border-2 border-nude-300 rounded-md shadow-sm text-sm font-medium text-nude-700 bg-white hover:bg-nude-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nude-500 transition-colors ${
+                        uploadingImage ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {uploadingImage ? 'در حال آپلود...' : 'انتخاب تصویر'}
+                    </label>
+                    {imageUrl && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-green-600 font-medium">تصویر آپلود شد</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImageUrl("")
+                            setImageFile(null)
+                          }}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {imageUrl && (
+                    <div className="mt-3">
+                      <img
+                        src={imageUrl}
+                        alt="تصویر ارزیابی"
+                        className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-nude-600">
+                    فرمت‌های مجاز: JPG, PNG, GIF | حداکثر حجم: ۵ مگابایت
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -18,6 +18,7 @@ const evaluationSchema = z.object({
   improvements: z.string().optional(),
   suggestions: z.string().optional(),
   evaluatorNotes: z.string().optional(),
+  imageUrl: z.string().optional(),
   status: z.enum(["PENDING", "COMPLETED"]).default("COMPLETED"),
 })
 
