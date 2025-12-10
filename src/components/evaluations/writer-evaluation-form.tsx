@@ -660,9 +660,13 @@ export function WriterEvaluationForm({
                   {imageUrl && (
                     <div className="mt-3">
                       <img
-                        src={imageUrl}
+                        src={imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`}
                         alt="تصویر ارزیابی"
                         className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200"
+                        onError={(e) => {
+                          console.error('Image failed to load:', imageUrl)
+                          e.currentTarget.style.display = 'none'
+                        }}
                       />
                     </div>
                   )}
