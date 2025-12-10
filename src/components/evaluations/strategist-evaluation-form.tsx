@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { Calculator, TrendingUp, ChevronRight, Save, X, Search } from "lucide-react"
 import Link from "next/link"
+import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
 
 // Evaluation metrics
@@ -67,10 +68,7 @@ const STRATEGIST_METRICS = [
 ]
 
 export function StrategistEvaluationForm({ strategists }: { strategists: User[] }) {
-  const currentPersian = moment()
-  const currentPersianMonth = currentPersian.jMonth() + 1
-  const currentPersianYear = currentPersian.jYear()
-  const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+  const { currentYear: currentPersianYear, effectiveCurrentMonth } = usePersianDate()
 
   const [loading, setLoading] = useState(false)
   const [selectedYear, setSelectedYear] = useState(currentPersianYear)

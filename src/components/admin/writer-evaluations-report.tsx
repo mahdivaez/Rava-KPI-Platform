@@ -154,6 +154,17 @@ export function WriterEvaluationsReport({
                           alt="تصویر ارزیابی"
                           className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
                           style={{ maxHeight: '400px', objectFit: 'contain' }}
+                          onError={(e) => {
+                            console.error('Image failed to load:', evaluation.imageUrl)
+                            e.currentTarget.style.display = 'none'
+                            const parent = e.currentTarget.parentElement
+                            if (parent) {
+                              const errorMsg = document.createElement('p')
+                              errorMsg.textContent = 'تصویر در دسترس نیست'
+                              errorMsg.className = 'text-sm text-gray-500 italic'
+                              parent.appendChild(errorMsg)
+                            }
+                          }}
                         />
                       </div>
                     </div>

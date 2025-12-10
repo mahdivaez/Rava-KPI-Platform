@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { Calculator, FileText, ChevronRight, Save, X } from "lucide-react"
 import Link from "next/link"
+import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
 
 type WorkgroupWithMembers = Workgroup & {
@@ -70,10 +71,7 @@ export function WriterEvaluationForm({
 }: {
   workgroups: WorkgroupWithMembers[]
 }) {
-  const currentPersian = moment()
-  const currentPersianMonth = currentPersian.jMonth() + 1
-  const currentPersianYear = currentPersian.jYear()
-  const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+  const { currentYear: currentPersianYear, effectiveCurrentMonth } = usePersianDate()
 
   const [loading, setLoading] = useState(false)
   const [selectedWorkgroup, setSelectedWorkgroup] = useState("")
