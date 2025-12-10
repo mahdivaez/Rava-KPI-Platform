@@ -1,10 +1,10 @@
 // @ts-nocheck
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-import { put } from '@vercel/blob'
-import { randomBytes } from 'crypto'
+import { writeFile, mkdir } from "fs/promises"
+import { join } from "path"
+import { randomBytes } from "crypto"
 
 export async function POST(req: Request) {
   try {
@@ -47,18 +47,41 @@ export async function POST(req: Request) {
     // Generate unique filename
     const fileName = `${randomBytes(16).toString('hex')}.${fileExtension}`
     
-    // Determine folder based on context
-    const folder = userId === 'evaluation-images' ? 'evaluations' : 'profiles'
+    // Determine upload directory based on context
+    let uploadDir: string
+    let imageUrl: string
     
-    // Convert File to Buffer for blob upload
+    if (userId === 'evaluation-images') {
+      // Save evaluation images to evaluations directory
+      uploadDir = join(process.cwd(), 'public', 'uploads', 'evaluations')
+      imageUrl = `/uploads/evaluations/${fileName}`
+    } else {
+      // Save profile images to profiles directory
+      uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles')
+      imageUrl = `/uploads/profiles/${fileName}`
+    }
+    
+    // Create upload directory if it doesn't exist
+    try {
+      await mkdir(uploadDir, { recursive: true })
+      console.log(`Created directory: ${uploadDir}`)
+    } catch (error) {
+      console.error(`Failed to create directory ${uploadDir}:`, error)
+      // Continue anyway, directory might already exist
+    }
+
+    // Save file
+    const filePath = join(uploadDir, fileName)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     
-    // Upload to Vercel Blob Storage
-    const { url: imageUrl } = await put(`${folder}/${fileName}`, buffer, {
-      access: 'public',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    })
+    try {
+      await writeFile(filePath, buffer)
+      console.log(`File saved successfully: ${filePath}`)
+    } catch (error) {
+      console.error(`Failed to save file ${filePath}:`, error)
+      throw new Error('Failed to save file')
+    }
 
     // Update user image in database only for profile images
     if (userId !== 'evaluation-images') {

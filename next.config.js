@@ -6,6 +6,25 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Ensure static files are properly served
+  async headers() {
+    return [
+      {
+        source: '/uploads/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+  // Configure for production deployment
+  output: 'standalone',
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
 };
 
 module.exports = nextConfig;
