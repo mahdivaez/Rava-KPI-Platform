@@ -1,8 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-import { unlink } from "fs/promises"
-import { join } from "path"
 
 export async function POST(req: Request) {
   try {
@@ -28,18 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Delete file from filesystem if it exists
-    if (user.image && user.image.startsWith('/uploads/')) {
-      try {
-        const filePath = join(process.cwd(), 'public', user.image)
-        await unlink(filePath)
-      } catch (error) {
-        // File might not exist, continue anyway
-        console.warn("Could not delete file:", error)
-      }
-    }
-
-    // Remove user image from database
+    // Remove user image from database (blob storage file will be orphaned)
     await prisma.user.update({
       where: { id: userId },
       data: { image: null },
