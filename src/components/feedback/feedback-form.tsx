@@ -106,19 +106,20 @@ export function FeedbackForm({
       if (response.ok) {
         const result = await response.json()
         setImageUrl(result.imageUrl)
-        // Clean up local preview after successful upload
-        setLocalImagePreview("")
+        // Keep local preview visible until form submission
         toast.success('تصویر با موفقیت آپلود شد')
       } else {
         const error = await response.json()
         toast.error(error.error || 'خطا در آپلود تصویر')
-        // Clean up local preview on error
+        // Clean up local preview only on error
         setLocalImagePreview("")
+        setImageFile(null)
       }
     } catch (error) {
       toast.error('خطا در آپلود تصویر')
-      // Clean up local preview on error
+      // Clean up local preview only on error
       setLocalImagePreview("")
+      setImageFile(null)
     } finally {
       setUploadingImage(false)
     }
