@@ -150,7 +150,13 @@ export function WriterEvaluationsReport({
                       <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر ارزیابی</h4>
                       <div className="relative">
                         <img
-                          src={evaluation.imageUrl}
+                          src={
+                            evaluation.imageUrl.startsWith('http')
+                              ? evaluation.imageUrl
+                              : evaluation.imageUrl.startsWith('/')
+                                ? evaluation.imageUrl
+                                : `/${evaluation.imageUrl}`
+                          }
                           alt="تصویر ارزیابی"
                           className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
                           style={{ maxHeight: '400px', objectFit: 'contain' }}
