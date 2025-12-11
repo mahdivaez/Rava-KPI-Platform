@@ -26,7 +26,7 @@ export function usePersianDate(): PersianDateState {
         const currentPersian = moment()
         const currentPersianMonth = currentPersian.jMonth() + 1
         const currentPersianYear = currentPersian.jYear()
-        const effectiveCurrentMonth = Math.min(currentPersianMonth, 11)
+        const effectiveCurrentMonth = currentPersianMonth
 
         setDateState({
           currentDate: currentPersian.format('jYYYY/jMM/jDD'),
@@ -41,7 +41,7 @@ export function usePersianDate(): PersianDateState {
           currentDate: now.toLocaleDateString('fa-IR'),
           currentMonth: now.getMonth() + 1,
           currentYear: now.getFullYear(),
-          effectiveCurrentMonth: Math.min(now.getMonth() + 1, 11)
+          effectiveCurrentMonth: now.getMonth() + 1
         })
       })
     } catch {
@@ -51,7 +51,7 @@ export function usePersianDate(): PersianDateState {
         currentDate: now.toLocaleDateString('fa-IR'),
         currentMonth: now.getMonth() + 1,
         currentYear: now.getFullYear(),
-        effectiveCurrentMonth: Math.min(now.getMonth() + 1, 11)
+        effectiveCurrentMonth: now.getMonth() + 1
       })
     }
   }, [])

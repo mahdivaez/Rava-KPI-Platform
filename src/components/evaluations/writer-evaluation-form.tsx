@@ -283,10 +283,10 @@ export function WriterEvaluationForm({
                     انصراف
                   </Button>
                 </Link>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-8 w-full sm:w-auto shadow-lg shadow-nude-500/30 text-sm"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-6 sm:px-8 w-full sm:w-auto shadow-lg shadow-nude-500/30 text-sm"
                 >
                   <Save className="w-4 h-4 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
@@ -695,10 +695,10 @@ export function WriterEvaluationForm({
                     انصراف
                   </Button>
                 </Link>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 sm:px-10 h-10 sm:h-12 shadow-lg shadow-nude-500/30 w-full sm:w-auto text-sm"
+                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-6 sm:px-10 h-10 sm:h-12 shadow-lg shadow-nude-500/30 w-full sm:w-auto text-sm"
                 >
                   <Save className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                   {loading ? "در حال ثبت..." : "ثبت ارزیابی"}

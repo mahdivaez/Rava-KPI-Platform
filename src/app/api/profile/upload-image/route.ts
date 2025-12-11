@@ -17,8 +17,9 @@ export async function POST(req: Request) {
     const file = formData.get("file") as File
     const userId = formData.get("userId") as string
 
-    // Verify user can only update their own image (unless admin)
-    if (userId !== session.user.id && !session.user.isAdmin) {
+    // Allow users to upload evaluation/feedback images or their own profile image
+    const isEvaluationImage = userId === 'evaluation-images' || userId === 'feedback-images'
+    if (userId !== session.user.id && !session.user.isAdmin && !isEvaluationImage) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
