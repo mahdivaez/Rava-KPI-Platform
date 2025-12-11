@@ -7,13 +7,11 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { formatPersianDateTime } from "@/lib/utils"
 import Link from "next/link"
-import { ImageWithModal } from "@/components/ui/image-with-modal"
 
 type FeedbackWithRelations = WriterFeedback & {
   writer: User
   strategist?: User | null
   workgroup: Workgroup
-  imageUrl?: string | null
 }
 
 export function FeedbackReport({
@@ -39,8 +37,17 @@ export function FeedbackReport({
     setExpandedId(expandedId === id ? null : id)
   }
 
+  const resolveImageUrl = (url?: string | null) => {
+    if (!url) return null
+    if (url.startsWith("http")) return url
+    const normalized = url.startsWith("/") ? url : `/${url}`
+    if (typeof window !== "undefined" && window.location?.origin) {
+      return `${window.location.origin}${normalized}`
+    }
+    return normalized
+  }
+
   return (
-    <>
     <div className="space-y-4">
       {feedbacks.map((feedback) => {
         const isExpanded = expandedId === feedback.id
@@ -133,31 +140,40 @@ export function FeedbackReport({
                     )}
                   </div>
 
-                  {/* Image Display with Modal */}
+                  {/* Image Display */}
                   {feedback.imageUrl && (
                     <div>
                       <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر بازخورد</h4>
-                      <ImageWithModal
-                        src={feedback.imageUrl}
-                        alt="تصویر بازخورد"
-                        className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
-                        style={{
-                          maxHeight: '400px',
-                          objectFit: 'contain',
-                          borderColor: '#10b981', // Green border to indicate clickable
-                          boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
-                        }}
-                      />
-                      {/* Additional download link */}
-                      <div className="mt-2">
-                        <Link
-                          href={feedback.imageUrl.startsWith("http") ? feedback.imageUrl : `/${feedback.imageUrl}`}
-                          target="_blank"
-                          className="text-xs text-indigo-600 hover:text-indigo-800 underline"
-                        >
-                          باز کردن تصویر در تب جدید
-                        </Link>
+                      <div className="relative">
+                        <img
+                          src={resolveImageUrl(feedback.imageUrl) || undefined}
+                          alt="تصویر بازخورد"
+                          className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
+                          style={{ maxHeight: '400px', objectFit: 'contain' }}
+                          onError={(e) => {
+                            console.error("Image failed to load:", feedback.imageUrl)
+                            e.currentTarget.style.display = "none"
+                            const parent = e.currentTarget.parentElement
+                            if (parent) {
+                              const errorMsg = document.createElement("p")
+                              errorMsg.textContent = "تصویر در دسترس نیست"
+                              errorMsg.className = "text-sm text-gray-500 italic"
+                              parent.appendChild(errorMsg)
+                            }
+                          }}
+                        />
                       </div>
+                      {resolveImageUrl(feedback.imageUrl) && (
+                        <div className="mt-2">
+                          <Link
+                            href={resolveImageUrl(feedback.imageUrl) || "#"}
+                            target="_blank"
+                            className="text-xs text-indigo-600 hover:text-indigo-800 underline"
+                          >
+                            باز کردن تصویر در تب جدید
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -175,7 +191,6 @@ export function FeedbackReport({
         )
       })}
     </div>
-    </>
   )
 }
 
@@ -196,3 +211,4 @@ function ScoreItem({ label, score }: { label: string; score: number }) {
     </div>
   )
 }
+

@@ -6,11 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { formatPersianDateTime } from "@/lib/utils"
+import { ImageWithModal } from "@/components/ui/image-with-modal"
 
 type EvaluationWithRelations = StrategistEvaluation & {
   strategist: User
   evaluator: User
-  imageUrl?: string
+  imageUrl?: string | null
 }
 
 export function StrategistEvaluationsReport({
@@ -37,6 +38,7 @@ export function StrategistEvaluationsReport({
   }
 
   return (
+    <>
     <div className="space-y-4">
       {evaluations.map((evaluation) => {
         const isExpanded = expandedId === evaluation.id
@@ -148,25 +150,17 @@ export function StrategistEvaluationsReport({
                   {evaluation.imageUrl && (
                     <div>
                       <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر ارزیابی</h4>
-                      <div className="relative">
-                        <img
-                          src={evaluation.imageUrl}
-                          alt="تصویر ارزیابی"
-                          className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
-                          style={{ maxHeight: '400px', objectFit: 'contain' }}
-                          onError={(e) => {
-                            console.error('Image failed to load:', evaluation.imageUrl)
-                            e.currentTarget.style.display = 'none'
-                            const parent = e.currentTarget.parentElement
-                            if (parent) {
-                              const errorMsg = document.createElement('p')
-                              errorMsg.textContent = 'تصویر در دسترس نیست'
-                              errorMsg.className = 'text-sm text-gray-500 italic'
-                              parent.appendChild(errorMsg)
-                            }
-                          }}
-                        />
-                      </div>
+                      <ImageWithModal
+                        src={evaluation.imageUrl}
+                        alt="تصویر ارزیابی"
+                        className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
+                        style={{
+                          maxHeight: '400px',
+                          objectFit: 'contain',
+                          borderColor: '#10b981', // Green border to indicate clickable
+                          boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
+                        }}
+                      />
                     </div>
                   )}
 
@@ -184,6 +178,7 @@ export function StrategistEvaluationsReport({
         )
       })}
     </div>
+    </>
   )
 }
 
