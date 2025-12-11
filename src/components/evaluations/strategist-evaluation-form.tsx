@@ -20,6 +20,7 @@ import { Calculator, TrendingUp, ChevronRight, Save, X, Search } from "lucide-re
 import Link from "next/link"
 import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
+import { ImageModal } from "@/components/ui/image-modal"
 
 // Evaluation metrics
 const STRATEGIST_METRICS = [
@@ -79,6 +80,8 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
   const [imageUrl, setImageUrl] = useState<string>("")
   const [localImagePreview, setLocalImagePreview] = useState<string>("")
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageModalOpen, setImageModalOpen] = useState(false)
+  const [modalImageSrc, setModalImageSrc] = useState<string>("")
   const router = useRouter()
 
   // Persian month names
@@ -195,6 +198,11 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
       URL.revokeObjectURL(localImagePreview)
       setLocalImagePreview("")
     }
+  }
+
+  const handleImageClick = (imageSrc: string) => {
+    setModalImageSrc(imageSrc)
+    setImageModalOpen(true)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -695,6 +703,14 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
           </CardContent>
         </Card>
       </form>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        imageSrc={modalImageSrc}
+        imageAlt="تصویر ارزیابی"
+      />
     </div>
   )
 }

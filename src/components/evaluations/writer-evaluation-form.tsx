@@ -21,6 +21,7 @@ import { Calculator, FileText, ChevronRight, Save, X } from "lucide-react"
 import Link from "next/link"
 import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
+import { ImageModal } from "@/components/ui/image-modal"
 
 type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
@@ -83,6 +84,8 @@ export function WriterEvaluationForm({
   const [imageUrl, setImageUrl] = useState<string>("")
   const [localImagePreview, setLocalImagePreview] = useState<string>("")
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageModalOpen, setImageModalOpen] = useState(false)
+  const [modalImageSrc, setModalImageSrc] = useState<string>("")
   const router = useRouter()
 
   // Persian month names
@@ -201,6 +204,11 @@ export function WriterEvaluationForm({
       URL.revokeObjectURL(localImagePreview)
       setLocalImagePreview("")
     }
+  }
+
+  const handleImageClick = (imageSrc: string) => {
+    setModalImageSrc(imageSrc)
+    setImageModalOpen(true)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -725,6 +733,14 @@ export function WriterEvaluationForm({
           </CardContent>
         </Card>
       </form>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        imageSrc={modalImageSrc}
+        imageAlt="تصویر ارزیابی"
+      />
     </div>
   )
 }

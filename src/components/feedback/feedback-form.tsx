@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { Search, MessageSquare, ChevronRight, Save, X } from "lucide-react"
 import Link from "next/link"
 import { usePersianDate } from "@/hooks/use-persian-date"
+import { ImageModal } from "@/components/ui/image-modal"
 
 type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
@@ -38,6 +39,8 @@ export function FeedbackForm({
   const [imageUrl, setImageUrl] = useState<string>("")
   const [localImagePreview, setLocalImagePreview] = useState<string>("")
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageModalOpen, setImageModalOpen] = useState(false)
+  const [modalImageSrc, setModalImageSrc] = useState<string>("")
   const router = useRouter()
 
   // Persian month names
@@ -132,6 +135,11 @@ export function FeedbackForm({
       URL.revokeObjectURL(localImagePreview)
       setLocalImagePreview("")
     }
+  }
+
+  const handleImageClick = (imageSrc: string) => {
+    setModalImageSrc(imageSrc)
+    setImageModalOpen(true)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -545,14 +553,15 @@ export function FeedbackForm({
                       </div>
                     )}
                   </div>
-                  {imageUrl && (
+                  {(imageUrl || localImagePreview) && (
                     <div className="mt-3">
                       <img
-                        src={imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`}
+                        src={localImagePreview || (imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`)}
                         alt="تصویر بازخورد"
-                        className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200"
+                        className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => handleImageClick(localImagePreview || (imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`))}
                         onError={(e) => {
-                          console.error('Image failed to load:', imageUrl)
+                          console.error('Image failed to load:', localImagePreview || imageUrl)
                           e.currentTarget.style.display = 'none'
                         }}
                       />
@@ -598,6 +607,14 @@ export function FeedbackForm({
           </CardContent>
         </Card>
       </form>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        imageSrc={modalImageSrc}
+        imageAlt="تصویر بازخورد"
+      />
     </div>
   )
 }
