@@ -124,15 +124,63 @@ export function FeedbackForm({
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
+
+    const workgroupId = formData.get("workgroupId") as string | null
+    const strategistId = formData.get("strategistId") as string | null
+    const month = Number(formData.get("month"))
+    const year = Number(formData.get("year"))
+
+    if (!workgroupId) {
+      toast.error("انتخاب کارگروه الزامی است")
+      setLoading(false)
+      return
+    }
+
+    if (!strategistId) {
+      toast.error("انتخاب استراتژیست الزامی است")
+      setLoading(false)
+      return
+    }
+
+    if (!month || Number.isNaN(month)) {
+      toast.error("ماه معتبر نیست")
+      setLoading(false)
+      return
+    }
+
+    if (!year || Number.isNaN(year)) {
+      toast.error("سال معتبر نیست")
+      setLoading(false)
+      return
+    }
+
+    const metricConfigs = [
+      { key: "communication", label: "ارتباطات" },
+      { key: "supportLevel", label: "سطح پشتیبانی" },
+      { key: "clarityOfTasks", label: "وضوح وظایف" },
+      { key: "feedbackQuality", label: "کیفیت بازخورد" },
+    ] as const
+
+    const metrics: Record<string, number> = {}
+    for (const metric of metricConfigs) {
+      const value = Number(formData.get(metric.key))
+      if (!value || Number.isNaN(value) || value < 1 || value > 10) {
+        toast.error(`امتیاز ${metric.label} باید بین ۱ تا ۱۰ باشد`)
+        setLoading(false)
+        return
+      }
+      metrics[metric.key] = value
+    }
+
     const data = {
-      strategistId: formData.get("strategistId"),
-      workgroupId: formData.get("workgroupId"),
-      month: parseInt(formData.get("month") as string),
-      year: parseInt(formData.get("year") as string),
-      communication: parseInt(formData.get("communication") as string),
-      supportLevel: parseInt(formData.get("supportLevel") as string),
-      clarityOfTasks: parseInt(formData.get("clarityOfTasks") as string),
-      feedbackQuality: parseInt(formData.get("feedbackQuality") as string),
+      strategistId,
+      workgroupId,
+      month,
+      year,
+      communication: metrics.communication,
+      supportLevel: metrics.supportLevel,
+      clarityOfTasks: metrics.clarityOfTasks,
+      feedbackQuality: metrics.feedbackQuality,
       positivePoints: formData.get("positivePoints") || undefined,
       improvements: formData.get("improvements") || undefined,
       suggestions: formData.get("suggestions") || undefined,
@@ -355,7 +403,6 @@ export function FeedbackForm({
                         max="10"
                         className="w-20 lg:w-24 mx-auto text-center font-bold text-lg lg:text-xl h-12 lg:h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
                         placeholder="1-10"
-                        required
                       />
                     </td>
                   </tr>
@@ -390,7 +437,6 @@ export function FeedbackForm({
                         max="10"
                         className="w-20 text-center font-bold text-lg h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
                         placeholder="1-10"
-                        required
                       />
                     </div>
                   </div>
