@@ -178,12 +178,14 @@ model WriterFeedback {
   positivePoints String?
   improvements   String?
   suggestions    String?
+  imageUrl       String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  writer    User      @relation(fields: [writerId], references: [id])
-  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
+  writer     User      @relation(fields: [writerId], references: [id])
+  strategist User      @relation(fields: [strategistId], references: [id])
+  workgroup  Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
 
   @@unique([writerId, strategistId, workgroupId, month, year])
   @@index([strategistId])

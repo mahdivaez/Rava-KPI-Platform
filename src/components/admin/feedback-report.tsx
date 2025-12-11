@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { formatPersianDateTime } from "@/lib/utils"
+import Link from "next/link"
 
 type FeedbackWithRelations = WriterFeedback & {
   writer: User
+  strategist: User
   workgroup: Workgroup
 }
 
@@ -33,6 +35,16 @@ export function FeedbackReport({
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
+  }
+
+  const resolveImageUrl = (url?: string | null) => {
+    if (!url) return null
+    if (url.startsWith("http")) return url
+    const normalized = url.startsWith("/") ? url : `/${url}`
+    if (typeof window !== "undefined" && window.location?.origin) {
+      return `${window.location.origin}${normalized}`
+    }
+    return normalized
   }
 
   return (
@@ -60,7 +72,9 @@ export function FeedbackReport({
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-slate-600">
                     <span className="truncate">کارگروه: {feedback.workgroup.name}</span>
                     <span>دوره: {feedback.month}/{feedback.year}</span>
-                    <span className="text-orange-600 truncate">درباره استراتژیست (ID: {feedback.strategistId.slice(0, 8)}...)</span>
+                    <span className="text-orange-600 truncate">
+                      درباره استراتژیست: {feedback.strategist.firstName} {feedback.strategist.lastName}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -122,6 +136,43 @@ export function FeedbackReport({
                       </div>
                     )}
                   </div>
+
+                  {/* Image Display */}
+                  {feedback.imageUrl && (
+                    <div>
+                      <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر بازخورد</h4>
+                      <div className="relative">
+                        <img
+                          src={resolveImageUrl(feedback.imageUrl) || undefined}
+                          alt="تصویر بازخورد"
+                          className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
+                          style={{ maxHeight: '400px', objectFit: 'contain' }}
+                          onError={(e) => {
+                            console.error("Image failed to load:", feedback.imageUrl)
+                            e.currentTarget.style.display = "none"
+                            const parent = e.currentTarget.parentElement
+                            if (parent) {
+                              const errorMsg = document.createElement("p")
+                              errorMsg.textContent = "تصویر در دسترس نیست"
+                              errorMsg.className = "text-sm text-gray-500 italic"
+                              parent.appendChild(errorMsg)
+                            }
+                          }}
+                        />
+                      </div>
+                      {resolveImageUrl(feedback.imageUrl) && (
+                        <div className="mt-2">
+                          <Link
+                            href={resolveImageUrl(feedback.imageUrl) || "#"}
+                            target="_blank"
+                            className="text-xs text-indigo-600 hover:text-indigo-800 underline"
+                          >
+                            باز کردن تصویر در تب جدید
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Metadata */}
                   <div className="text-xs text-slate-500 pt-3 sm:pt-4 border-t">

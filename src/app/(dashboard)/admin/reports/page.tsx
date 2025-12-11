@@ -58,6 +58,7 @@ export default async function ReportsPage() {
     ],
     include: {
       writer: true,
+      strategist: true,
       workgroup: true,
     },
   })

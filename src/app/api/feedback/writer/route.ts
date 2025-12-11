@@ -15,6 +15,7 @@ const feedbackSchema = z.object({
   positivePoints: z.string().optional(),
   improvements: z.string().optional(),
   suggestions: z.string().optional(),
+  imageUrl: z.string().optional(),
 })
 
 export async function POST(req: NextRequest) {
