@@ -6,6 +6,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    serverActions: true,           // ← این خط رو اضافه کن
+  },
   // Ensure static files are properly served
   async headers() {
     return [
