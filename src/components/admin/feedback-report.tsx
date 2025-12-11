@@ -10,7 +10,7 @@ import Link from "next/link"
 
 type FeedbackWithRelations = WriterFeedback & {
   writer: User
-  strategist: User
+  strategist?: User | null
   workgroup: Workgroup
 }
 
@@ -73,7 +73,10 @@ export function FeedbackReport({
                     <span className="truncate">کارگروه: {feedback.workgroup.name}</span>
                     <span>دوره: {feedback.month}/{feedback.year}</span>
                     <span className="text-orange-600 truncate">
-                      درباره استراتژیست: {feedback.strategist.firstName} {feedback.strategist.lastName}
+                      درباره استراتژیست:{" "}
+                      {feedback.strategist
+                        ? `${feedback.strategist.firstName} ${feedback.strategist.lastName}`
+                        : "نامشخص"}
                     </span>
                   </div>
                 </div>

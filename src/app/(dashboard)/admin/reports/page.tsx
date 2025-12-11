@@ -58,10 +58,26 @@ export default async function ReportsPage() {
     ],
     include: {
       writer: true,
-      strategist: true,
       workgroup: true,
     },
   })
+
+  const strategistIds = Array.from(
+    new Set(writerFeedbacks.map((f) => f.strategistId).filter(Boolean))
+  )
+
+  const strategists = strategistIds.length
+    ? await prisma.user.findMany({
+        where: { id: { in: strategistIds } },
+      })
+    : []
+
+  const strategistById = new Map(strategists.map((s) => [s.id, s]))
+
+  const writerFeedbacksWithStrategist = writerFeedbacks.map((f) => ({
+    ...f,
+    strategist: strategistById.get(f.strategistId) || null,
+  }))
 
   return (
     <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
@@ -163,7 +179,7 @@ export default async function ReportsPage() {
         </TabsContent>
 
         <TabsContent value="feedback" className="mt-4 sm:mt-6">
-          <FeedbackReport feedbacks={writerFeedbacks} />
+          <FeedbackReport feedbacks={writerFeedbacksWithStrategist} />
         </TabsContent>
       </Tabs>
     </div>
