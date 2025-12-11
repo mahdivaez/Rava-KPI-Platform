@@ -15,12 +15,26 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
     const file = formData.get("file") as File
-    const userId = formData.get("userId") as string
+    const rawUserId = formData.get("userId")
+    const userId = typeof rawUserId === "string" ? rawUserId : undefined
+    const isEvaluationImage = userId === 'evaluation-images'
+    const isFeedbackImage = userId === 'feedback-images'
+    const isSpecialImage = isEvaluationImage || isFeedbackImage
+
+    // Determine whose profile should be updated (ignore provided userId for non-admins)
+    const targetUserId = isSpecialImage
+      ? undefined
+      : session.user.isAdmin
+        ? userId || session.user.id
+        : session.user.id
 
     // Allow users to upload evaluation/feedback images or their own profile image
-    const isEvaluationImage = userId === 'evaluation-images' || userId === 'feedback-images'
-    if (userId !== session.user.id && !session.user.isAdmin && !isEvaluationImage) {
-      console.log(`Upload denied: userId=${userId}, sessionUserId=${session.user.id}, isAdmin=${session.user.isAdmin}, isEvaluationImage=${isEvaluationImage}`)
+    if (!isSpecialImage && !targetUserId) {
+      return NextResponse.json({ error: "Target user is required" }, { status: 400 })
+    }
+
+    if (!isSpecialImage && targetUserId !== session.user.id && !session.user.isAdmin) {
+      console.log(`Upload denied: targetUserId=${targetUserId}, sessionUserId=${session.user.id}, isAdmin=${session.user.isAdmin}, isSpecialImage=${isSpecialImage}`)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -53,10 +67,14 @@ export async function POST(req: Request) {
     let uploadDir: string
     let imageUrl: string
     
-    if (userId === 'evaluation-images') {
+    if (isEvaluationImage) {
       // Save evaluation images to evaluations directory
       uploadDir = join(process.cwd(), 'public', 'uploads', 'evaluations')
       imageUrl = `/uploads/evaluations/${fileName}`
+    } else if (isFeedbackImage) {
+      // Save feedback images to feedback directory
+      uploadDir = join(process.cwd(), 'public', 'uploads', 'feedback')
+      imageUrl = `/uploads/feedback/${fileName}`
     } else {
       // Save profile images to profiles directory
       uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles')
@@ -86,9 +104,18 @@ export async function POST(req: Request) {
     }
 
     // Update user image in database only for profile images
-    if (userId !== 'evaluation-images') {
+    if (!isSpecialImage) {
+      const user = await prisma.user.findUnique({
+        where: { id: targetUserId },
+        select: { id: true },
+      })
+
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 })
+      }
+
       await prisma.user.update({
-        where: { id: userId },
+        where: { id: targetUserId },
         data: { image: imageUrl },
       })
     }
