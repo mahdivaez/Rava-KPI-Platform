@@ -7,9 +7,23 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   experimental: {
-    serverActions: true,           // ← این خط رو اضافه کن
+    serverActions: true,
   },
-  // Ensure static files are properly served
+  // این قسمت جدید رو اضافه کن (حل‌کننده ۱۰۰٪ ارور fs)
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        path: false,
+        os: false,
+      };
+    }
+    return config;
+  },
+
   async headers() {
     return [
       {
@@ -23,7 +37,7 @@ const nextConfig = {
       },
     ];
   },
-  // Configure for production deployment
+
   output: 'standalone',
 };
 
