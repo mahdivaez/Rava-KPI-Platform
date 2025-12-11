@@ -86,15 +86,13 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
   ]
 
-  // Available months based on selected year (only current month and year allowed)
+  // Available months - always show current month regardless of year
   const getAvailableMonths = (selectedYear: number) => {
-    if (selectedYear === currentPersianYear) {
-      return [{
-        name: persianMonths[effectiveCurrentMonth - 1],
-        value: effectiveCurrentMonth
-      }]
-    }
-    return []
+    // Always show the current Persian month
+    return [{
+      name: persianMonths[effectiveCurrentMonth - 1],
+      value: effectiveCurrentMonth
+    }]
   }
 
   // Get available months for the selected year

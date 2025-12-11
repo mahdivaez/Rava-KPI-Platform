@@ -90,15 +90,13 @@ export function WriterEvaluationForm({
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن'
   ]
 
-  // Available months based on selected year (only current month and year allowed)
+  // Available months - always show current month regardless of year
   const getAvailableMonths = (selectedYear: number) => {
-    if (selectedYear === currentPersianYear) {
-      return [{
-        name: persianMonths[effectiveCurrentMonth - 1],
-        value: effectiveCurrentMonth
-      }]
-    }
-    return []
+    // Always show the current Persian month
+    return [{
+      name: persianMonths[effectiveCurrentMonth - 1],
+      value: effectiveCurrentMonth
+    }]
   }
 
   const writers = selectedWorkgroup
@@ -546,7 +544,7 @@ export function WriterEvaluationForm({
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-green-50 shadow-lg">
+          <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-nude-50 shadow-lg">
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -555,8 +553,8 @@ export function WriterEvaluationForm({
                     {averageScore}
                   </p>
                   <p className="text-nude-600 font-semibold text-xs sm:text-sm">از 5 امتیاز</p>
-                  <div className="mt-3 sm:mt-4 w-full bg-green-200 rounded-full h-2 sm:h-3 overflow-hidden">
-                    <div 
+                  <div className="mt-3 sm:mt-4 w-full bg-nude-200 rounded-full h-2 sm:h-3 overflow-hidden">
+                    <div
                       className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${scorePercentage}%` }}
                     ></div>

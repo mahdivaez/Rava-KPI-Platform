@@ -20,6 +20,7 @@ export async function POST(req: Request) {
     // Allow users to upload evaluation/feedback images or their own profile image
     const isEvaluationImage = userId === 'evaluation-images' || userId === 'feedback-images'
     if (userId !== session.user.id && !session.user.isAdmin && !isEvaluationImage) {
+      console.log(`Upload denied: userId=${userId}, sessionUserId=${session.user.id}, isAdmin=${session.user.isAdmin}, isEvaluationImage=${isEvaluationImage}`)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
