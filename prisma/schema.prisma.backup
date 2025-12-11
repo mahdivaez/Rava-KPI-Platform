@@ -51,8 +51,7 @@ model User {
   evaluatorEvaluations      StrategistEvaluation[] @relation("Evaluator")
   writerEvaluations         WriterEvaluation[]     @relation("EvaluatedWriter")
   strategistAsEvaluator     WriterEvaluation[]     @relation("StrategistEvaluator")
-  writerFeedbacks           WriterFeedback[]       @relation("FeedbackForWriter")
-  strategistFeedbacks       WriterFeedback[]       @relation("FeedbackFromStrategist")
+  writerFeedbacks           WriterFeedback[]
   comments                  Comment[]
   pointTransactions         PointTransaction[]
   totalPoints               Int                    @default(0)
@@ -184,8 +183,8 @@ model WriterFeedback {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  writer     User      @relation("FeedbackForWriter", fields: [writerId], references: [id])
-  strategist User      @relation("FeedbackFromStrategist", fields: [strategistId], references: [id])
+  writer     User      @relation(fields: [writerId], references: [id])
+  strategist User      @relation(fields: [strategistId], references: [id])
   workgroup  Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
 
   @@unique([writerId, strategistId, workgroupId, month, year])
