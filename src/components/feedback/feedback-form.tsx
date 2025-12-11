@@ -36,6 +36,7 @@ export function FeedbackForm({
   const [strategistSearch, setStrategistSearch] = useState("")
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imageUrl, setImageUrl] = useState<string>("")
+  const [localImagePreview, setLocalImagePreview] = useState<string>("")
   const [uploadingImage, setUploadingImage] = useState(false)
   const router = useRouter()
 
@@ -85,7 +86,10 @@ export function FeedbackForm({
       return
     }
 
+    // Create local preview immediately
+    const previewUrl = URL.createObjectURL(file)
     setImageFile(file)
+    setLocalImagePreview(previewUrl)
     setUploadingImage(true)
 
     try {
@@ -102,13 +106,19 @@ export function FeedbackForm({
       if (response.ok) {
         const result = await response.json()
         setImageUrl(result.imageUrl)
+        // Clean up local preview after successful upload
+        setLocalImagePreview("")
         toast.success('تصویر با موفقیت آپلود شد')
       } else {
         const error = await response.json()
         toast.error(error.error || 'خطا در آپلود تصویر')
+        // Clean up local preview on error
+        setLocalImagePreview("")
       }
     } catch (error) {
       toast.error('خطا در آپلود تصویر')
+      // Clean up local preview on error
+      setLocalImagePreview("")
     } finally {
       setUploadingImage(false)
     }
@@ -117,6 +127,10 @@ export function FeedbackForm({
   const removeImage = () => {
     setImageFile(null)
     setImageUrl("")
+    if (localImagePreview) {
+      URL.revokeObjectURL(localImagePreview)
+      setLocalImagePreview("")
+    }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

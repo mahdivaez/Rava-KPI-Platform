@@ -81,6 +81,7 @@ export function WriterEvaluationForm({
   const [writerSearch, setWriterSearch] = useState("")
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imageUrl, setImageUrl] = useState<string>("")
+  const [localImagePreview, setLocalImagePreview] = useState<string>("")
   const [uploadingImage, setUploadingImage] = useState(false)
   const router = useRouter()
 
@@ -153,7 +154,10 @@ export function WriterEvaluationForm({
       return
     }
 
+    // Create local preview immediately
+    const previewUrl = URL.createObjectURL(file)
     setImageFile(file)
+    setLocalImagePreview(previewUrl)
     setUploadingImage(true)
 
     try {
@@ -171,15 +175,30 @@ export function WriterEvaluationForm({
       if (response.ok) {
         const result = await response.json()
         setImageUrl(result.imageUrl)
+        // Clean up local preview after successful upload
+        setLocalImagePreview("")
         toast.success('تصویر با موفقیت آپلود شد')
       } else {
         const error = await response.json()
         toast.error(error.error || 'خطا در آپلود تصویر')
+        // Clean up local preview on error
+        setLocalImagePreview("")
       }
     } catch (error) {
       toast.error('خطا در آپلود تصویر')
+      // Clean up local preview on error
+      setLocalImagePreview("")
     } finally {
       setUploadingImage(false)
+    }
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    setImageUrl("")
+    if (localImagePreview) {
+      URL.revokeObjectURL(localImagePreview)
+      setLocalImagePreview("")
     }
   }
 
@@ -637,15 +656,14 @@ export function WriterEvaluationForm({
                     >
                       {uploadingImage ? 'در حال آپلود...' : 'انتخاب تصویر'}
                     </label>
-                    {imageUrl && (
+                    {(imageUrl || localImagePreview) && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-600 font-medium">تصویر آپلود شد</span>
+                        <span className="text-sm text-green-600 font-medium">
+                          {localImagePreview ? 'تصویر انتخاب شد' : 'تصویر آپلود شد'}
+                        </span>
                         <button
                           type="button"
-                          onClick={() => {
-                            setImageUrl("")
-                            setImageFile(null)
-                          }}
+                          onClick={removeImage}
                           className="text-red-600 hover:text-red-800 text-sm font-medium"
                         >
                           حذف
@@ -653,14 +671,14 @@ export function WriterEvaluationForm({
                       </div>
                     )}
                   </div>
-                  {imageUrl && (
+                  {(imageUrl || localImagePreview) && (
                     <div className="mt-3">
                       <img
-                        src={imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`}
+                        src={localImagePreview || (imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`)}
                         alt="تصویر ارزیابی"
                         className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200"
                         onError={(e) => {
-                          console.error('Image failed to load:', imageUrl)
+                          console.error('Image failed to load:', localImagePreview || imageUrl)
                           e.currentTarget.style.display = 'none'
                         }}
                       />
