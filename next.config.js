@@ -22,11 +22,6 @@ const nextConfig = {
   },
   // Configure for production deployment
   output: 'standalone',
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
 };
 
 module.exports = nextConfig;
-
-
