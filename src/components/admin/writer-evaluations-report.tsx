@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { formatPersianDateTime } from "@/lib/utils"
+import Link from "next/link"
 
 type EvaluationWithRelations = WriterEvaluation & {
   writer: User
@@ -35,6 +36,16 @@ export function WriterEvaluationsReport({
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
+  }
+
+  const resolveImageUrl = (url?: string | null) => {
+    if (!url) return null
+    if (url.startsWith("http")) return url
+    const normalized = url.startsWith("/") ? url : `/${url}`
+    if (typeof window !== "undefined" && window.location?.origin) {
+      return `${window.location.origin}${normalized}`
+    }
+    return normalized
   }
 
   return (
@@ -150,29 +161,34 @@ export function WriterEvaluationsReport({
                       <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر ارزیابی</h4>
                       <div className="relative">
                         <img
-                          src={
-                            evaluation.imageUrl.startsWith('http')
-                              ? evaluation.imageUrl
-                              : evaluation.imageUrl.startsWith('/')
-                                ? evaluation.imageUrl
-                                : `/${evaluation.imageUrl}`
-                          }
+                          src={resolveImageUrl(evaluation.imageUrl) || undefined}
                           alt="تصویر ارزیابی"
                           className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
                           style={{ maxHeight: '400px', objectFit: 'contain' }}
                           onError={(e) => {
-                            console.error('Image failed to load:', evaluation.imageUrl)
-                            e.currentTarget.style.display = 'none'
+                            console.error("Image failed to load:", evaluation.imageUrl)
+                            e.currentTarget.style.display = "none"
                             const parent = e.currentTarget.parentElement
                             if (parent) {
-                              const errorMsg = document.createElement('p')
-                              errorMsg.textContent = 'تصویر در دسترس نیست'
-                              errorMsg.className = 'text-sm text-gray-500 italic'
+                              const errorMsg = document.createElement("p")
+                              errorMsg.textContent = "تصویر در دسترس نیست"
+                              errorMsg.className = "text-sm text-gray-500 italic"
                               parent.appendChild(errorMsg)
                             }
                           }}
                         />
                       </div>
+                      {resolveImageUrl(evaluation.imageUrl) && (
+                        <div className="mt-2">
+                          <Link
+                            href={resolveImageUrl(evaluation.imageUrl) || "#"}
+                            target="_blank"
+                            className="text-xs text-indigo-600 hover:text-indigo-800 underline"
+                          >
+                            باز کردن تصویر در تب جدید
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   )}
 
