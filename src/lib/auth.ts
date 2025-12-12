@@ -23,8 +23,13 @@ const testUsers = [
   },
 ]
 
+const authSecret = process.env.NEXTAUTH_SECRET
+if (!authSecret) {
+  throw new Error('NEXTAUTH_SECRET is not set')
+}
+
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret',
+  secret: authSecret,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -80,5 +85,7 @@ export const authOptions: NextAuthOptions = {
   },
 }
 
-export default NextAuth(authOptions)
-export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)
+const authHandler = NextAuth(authOptions)
+
+export default authHandler
+export const { handlers, signIn, signOut, auth } = authHandler

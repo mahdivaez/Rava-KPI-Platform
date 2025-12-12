@@ -2,11 +2,10 @@
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  // Server Actions are stable in Next.js 14, so no experimental flag is needed.
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
-    serverActions: true, // Enable Server Actions for Next.js 14
   },
-  ignoreBuildErrors: true,
 };
 
 module.exports = nextConfig;
