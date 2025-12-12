@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
@@ -19,7 +19,7 @@ const userSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }

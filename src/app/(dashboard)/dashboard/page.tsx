@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,7 +21,7 @@ import {
 } from "lucide-react"
 
 export default async function DashboardPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session) return null
 
   // Check if database is available

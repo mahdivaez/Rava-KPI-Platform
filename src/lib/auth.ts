@@ -1,7 +1,8 @@
-import NextAuth from "next-auth"
+import NextAuth, { type NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { getServerSession } from "next-auth/next"
 import bcrypt from "bcryptjs"
-import type { NextAuthOptions } from "next-auth"
+import { prisma } from "@/lib/prisma"
 
 // Test users for development when database is not available
 const testUsers = [
@@ -42,7 +43,36 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // For development, just use test users
+        try {
+          // Try database first
+          if (prisma) {
+            const user = await prisma.user.findUnique({
+              where: { email: credentials.email as string },
+            })
+
+            if (user && user.isActive) {
+              const isValid = await bcrypt.compare(
+                credentials.password as string,
+                user.password
+              )
+
+              if (isValid) {
+                return {
+                  id: user.id,
+                  email: user.email,
+                  name: `${user.firstName} ${user.lastName}`,
+                  isAdmin: user.isAdmin,
+                  isTechnicalDeputy: user.isTechnicalDeputy,
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Database auth error:", error)
+          // Fall through to test users if DB fails
+        }
+
+        // Fallback to test users for development
         const testUser = testUsers.find(user => user.email === credentials.email)
         if (testUser && credentials.password === testUser.password) {
           return {
@@ -85,7 +115,13 @@ export const authOptions: NextAuthOptions = {
   },
 }
 
-const authHandler = NextAuth(authOptions)
+// NextAuth v4: NextAuth() returns a handler function
+const handler = NextAuth(authOptions)
 
-export default authHandler
-export const { handlers, signIn, signOut, auth } = authHandler
+// Export handler for API route
+export default handler
+
+// Helper function to get server session (NextAuth v4 way)
+export async function getSession() {
+  return await getServerSession(authOptions)
+}
