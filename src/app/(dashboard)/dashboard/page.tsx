@@ -24,15 +24,34 @@ export default async function DashboardPage() {
   const session = await auth()
   if (!session) return null
 
+  // Check if database is available
+  if (!prisma) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="bg-gradient-to-br from-nude-50 to-white border border-nude-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 mb-4">
+            خوش آمدید، {session.user.name?.split(' ')[0]} 👋
+          </h1>
+          <p className="text-nude-600">
+            دیتابیس در دسترس نیست. این یک محیط توسعه است و از کاربران تست استفاده می‌شود.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Database is available, use it
+  const prismaClient = prisma as any
+
   // Get user data
-  const currentUser = await prisma.user.findUnique({
+  const currentUser = await prismaClient.user.findUnique({
     where: { id: session.user.id },
     select: { image: true },
   })
 
 
   // Get unread messages
-  const unreadMessages = await prisma.message.count({
+  const unreadMessages = await prismaClient.message.count({
     where: {
       receiverId: session.user.id,
       isRead: false,
@@ -40,11 +59,11 @@ export default async function DashboardPage() {
   })
 
   // Check roles
-  const isStrategist = await prisma.workgroupMember.findFirst({
+  const isStrategist = await prismaClient.workgroupMember.findFirst({
     where: { userId: session.user.id, role: 'STRATEGIST' },
   })
 
-  const memberships = await prisma.workgroupMember.findMany({
+  const memberships = await prismaClient.workgroupMember.findMany({
     where: { userId: session.user.id },
     include: { workgroup: true },
   })
@@ -61,8 +80,8 @@ export default async function DashboardPage() {
   let adminStats = null
   if (session.user.isAdmin) {
     adminStats = {
-      totalUsers: await prisma.user.count(),
-      totalMessages: await prisma.message.count(),
+      totalUsers: await prismaClient.user.count(),
+      totalMessages: await prismaClient.message.count(),
     }
   }
 

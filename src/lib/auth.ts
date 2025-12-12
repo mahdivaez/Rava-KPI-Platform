@@ -24,7 +24,7 @@ const testUsers = [
 ]
 
 export const authOptions: NextAuthOptions = {
-  secret: (globalThis as any).process?.env?.NEXTAUTH_SECRET || 'fallback-secret',
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret',
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -37,65 +37,24 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        try {
-          // First try to find user in test users (for development)
-          const testUser = testUsers.find(user => user.email === credentials.email)
-          if (testUser) {
-            const isValidPassword = await bcrypt.compare(
-              credentials.password as string,
-              testUser.password
-            )
-            if (isValidPassword) {
-              return {
-                id: testUser.id,
-                email: testUser.email,
-                name: testUser.name,
-                isAdmin: testUser.isAdmin,
-                isTechnicalDeputy: testUser.isTechnicalDeputy,
-              }
-            }
+        // For development, just use test users
+        const testUser = testUsers.find(user => user.email === credentials.email)
+        if (testUser && credentials.password === testUser.password) {
+          return {
+            id: testUser.id,
+            email: testUser.email,
+            name: testUser.name,
+            isAdmin: testUser.isAdmin,
+            isTechnicalDeputy: testUser.isTechnicalDeputy,
           }
-
-          // If not found in test users, try database
-          try {
-            const { prisma } = await import('@/lib/prisma')
-            const user = await prisma.user.findUnique({
-              where: { email: credentials.email as string },
-            })
-
-            if (!user || !user.isActive) {
-              return null
-            }
-
-            const isValidPassword = await bcrypt.compare(
-              credentials.password as string,
-              user.password
-            )
-
-            if (!isValidPassword) {
-              return null
-            }
-
-            return {
-              id: user.id,
-              email: user.email,
-              name: `${user.firstName} ${user.lastName}`,
-              isAdmin: user.isAdmin,
-              isTechnicalDeputy: user.isTechnicalDeputy,
-            }
-          } catch (dbError) {
-            console.log('Database not available, using test users only')
-            return null
-          }
-        } catch (error) {
-          console.error('Auth error:', error)
-          return null
         }
+
+        return null
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.isAdmin = user.isAdmin
@@ -103,11 +62,11 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async session({ session, token }: { session: any; token: any }) {
-      if (session.user) {
-        session.user.id = token.id
-        session.user.isAdmin = token.isAdmin
-        session.user.isTechnicalDeputy = token.isTechnicalDeputy
+    async session({ session, token }) {
+      if (token && session?.user) {
+        session.user.id = token.id as string
+        session.user.isAdmin = token.isAdmin as boolean
+        session.user.isTechnicalDeputy = token.isTechnicalDeputy as boolean
       }
       return session
     },
