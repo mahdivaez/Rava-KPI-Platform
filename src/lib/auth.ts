@@ -4,10 +4,14 @@ import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 
 // NextAuth v5 configuration
+// trustHost is controlled by AUTH_TRUST_HOST environment variable
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
   providers: [
     Credentials({
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null
