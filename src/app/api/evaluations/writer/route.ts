@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
@@ -24,19 +24,22 @@ const evaluationSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+    const session = await getSession()
     if (!session?.user) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
     const body = await req.json()
-    const data = evaluationSchema.parse(body)
+    const parsed = evaluationSchema.parse(body)
 
     // Check if user is strategist in this workgroup (or admin)
     if (!session.user.isAdmin) {
       const membership = await prisma.workgroupMember.findFirst({
         where: {
-          workgroupId: data.workgroupId,
+          workgroupId: parsed.workgroupId,
           userId: session.user.id,
           role: "STRATEGIST",
         },
@@ -52,8 +55,23 @@ export async function POST(req: NextRequest) {
 
     const evaluation = await prisma.writerEvaluation.create({
       data: {
-        ...data,
+        writerId: parsed.writerId,
+        workgroupId: parsed.workgroupId,
         strategistId: session.user.id,
+        month: parsed.month,
+        year: parsed.year,
+        responsibility: parsed.responsibility,
+        strategistSatisfaction: parsed.strategistSatisfaction,
+        meetingEngagement: parsed.meetingEngagement,
+        scenarioPerformance: parsed.scenarioPerformance,
+        clientSatisfaction: parsed.clientSatisfaction,
+        brandAlignment: parsed.brandAlignment,
+        strengths: parsed.strengths,
+        improvements: parsed.improvements,
+        suggestions: parsed.suggestions,
+        evaluatorNotes: parsed.evaluatorNotes,
+        imageUrl: parsed.imageUrl,
+        status: parsed.status,
       },
     })
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
@@ -11,16 +11,23 @@ const memberSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+    const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
     const body = await req.json()
-    const data = memberSchema.parse(body)
+    const parsed = memberSchema.parse(body)
 
     const member = await prisma.workgroupMember.create({
-      data,
+      data: {
+        workgroupId: parsed.workgroupId,
+        userId: parsed.userId,
+        role: parsed.role,
+      },
     })
 
     return NextResponse.json({ success: true, member })
@@ -35,7 +42,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth()
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+    const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }

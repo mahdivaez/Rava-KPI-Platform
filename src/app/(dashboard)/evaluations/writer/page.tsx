@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Plus } from "lucide-react"
 import Link from "next/link"
 
 export default async function WriterEvaluationPage() {
-  const session = await auth()
+  const session = await getSession()
   
   // Get workgroups where user is a strategist
   const strategistMemberships = await prisma.workgroupMember.findMany({

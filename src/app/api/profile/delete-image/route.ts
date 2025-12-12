@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { unlink } from "fs/promises"
@@ -7,7 +7,10 @@ import { join } from "path"
 
 export async function POST(req: Request) {
   try {
-    const session = await auth()
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+    const session = await getSession()
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

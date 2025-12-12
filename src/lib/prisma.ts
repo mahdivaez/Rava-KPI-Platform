@@ -6,15 +6,16 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 // Only create PrismaClient if DATABASE_URL is set and not dummy
+// Don't throw during build time - return undefined instead
 const shouldCreatePrisma = process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('dummy')
 
-if (!shouldCreatePrisma) {
-  throw new Error('Database not configured. Please set DATABASE_URL environment variable.')
+export const prisma = shouldCreatePrisma
+  ? (globalForPrisma.prisma ?? new PrismaClient({
+      log: (process.env as any).NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    }))
+  : undefined
+
+if (shouldCreatePrisma && (process.env as any).NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma as PrismaClient
 }
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: (process.env as any).NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-})
-
-if ((process.env as any).NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 

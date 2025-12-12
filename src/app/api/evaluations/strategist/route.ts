@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
@@ -24,18 +24,36 @@ const evaluationSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+    const session = await getSession()
     if (!session?.user?.isTechnicalDeputy && !session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
     const body = await req.json()
-    const data = evaluationSchema.parse(body)
+    const parsed = evaluationSchema.parse(body)
 
     const evaluation = await prisma.strategistEvaluation.create({
       data: {
-        ...data,
+        strategistId: parsed.strategistId,
         evaluatorId: session.user.id,
+        month: parsed.month,
+        year: parsed.year,
+        ideation: parsed.ideation,
+        avgViews: parsed.avgViews,
+        qualityControl: parsed.qualityControl,
+        teamRelations: parsed.teamRelations,
+        clientRelations: parsed.clientRelations,
+        responsiveness: parsed.responsiveness,
+        clientSatisfaction: parsed.clientSatisfaction,
+        strengths: parsed.strengths,
+        improvements: parsed.improvements,
+        suggestions: parsed.suggestions,
+        evaluatorNotes: parsed.evaluatorNotes,
+        imageUrl: parsed.imageUrl,
+        status: parsed.status,
       },
     })
 

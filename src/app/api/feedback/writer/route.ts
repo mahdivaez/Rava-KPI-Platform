@@ -20,18 +20,21 @@ const feedbackSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
     const session = await getSession()
     if (!session?.user) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
     const body = await req.json()
-    const data = feedbackSchema.parse(body)
+    const parsed = feedbackSchema.parse(body)
 
     // Check if user is writer in this workgroup
     const membership = await prisma.workgroupMember.findFirst({
       where: {
-        workgroupId: data.workgroupId,
+        workgroupId: parsed.workgroupId,
         userId: session.user.id,
         role: "WRITER",
       },
@@ -46,8 +49,19 @@ export async function POST(req: NextRequest) {
 
     const feedback = await prisma.writerFeedback.create({
       data: {
-        ...data,
         writerId: session.user.id,
+        strategistId: parsed.strategistId,
+        workgroupId: parsed.workgroupId,
+        month: parsed.month,
+        year: parsed.year,
+        communication: parsed.communication,
+        supportLevel: parsed.supportLevel,
+        clarityOfTasks: parsed.clarityOfTasks,
+        feedbackQuality: parsed.feedbackQuality,
+        positivePoints: parsed.positivePoints,
+        improvements: parsed.improvements,
+        suggestions: parsed.suggestions,
+        imageUrl: parsed.imageUrl,
       },
     })
 

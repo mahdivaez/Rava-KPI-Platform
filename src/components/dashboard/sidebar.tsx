@@ -1,7 +1,4 @@
 'use client'
-
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import {
   LayoutDashboard,
@@ -185,9 +182,14 @@ function NavLink({ href, icon, children, pathname }: any) {
 }
 
 // Server Component Wrapper
+import { getSession } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+
 export async function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
-  const session = await auth()
+  const session = await getSession()
   if (!session) return null
+
+  if (!prisma) return null
 
   const memberships = await prisma.workgroupMember.findMany({
     where: { userId: session.user.id },

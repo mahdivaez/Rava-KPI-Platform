@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { WorkgroupsTable } from "@/components/admin/workgroups-table"
@@ -6,7 +6,7 @@ import { CreateWorkgroupDialog } from "@/components/admin/create-workgroup-dialo
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function WorkgroupsPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session?.user?.isAdmin) redirect('/dashboard')
 
   const workgroups = await prisma.workgroup.findMany({

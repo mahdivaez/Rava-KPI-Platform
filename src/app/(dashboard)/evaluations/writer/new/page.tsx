@@ -1,10 +1,10 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { WriterEvaluationForm } from "@/components/evaluations/writer-evaluation-form"
 
 export default async function NewWriterEvaluationPage() {
-  const session = await auth()
+  const session = await getSession()
   
   // Get workgroups where user is a strategist
   const strategistMemberships = await prisma.workgroupMember.findMany({

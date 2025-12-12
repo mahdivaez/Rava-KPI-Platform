@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +13,7 @@ import { formatPersianDate } from "@/lib/utils"
 import { Toaster } from "sonner"
 
 export default async function ProfilePage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session) redirect('/login')
 
   // Fetch full user data from database

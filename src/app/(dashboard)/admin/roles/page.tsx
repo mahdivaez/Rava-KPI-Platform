@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,7 +6,7 @@ import { RolesTable } from "@/components/admin/roles-table"
 import { UserCog } from "lucide-react"
 
 export default async function RolesPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session?.user?.isAdmin) redirect('/dashboard')
 
   const users = await prisma.user.findMany({

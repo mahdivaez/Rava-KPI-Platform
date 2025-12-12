@@ -1,10 +1,10 @@
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { FeedbackForm } from "@/components/feedback/feedback-form"
 
 export default async function SendFeedbackPage() {
-  const session = await auth()
+  const session = await getSession()
   if (!session?.user) redirect('/login')
 
   // Get workgroups where user is a writer

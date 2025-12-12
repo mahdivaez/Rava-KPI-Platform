@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
+
     const body = await req.json()
     const data = userSchema.parse(body)
 
@@ -31,8 +35,13 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.create({
       data: {
-        ...data,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
         password: hashedPassword,
+        isAdmin: data.isAdmin,
+        isTechnicalDeputy: data.isTechnicalDeputy,
+        isActive: data.isActive,
       },
     })
 
@@ -45,6 +54,9 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
     const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
@@ -73,6 +85,9 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not available" }, { status: 503 })
+    }
     const session = await getSession()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
