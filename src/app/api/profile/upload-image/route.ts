@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { writeFile, mkdir } from "fs/promises"
@@ -8,7 +8,7 @@ import { randomBytes } from "crypto"
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession()
+    const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

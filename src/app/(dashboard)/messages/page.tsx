@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { MessagesInterface } from "@/components/messages/messages-interface"
 export const dynamic = 'force-dynamic'
 
 export default async function MessagesPage() {
-  const session = await getSession()
+  const session = await auth()
   if (!session) redirect('/login')
 
   // Fetch conversations (unique users the current user has chatted with)

@@ -182,11 +182,11 @@ function NavLink({ href, icon, children, pathname }: any) {
 }
 
 // Server Component Wrapper
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 export async function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
-  const session = await getSession()
+  const session = await auth()
   if (!session) return null
 
   if (!prisma) return null

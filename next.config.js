@@ -2,7 +2,10 @@
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
-  // Server Actions are stable in Next.js 14, so no experimental flag is needed.
+  // Use Webpack instead of Turbopack for better compatibility
+  webpack: (config) => {
+    return config
+  },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
   },

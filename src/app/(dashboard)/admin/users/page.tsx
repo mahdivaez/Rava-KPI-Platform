@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { UsersTable } from "@/components/admin/users-table"
@@ -6,7 +6,7 @@ import { CreateUserDialog } from "@/components/admin/create-user-dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function UsersPage() {
-  const session = await getSession()
+  const session = await auth()
   if (!session?.user?.isAdmin) redirect('/dashboard')
 
   const users = await prisma.user.findMany({

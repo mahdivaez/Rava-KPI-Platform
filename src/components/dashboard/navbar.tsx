@@ -153,11 +153,11 @@ export function NavbarContent({ session, onMenuClick, signOutAction }: NavbarCon
 }
 
 // Server Component Wrapper
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { handleSignOut } from "@/app/actions/auth"
 
 export async function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
-  const session = await getSession()
+  const session = await auth()
   if (!session) return null
 
   return <NavbarContent session={session} onMenuClick={onMenuClick} signOutAction={handleSignOut} />

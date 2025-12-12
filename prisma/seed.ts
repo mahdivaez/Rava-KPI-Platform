@@ -5,6 +5,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Seeding database...')
+  console.log('NODE_ENV:', process.env.NODE_ENV || 'not set')
 
   // Clear all existing users first
   await prisma.user.deleteMany({})

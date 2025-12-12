@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!prisma) {
       return NextResponse.json({ error: "Database not available" }, { status: 503 })
     }
-    const session = await getSession()
+    const session = await auth()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
@@ -45,7 +45,7 @@ export async function DELETE(req: NextRequest) {
     if (!prisma) {
       return NextResponse.json({ error: "Database not available" }, { status: 503 })
     }
-    const session = await getSession()
+    const session = await auth()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }

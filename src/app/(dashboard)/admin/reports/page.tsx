@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,7 +9,7 @@ import { WriterEvaluationsReport } from "@/components/admin/writer-evaluations-r
 import { FeedbackReport } from "@/components/admin/feedback-report"
 
 export default async function ReportsPage() {
-  const session = await getSession()
+  const session = await auth()
   if (!session?.user?.isAdmin) redirect('/dashboard')
 
   const stats = {

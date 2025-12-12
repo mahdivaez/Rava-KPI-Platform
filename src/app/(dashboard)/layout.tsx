@@ -1,7 +1,7 @@
 // Force dynamic rendering to prevent static generation errors
 export const dynamic = 'force-dynamic'
 
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import DashboardLayoutClient from "@/components/dashboard/dashboard-layout-client"
@@ -11,7 +11,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getSession()
+  const session = await auth()
   if (!session) redirect('/login')
 
   const memberships = await prisma.workgroupMember.findMany({

@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     if (!prisma) {
       return NextResponse.json({ error: "Database not available" }, { status: 503 })
     }
-    const session = await getSession()
+    const session = await auth()
     if (!session?.user?.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

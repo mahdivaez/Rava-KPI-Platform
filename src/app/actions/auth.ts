@@ -1,10 +1,9 @@
 "use server"
 
-import { redirect } from "next/navigation"
+import { signOut } from "@/lib/auth"
 
 export async function handleSignOut() {
-  // NextAuth v4: redirect to signout endpoint
-  redirect("/api/auth/signout")
+  await signOut({ redirectTo: "/login" })
 }
 
 

@@ -1,10 +1,10 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { StrategistEvaluationForm } from "@/components/evaluations/strategist-evaluation-form"
 
 export default async function NewStrategistEvaluationPage() {
-  const session = await getSession()
+  const session = await auth()
   if (!session?.user?.isTechnicalDeputy && !session?.user?.isAdmin) {
     redirect('/dashboard')
   }

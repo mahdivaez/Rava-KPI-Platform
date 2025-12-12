@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,7 @@ import { TeamLeaderboard } from "@/components/admin/dashboard/team-leaderboard"
 import { PerformanceAlerts } from "@/components/admin/dashboard/performance-alerts"
 
 export default async function AdminDashboardPage() {
-  const session = await getSession()
+  const session = await auth()
   if (!session?.user?.isAdmin) redirect('/dashboard')
 
   // Get comprehensive statistics
