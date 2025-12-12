@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma"
 import { Card } from "@/components/ui/card"
 import { MessagesInterface } from "@/components/messages/messages-interface"
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+
 export default async function MessagesPage() {
   const session = await auth()
   if (!session) redirect('/login')
@@ -75,6 +78,21 @@ export default async function MessagesPage() {
     },
   })
 
+  // Fetch initial messages for the first conversation if exists
+  let initialMessages: any[] = []
+  if (conversationsWithUnread.length > 0) {
+    const firstUserId = conversationsWithUnread[0].id
+    initialMessages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: session.user.id, receiverId: firstUserId },
+          { senderId: firstUserId, receiverId: session.user.id },
+        ],
+      },
+      orderBy: { createdAt: 'asc' },
+    })
+  }
+
   return (
     <div className="h-[calc(100vh-10rem)] sm:h-[calc(100vh-9rem)] lg:h-[calc(100vh-8rem)]">
       <Card className="h-full border-nude-200 overflow-hidden">
@@ -82,6 +100,7 @@ export default async function MessagesPage() {
           currentUserId={session.user.id}
           conversations={conversationsWithUnread}
           allUsers={allUsers}
+          initialMessages={initialMessages}
         />
       </Card>
     </div>

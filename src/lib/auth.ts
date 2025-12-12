@@ -1,22 +1,21 @@
 import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
+import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import type { NextAuthOptions } from "next-auth"
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET,
+export const authOptions: NextAuthOptions = {
+  secret: (globalThis as any).process?.env?.NEXTAUTH_SECRET || 'fallback-secret',
   providers: [
-    Credentials({
+    CredentialsProvider({
+      name: "Credentials",
       credentials: {
-        email: { type: "email" },
-        password: { type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
-      authorize: async (credentials) => {
-        // --- تغییرات پیشنهادی اعمال شد: استفاده از return null بجای throw new Error ---
-        
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          // در صورت نقص اطلاعات، بجای پرتاب خطا، null برمی‌گرداند.
-          return null 
+          return null
         }
 
         const user = await prisma.user.findUnique({
@@ -24,8 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         })
 
         if (!user || !user.isActive) {
-          // در صورت عدم وجود کاربر یا غیرفعال بودن، null برمی‌گرداند.
-          return null 
+          return null
         }
 
         const isValidPassword = await bcrypt.compare(
@@ -34,11 +32,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         )
 
         if (!isValidPassword) {
-          // در صورت اشتباه بودن رمز عبور، null برمی‌گرداند.
-          return null 
+          return null
         }
 
-        // --- در صورت موفقیت، شیء کاربر برگردانده می‌شود ---
         return {
           id: user.id,
           email: user.email,
@@ -50,7 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id
         token.isAdmin = user.isAdmin
@@ -58,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token
     },
-    session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (session.user) {
         session.user.id = token.id as string
         session.user.isAdmin = token.isAdmin as boolean
@@ -71,6 +67,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/login',
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
-})
+}
+
+export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)

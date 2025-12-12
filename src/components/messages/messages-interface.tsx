@@ -41,12 +41,13 @@ interface MessagesInterfaceProps {
   currentUserId: string
   conversations: Conversation[]
   allUsers: User[]
+  initialMessages?: Message[]
 }
 
-export function MessagesInterface({ currentUserId, conversations, allUsers }: MessagesInterfaceProps) {
+export function MessagesInterface({ currentUserId, conversations, allUsers, initialMessages = [] }: MessagesInterfaceProps) {
   const router = useRouter()
   const [selectedUser, setSelectedUser] = useState<string | null>(conversations[0]?.id || null)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [newMessage, setNewMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSending, setIsSending] = useState(false)
@@ -59,9 +60,17 @@ export function MessagesInterface({ currentUserId, conversations, allUsers }: Me
   // Load messages when user is selected
   useEffect(() => {
     if (selectedUser) {
-      loadMessages(selectedUser)
+      // Only load from API if we don't have initial messages for this user
+      const hasInitialMessages = initialMessages.length > 0 &&
+        (initialMessages[0].senderId === selectedUser || initialMessages[0].receiverId === selectedUser)
+      
+      if (!hasInitialMessages) {
+        loadMessages(selectedUser)
+      } else {
+        setMessages(initialMessages)
+      }
     }
-  }, [selectedUser])
+  }, [selectedUser, initialMessages])
 
   useEffect(() => {
     scrollToBottom()

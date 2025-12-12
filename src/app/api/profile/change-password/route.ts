@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 
+// Ensure this route runs on Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   try {
     const session = await auth()

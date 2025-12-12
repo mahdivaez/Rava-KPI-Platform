@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 
+// Ensure this route runs on Node.js runtime, not Edge Runtime
+export const runtime = 'nodejs'
+
 const userSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(1),

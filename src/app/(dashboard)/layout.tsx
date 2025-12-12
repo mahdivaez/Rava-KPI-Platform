@@ -1,3 +1,6 @@
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
