@@ -59,7 +59,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-[#3d3530] mb-3 leading-tight">
-              خوش آمدید
+              خوش مدید
             </h1>
             <p className="text-[#8a7a6f] text-base font-medium">
               برای ادامه وارد حساب کاربری خود شوید
