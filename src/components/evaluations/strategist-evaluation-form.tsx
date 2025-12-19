@@ -21,6 +21,7 @@ import Link from "next/link"
 import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
 import { ImageModal } from "@/components/ui/image-modal"
+import { ScoreSelector } from "@/components/ui/score-selector"
 
 // Evaluation metrics
 const STRATEGIST_METRICS = [
@@ -118,8 +119,8 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
   const scorePercentage = maxTotalScore > 0 ? (totalScore / maxTotalScore) * 100 : 0
 
   // Update score
-  const handleScoreChange = (key: string, value: string) => {
-    const numValue = parseInt(value) || 0
+  const handleScoreChange = (key: string, value: string | number) => {
+    const numValue = typeof value === 'string' ? (parseInt(value) || 0) : value
     if (numValue >= 1 && numValue <= 5) {
       setScores(prev => ({ ...prev, [key]: numValue }))
     } else if (value === '') {
@@ -487,15 +488,11 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                       <Label className="text-nude-900 font-bold text-xs mb-2 block">
                         امتیاز از 1 تا 5:
                       </Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={scores[metric.key] || ''}
-                        onChange={(e) => handleScoreChange(metric.key, e.target.value)}
-                        className="w-20 text-center font-bold text-lg h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
-                        placeholder="1-5"
-                        required
+                      <ScoreSelector
+                        value={scores[metric.key]}
+                        onChange={(value) => handleScoreChange(metric.key, value)}
+                        min={1}
+                        max={5}
                       />
                     </div>
                     

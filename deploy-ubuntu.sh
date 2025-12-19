@@ -116,6 +116,14 @@ server {
     listen 80;
     server_name _;
 
+    # Static files - serve Next.js static assets directly
+    location /_next/static/ {
+        alias $PROJECT_DIR/.next/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Access-Control-Allow-Origin *;
+    }
+
     # Next.js app
     location / {
         proxy_pass http://localhost:3000;
@@ -160,6 +168,9 @@ echo "🔧 Setting permissions..."
 sudo chown -R www-data:www-data $PROJECT_DIR
 sudo chmod -R 755 $PROJECT_DIR
 sudo chmod -R 777 $PROJECT_DIR/public/uploads
+# Ensure .next directory has correct permissions (set after build)
+sudo chown -R www-data:www-data $PROJECT_DIR/.next 2>/dev/null || true
+sudo chmod -R 755 $PROJECT_DIR/.next 2>/dev/null || true
 
 # Add user to www-data group for file access
 sudo usermod -a -G www-data $USER
@@ -167,6 +178,11 @@ sudo usermod -a -G www-data $USER
 # Build the application for production
 echo "🏗️  Building application..."
 npm run build
+
+# Set proper permissions for build artifacts
+echo "🔧 Setting permissions for build artifacts..."
+sudo chown -R www-data:www-data $PROJECT_DIR/.next
+sudo chmod -R 755 $PROJECT_DIR/.next
 
 # Start with PM2
 echo "🚀 Starting application with PM2..."
