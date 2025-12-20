@@ -50,6 +50,35 @@ export function FeedbackForm({
   const [modalImageSrc, setModalImageSrc] = useState<string>("")
   const router = useRouter()
 
+  // Rating states
+  const [communication, setCommunication] = useState(0)
+  const [supportLevel, setSupportLevel] = useState(0)
+  const [clarityOfTasks, setClarityOfTasks] = useState(0)
+  const [feedbackQuality, setFeedbackQuality] = useState(0)
+
+  // Rating circles component
+  const RatingCircles = ({ name, value, onChange }: { name: string; value: number; onChange: (value: number) => void }) => {
+    return (
+      <div className="flex gap-1 justify-center">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+          <button
+            key={num}
+            type="button"
+            onClick={() => onChange(num)}
+            className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${
+              num <= value
+                ? 'bg-nude-500 border-nude-500 text-white'
+                : 'bg-white border-nude-300 hover:border-nude-400'
+            }`}
+            title={`امتیاز ${num}`}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   // Persian month names
   const persianMonths = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
@@ -184,25 +213,26 @@ export function FeedbackForm({
       return
     }
 
-    const metricConfigs = [
-      { key: "communication", label: "ارتباطات" },
-      { key: "supportLevel", label: "سطح پشتیبانی" },
-      { key: "clarityOfTasks", label: "وضوح وظایف" },
-      { key: "feedbackQuality", label: "کیفیت بازخورد" },
-    ] as const
+    const metrics = {
+      communication,
+      supportLevel,
+      clarityOfTasks,
+      feedbackQuality,
+    }
 
-    const metrics: Record<string, number> = {}
-    for (const metric of metricConfigs) {
-      const rawValue = formData.get(metric.key)
-      console.log(`Raw value for ${metric.key}:`, rawValue, typeof rawValue)
-      const value = Number(rawValue)
-      console.log(`Parsed value for ${metric.key}:`, value, Number.isNaN(value))
-      if (!value || Number.isNaN(value) || value < 1 || value > 10) {
-        toast.error(`امتیاز ${metric.label} باید بین ۱ تا ۱۰ باشد`)
+    // Validate all ratings are selected
+    for (const [key, value] of Object.entries(metrics)) {
+      const label = {
+        communication: "ارتباطات",
+        supportLevel: "سطح پشتیبانی",
+        clarityOfTasks: "وضوح وظایف",
+        feedbackQuality: "کیفیت بازخورد",
+      }[key]
+      if (value < 1 || value > 10) {
+        toast.error(`امتیاز ${label} باید بین ۱ تا ۱۰ باشد`)
         setLoading(false)
         return
       }
-      metrics[metric.key] = value
     }
 
     const data = {
@@ -233,6 +263,10 @@ export function FeedbackForm({
         setStrategistSearch("")
         setImageUrl("")
         setImageFile(null)
+        setCommunication(0)
+        setSupportLevel(0)
+        setClarityOfTasks(0)
+        setFeedbackQuality(0)
         router.refresh()
       } else {
         const result = await res.json()
@@ -429,14 +463,33 @@ export function FeedbackForm({
                       </span>
                     </td>
                     <td className="p-3 lg:p-5 border-t border-nude-200">
-                      <Input
-                        type="number"
-                        name={metric.key}
-                        min="1"
-                        max="10"
-                        className="w-20 lg:w-24 mx-auto text-center font-bold text-lg lg:text-xl h-12 lg:h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
-                        placeholder="1-10"
-                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <RatingCircles
+                          name={metric.key}
+                          value={
+                            metric.key === 'communication' ? communication :
+                            metric.key === 'supportLevel' ? supportLevel :
+                            metric.key === 'clarityOfTasks' ? clarityOfTasks :
+                            feedbackQuality
+                          }
+                          onChange={
+                            metric.key === 'communication' ? setCommunication :
+                            metric.key === 'supportLevel' ? setSupportLevel :
+                            metric.key === 'clarityOfTasks' ? setClarityOfTasks :
+                            setFeedbackQuality
+                          }
+                        />
+                        <input
+                          type="hidden"
+                          name={metric.key}
+                          value={
+                            metric.key === 'communication' ? communication :
+                            metric.key === 'supportLevel' ? supportLevel :
+                            metric.key === 'clarityOfTasks' ? clarityOfTasks :
+                            feedbackQuality
+                          }
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -463,14 +516,33 @@ export function FeedbackForm({
                       <Label className="text-nude-900 font-bold text-xs mb-2 block">
                         امتیاز از 1 تا 10:
                       </Label>
-                      <Input
-                        type="number"
-                        name={metric.key}
-                        min="1"
-                        max="10"
-                        className="w-20 text-center font-bold text-lg h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
-                        placeholder="1-10"
-                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <RatingCircles
+                          name={metric.key}
+                          value={
+                            metric.key === 'communication' ? communication :
+                            metric.key === 'supportLevel' ? supportLevel :
+                            metric.key === 'clarityOfTasks' ? clarityOfTasks :
+                            feedbackQuality
+                          }
+                          onChange={
+                            metric.key === 'communication' ? setCommunication :
+                            metric.key === 'supportLevel' ? setSupportLevel :
+                            metric.key === 'clarityOfTasks' ? setClarityOfTasks :
+                            setFeedbackQuality
+                          }
+                        />
+                        <input
+                          type="hidden"
+                          name={metric.key}
+                          value={
+                            metric.key === 'communication' ? communication :
+                            metric.key === 'supportLevel' ? supportLevel :
+                            metric.key === 'clarityOfTasks' ? clarityOfTasks :
+                            feedbackQuality
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 </CardContent>
