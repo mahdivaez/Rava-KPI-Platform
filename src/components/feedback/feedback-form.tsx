@@ -25,6 +25,13 @@ type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
 }
 
+// Convert Persian numerals to Western numerals
+function convertPersianToWesternNumerals(str: string): string {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  const westernDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  return str.replace(/[۰-۹]/g, (match) => westernDigits[persianDigits.indexOf(match)]);
+}
+
 export function FeedbackForm({
   workgroups,
 }: {
@@ -186,7 +193,10 @@ export function FeedbackForm({
 
     const metrics: Record<string, number> = {}
     for (const metric of metricConfigs) {
-      const value = Number(formData.get(metric.key))
+      const rawValue = formData.get(metric.key)
+      console.log(`Raw value for ${metric.key}:`, rawValue, typeof rawValue)
+      const value = Number(rawValue)
+      console.log(`Parsed value for ${metric.key}:`, value, Number.isNaN(value))
       if (!value || Number.isNaN(value) || value < 1 || value > 10) {
         toast.error(`امتیاز ${metric.label} باید بین ۱ تا ۱۰ باشد`)
         setLoading(false)
