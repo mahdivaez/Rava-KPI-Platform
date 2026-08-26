@@ -17,8 +17,10 @@ import {
   Sparkles,
   Clock,
   CheckCircle2,
-  Mail
+  Mail,
+  ClipboardCheck
 } from "lucide-react"
+import { getRoleBadgeClass, getRoleLabel, isTeamRole, type TeamRole } from "@/lib/roles"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -76,6 +78,13 @@ export default async function DashboardPage() {
     .filter(m => m.role === 'WRITER')
     .map(m => m.workgroup)
 
+  // Every distinct workgroup role this user holds, for badges and quick actions.
+  const myTeamRoles: TeamRole[] = Array.from(
+    new Set<TeamRole>(
+      memberships.map((m: any) => m.role).filter(isTeamRole)
+    )
+  )
+
   // Get stats for admin
   let adminStats = null
   if (session.user.isAdmin) {
@@ -108,8 +117,11 @@ export default async function DashboardPage() {
               <p className="text-nude-600 flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 {session.user.isAdmin && <Badge className="badge-error text-xs">مدیر سیستم</Badge>}
                 {session.user.isTechnicalDeputy && <Badge className="badge-neutral text-xs">معاون فنی</Badge>}
-                {isStrategist && <Badge className="bg-info/10 text-info border border-info/30 text-xs">استراتژیست</Badge>}
-                {writerGroups.length > 0 && <Badge className="badge-success text-xs">نویسنده</Badge>}
+                {myTeamRoles.map(role => (
+                  <Badge key={role} className={`text-xs ${getRoleBadgeClass(role)}`}>
+                    {getRoleLabel(role)}
+                  </Badge>
+                ))}
               </p>
             </div>
           </div>
@@ -251,6 +263,18 @@ export default async function DashboardPage() {
                 </div>
                 <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی استراتژیست</p>
                 <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
+              </Link>
+            )}
+
+            {/* Role-based team evaluation - anyone holding a workgroup role */}
+            {(myTeamRoles.length > 0 || session.user.isAdmin) && (
+              <Link href="/evaluations/team" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
+                <div className="flex items-center justify-between mb-2">
+                  <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی تیم</p>
+                <p className="text-xs text-nude-600 mt-1">ارزیابی همکاران بر اساس نقش</p>
               </Link>
             )}
 

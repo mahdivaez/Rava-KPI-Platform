@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { Trash2, Plus } from "lucide-react"
+import { TEAM_ROLES, getRoleBadgeClass, getRoleLabel, type TeamRole } from "@/lib/roles"
 
 type WorkgroupWithMembers = Workgroup & {
   members: (WorkgroupMember & { user: User })[]
@@ -39,7 +40,7 @@ export function ManageMembersDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const [selectedUserId, setSelectedUserId] = useState("")
-  const [selectedRole, setSelectedRole] = useState<"STRATEGIST" | "WRITER">("WRITER")
+  const [selectedRole, setSelectedRole] = useState<TeamRole>("WRITER")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -135,9 +136,12 @@ export function ManageMembersDialog({
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="STRATEGIST">استراتژیست</SelectItem>
-                    <SelectItem value="WRITER">نویسنده</SelectItem>
+                  <SelectContent className="max-h-60">
+                    {TEAM_ROLES.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {getRoleLabel(role)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -166,8 +170,8 @@ export function ManageMembersDialog({
                       <span className="font-medium">
                         {member.user.firstName} {member.user.lastName}
                       </span>
-                      <Badge variant={member.role === "STRATEGIST" ? "default" : "secondary"}>
-                        {member.role === "STRATEGIST" ? "استراتژیست" : "نویسنده"}
+                      <Badge className={`text-xs ${getRoleBadgeClass(member.role)}`}>
+                        {getRoleLabel(member.role)}
                       </Badge>
                     </div>
                     <Button

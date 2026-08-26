@@ -9,7 +9,13 @@ generator client {
 
 enum WorkgroupRole {
   STRATEGIST
+  STRATEGIST_ASSISTANT
   WRITER
+  DESIGNER
+  EDITOR
+  VIDEOGRAPHER
+  SOCIAL_ADMIN
+  ONSITE_ADMIN
 }
 
 enum EvaluationStatus {
@@ -22,6 +28,7 @@ enum CommentType {
   STRATEGIST_EVALUATION
   WRITER_EVALUATION
   WRITER_FEEDBACK
+  ROLE_EVALUATION
 }
 
 enum PointTransactionType {
@@ -58,6 +65,8 @@ model User {
   totalPoints               Int                    @default(0)
   sentMessages              Message[]              @relation("SentMessages")
   receivedMessages          Message[]              @relation("ReceivedMessages")
+  roleEvaluationsGiven      RoleEvaluation[]       @relation("RoleEvaluationEvaluator")
+  roleEvaluationsReceived   RoleEvaluation[]       @relation("RoleEvaluationTarget")
 
   @@index([email])
   @@index([totalPoints])
@@ -74,6 +83,7 @@ model Workgroup {
   members            WorkgroupMember[]
   writerEvaluations  WriterEvaluation[]
   writerFeedbacks    WriterFeedback[]
+  roleEvaluations    RoleEvaluation[]
 
   @@index([name])
 }
@@ -194,6 +204,49 @@ model WriterFeedback {
   @@index([month, year])
 }
 
+
+/// Generic, role-driven monthly evaluation.
+/// The metric keys stored in `scores` are defined per role in src/lib/roles.ts,
+/// so adding a role or a KPI needs no schema change.
+model RoleEvaluation {
+  id            String           @id @default(cuid())
+  workgroupId   String
+  evaluatorId   String
+  evaluatorRole WorkgroupRole
+  targetId      String
+  targetRole    WorkgroupRole
+  month         Int
+  year          Int
+  status        EvaluationStatus @default(COMPLETED)
+
+  /// { [metricKey]: 1..10 }
+  scores       Json
+  totalScore   Int
+  averageScore Float
+
+  /// Optional per-metric evaluator notes: { [metricKey]: string }
+  metricNotes  Json?
+
+  strengths    String?
+  improvements String?
+  example      String?
+  suggestions  String?
+  imageUrl     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workgroup Workgroup @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
+  evaluator User      @relation("RoleEvaluationEvaluator", fields: [evaluatorId], references: [id])
+  target    User      @relation("RoleEvaluationTarget", fields: [targetId], references: [id])
+
+  @@unique([evaluatorId, targetId, targetRole, workgroupId, month, year], map: "RoleEvaluation_unique_per_period")
+  @@index([evaluatorId])
+  @@index([targetId])
+  @@index([workgroupId])
+  @@index([targetRole])
+  @@index([month, year])
+}
 
 model Comment {
   id        String      @id @default(cuid())

@@ -10,6 +10,7 @@ import {
   Target,
   PieChart,
   TrendingUp,
+  UserCog,
   X
 } from "lucide-react"
 import { usePathname } from "next/navigation"
@@ -27,6 +28,8 @@ export function SidebarContent({ session, memberships, isOpen, onClose }: Sideba
   
   const isStrategist = memberships.some(m => m.role === 'STRATEGIST')
   const isWriter = memberships.some(m => m.role === 'WRITER')
+  // Anyone holding a workgroup role takes part in the role-based team evaluations.
+  const isTeamMember = memberships.length > 0
 
   // Close sidebar on route change for mobile
   useEffect(() => {
@@ -81,6 +84,19 @@ export function SidebarContent({ session, memberships, isOpen, onClose }: Sideba
           داشبورد
         </NavLink>
 
+        {(isTeamMember || session.user.isAdmin) && (
+          <>
+            <div className="pt-6 pb-3">
+              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
+                ارزیابی تیم
+              </div>
+            </div>
+            <NavLink href="/evaluations/team" icon={<ClipboardCheck size={20} />} pathname={pathname}>
+              ارزیابی همکاران
+            </NavLink>
+          </>
+        )}
+
         {session.user.isAdmin && (
           <>
             <div className="pt-6 pb-3">
@@ -96,6 +112,9 @@ export function SidebarContent({ session, memberships, isOpen, onClose }: Sideba
             </NavLink>
             <NavLink href="/admin/workgroups" icon={<FolderKanban size={20} />} pathname={pathname}>
               کارگروه‌ها
+            </NavLink>
+            <NavLink href="/admin/roles" icon={<UserCog size={20} />} pathname={pathname}>
+              نقش‌ها و دسترسی‌ها
             </NavLink>
             <NavLink href="/admin/reports" icon={<BarChart3 size={20} />} pathname={pathname}>
               گزارشات
