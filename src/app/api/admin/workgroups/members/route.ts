@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { TEAM_ROLES } from "@/lib/roles"
 
 const memberSchema = z.object({
   workgroupId: z.string(),
   userId: z.string(),
-  role: z.enum(["STRATEGIST", "WRITER"]),
+  role: z.enum(TEAM_ROLES),
 })
 
 export async function POST(req: NextRequest) {
