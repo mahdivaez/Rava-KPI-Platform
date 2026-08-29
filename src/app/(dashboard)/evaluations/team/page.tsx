@@ -63,7 +63,7 @@ export default async function TeamEvaluationsPage() {
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-nude-900">ارزیابی تیم</h1>
           <p className="text-sm sm:text-base text-nude-600 mt-1">
-            ارزیابی ماهانه اعضای تیم بر اساس نقش —{" "}
+            ارزیابی ماهانه اعضای تیم و خودارزیابی بر اساس نقش —{" "}
             {PERSIAN_MONTHS[currentMonth - 1]} {currentYear}
           </p>
         </div>
@@ -149,7 +149,9 @@ export default async function TeamEvaluationsPage() {
                       className="flex items-center gap-2 border border-nude-200 rounded-lg px-3 py-2 bg-nude-50/60"
                     >
                       <span className="text-sm font-medium text-nude-900">
-                        {person.firstName} {person.lastName}
+                        {person.isSelf
+                          ? "خودارزیابی"
+                          : `${person.firstName} ${person.lastName}`}
                       </span>
                       <Badge className={`text-xs ${getRoleBadgeClass(person.role)}`}>
                         {getRoleLabel(person.role)}

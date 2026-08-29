@@ -25,10 +25,11 @@ export const SCORE_MAX = 10
 
 /**
  * Whether a member may submit an evaluation for themselves.
- * The role matrix says each role comments on "نقش خودش" (their own role),
- * which we read as peers holding that role — not self-assessment.
+ * Each role comments on "نقش خودش" — both peers holding that role and the
+ * member themselves. Someone holding two roles in one workgroup files one
+ * self-evaluation per role, since the uniqueness key includes targetRole.
  */
-export const ALLOW_SELF_EVALUATION = false
+export const ALLOW_SELF_EVALUATION = true
 
 export interface RoleMetric {
   key: string

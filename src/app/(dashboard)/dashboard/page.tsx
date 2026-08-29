@@ -16,7 +16,6 @@ import {
   ArrowRight,
   Sparkles,
   Clock,
-  CheckCircle2,
   Mail,
   ClipboardCheck
 } from "lucide-react"
@@ -60,23 +59,28 @@ export default async function DashboardPage() {
     },
   })
 
-  // Check roles
-  const isStrategist = await prismaClient.workgroupMember.findFirst({
-    where: { userId: session.user.id, role: 'STRATEGIST' },
-  })
-
   const memberships = await prismaClient.workgroupMember.findMany({
     where: { userId: session.user.id },
     include: { workgroup: true },
   })
 
-  const strategistGroups = memberships
-    .filter(m => m.role === 'STRATEGIST')
-    .map(m => m.workgroup)
-
-  const writerGroups = memberships
-    .filter(m => m.role === 'WRITER')
-    .map(m => m.workgroup)
+  // One entry per workgroup, carrying every role the user holds there.
+  const myWorkgroups = Array.from(
+    memberships
+      .reduce((map: Map<string, any>, m: any) => {
+        const existing = map.get(m.workgroupId)
+        if (existing) existing.roles.push(m.role)
+        else map.set(m.workgroupId, { ...m.workgroup, roles: [m.role] })
+        return map
+      }, new Map<string, any>())
+      .values()
+  ) as Array<{
+    id: string
+    name: string
+    description: string | null
+    isActive: boolean
+    roles: string[]
+  }>
 
   // Every distinct workgroup role this user holds, for badges and quick actions.
   const myTeamRoles: TeamRole[] = Array.from(
@@ -277,95 +281,47 @@ export default async function DashboardPage() {
                 <p className="text-xs text-nude-600 mt-1">ارزیابی همکاران بر اساس نقش</p>
               </Link>
             )}
-
-            {/* Writer Evaluation - Only for Strategists/Admin */}
-            {(isStrategist || session.user.isAdmin) && (
-              <Link href="/evaluations/writer" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی نویسنده</p>
-                <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
-              </Link>
-            )}
-
-            {/* Feedback for Strategists */}
-            {isStrategist && (
-              <Link href="/feedback/send" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <MessageSquareText className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">ارسال بازخورد</p>
-                <p className="text-xs text-nude-600 mt-1">به استراتژیست‌ها</p>
-              </Link>
-            )}
           </div>
         </CardContent>
       </Card>
 
       {/* My Workgroups */}
-      {(strategistGroups.length > 0 || writerGroups.length > 0) && (
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          {/* Strategist Workgroups */}
-          {strategistGroups.length > 0 && (
-            <Card className="border-nude-200">
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
-                  <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-info" />
-                  کارگروه‌های استراتژیست
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="space-y-2 sm:space-y-3">
-                  {strategistGroups.map((group) => (
-                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
-                      <div className="flex-1 min-w-0 mr-3">
-                        <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
-                        {group.description && (
-                          <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
-                        )}
-                      </div>
-                      <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap`}>
-                        {group.isActive ? 'فعال' : 'غیرفعال'}
-                      </Badge>
+      {myWorkgroups.length > 0 && (
+        <Card className="border-nude-200">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
+              <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-info" />
+              کارگروه‌های من
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              نقش‌های شما در هر کارگروه
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6">
+            <div className="grid gap-2 sm:gap-3 grid-cols-1 lg:grid-cols-2">
+              {myWorkgroups.map((group) => (
+                <div key={group.id} className="flex items-start justify-between gap-3 p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
+                    {group.description && (
+                      <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
+                    )}
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {group.roles.map((role) => (
+                        <Badge key={role} className={`text-xs ${getRoleBadgeClass(role)}`}>
+                          {getRoleLabel(role)}
+                        </Badge>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap flex-shrink-0`}>
+                    {group.isActive ? 'فعال' : 'غیرفعال'}
+                  </Badge>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Writer Workgroups */}
-          {writerGroups.length > 0 && (
-            <Card className="border-nude-200">
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
-                  کارگروه‌های نویسنده
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="space-y-2 sm:space-y-3">
-                  {writerGroups.map((group) => (
-                    <div key={group.id} className="flex items-center justify-between p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
-                      <div className="flex-1 min-w-0 mr-3">
-                        <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
-                        {group.description && (
-                          <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
-                        )}
-                      </div>
-                      <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap`}>
-                        {group.isActive ? 'فعال' : 'غیرفعال'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

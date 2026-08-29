@@ -33,6 +33,8 @@ export interface EvaluableMember {
   firstName: string
   lastName: string
   role: TeamRole
+  /** True when this entry is the current user evaluating themselves. */
+  isSelf: boolean
 }
 
 export interface EvaluableWorkgroup {
@@ -91,13 +93,19 @@ export function RoleEvaluationForm({
     return workgroup.members.filter((m) => m.role === targetRole)
   }, [workgroup, targetRole])
 
-  const filteredMembers = members.filter(
-    (m) =>
-      m.id === targetId ||
-      `${m.firstName} ${m.lastName}`
-        .toLowerCase()
-        .includes(memberSearch.toLowerCase())
-  )
+  const filteredMembers = members
+    .filter(
+      (m) =>
+        m.id === targetId ||
+        `${m.firstName} ${m.lastName}`
+          .toLowerCase()
+          .includes(memberSearch.toLowerCase())
+    )
+    // Self-evaluation first, so it is easy to find.
+    .sort((a, b) => Number(b.isSelf) - Number(a.isSelf))
+
+  const selectedMember = members.find((m) => m.id === targetId)
+  const isSelfEvaluation = !!selectedMember?.isSelf
 
   const totalScore = metrics.reduce((sum, m) => sum + (scores[m.key] || 0), 0)
   const maxTotalScore = metrics.length * SCORE_MAX
@@ -304,7 +312,11 @@ export function RoleEvaluationForm({
                 </div>
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 leading-tight">
-                    {definition ? `ارزیابی ${definition.label}` : "ارزیابی عملکرد تیم"}
+                    {!definition
+                      ? "ارزیابی عملکرد تیم"
+                      : isSelfEvaluation
+                      ? `خودارزیابی — ${definition.label}`
+                      : `ارزیابی ${definition.label}`}
                   </h1>
                   <p className="text-nude-600 text-xs sm:text-sm lg:text-base mt-1">
                     فرم ارزیابی ماهانه بر اساس نقش — امتیاز {SCORE_MIN} تا {SCORE_MAX}
@@ -405,6 +417,7 @@ export function RoleEvaluationForm({
                   {filteredMembers.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.firstName} {m.lastName}
+                      {m.isSelf ? " (خودم)" : ""}
                     </option>
                   ))}
                 </select>

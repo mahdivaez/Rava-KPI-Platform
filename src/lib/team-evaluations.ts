@@ -53,6 +53,7 @@ export async function getEvaluableWorkgroups(
         firstName: m.user.firstName,
         lastName: m.user.lastName,
         role: m.role as TeamRole,
+        isSelf: m.userId === userId,
       }))
 
     // Only offer roles that actually have someone to evaluate.

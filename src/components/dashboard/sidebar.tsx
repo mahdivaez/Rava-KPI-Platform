@@ -5,7 +5,6 @@ import {
   Users,
   FolderKanban,
   ClipboardCheck,
-  MessageSquare,
   BarChart3,
   Target,
   PieChart,
@@ -26,8 +25,6 @@ interface SidebarProps {
 export function SidebarContent({ session, memberships, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
   
-  const isStrategist = memberships.some(m => m.role === 'STRATEGIST')
-  const isWriter = memberships.some(m => m.role === 'WRITER')
   // Anyone holding a workgroup role takes part in the role-based team evaluations.
   const isTeamMember = memberships.length > 0
 
@@ -135,31 +132,6 @@ export function SidebarContent({ session, memberships, isOpen, onClose }: Sideba
           </>
         )}
 
-        {isStrategist && (
-          <>
-            <div className="pt-6 pb-3">
-              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
-                استراتژیست
-              </div>
-            </div>
-            <NavLink href="/evaluations/writer" icon={<ClipboardCheck size={20} />} pathname={pathname}>
-              ارزیابی نویسنده‌ها
-            </NavLink>
-          </>
-        )}
-
-        {isWriter && (
-          <>
-            <div className="pt-6 pb-3">
-              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
-                نویسنده
-              </div>
-            </div>
-            <NavLink href="/feedback/send" icon={<MessageSquare size={20} />} pathname={pathname}>
-              ارسال بازخورد
-            </NavLink>
-          </>
-        )}
       </nav>
 
       {/* Footer */}
