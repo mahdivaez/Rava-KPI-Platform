@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Send, MessageSquare, Loader2, Plus } from "lucide-react"
+import { ArrowRight, Loader2, MessageSquare, Send } from "lucide-react"
+import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
@@ -126,11 +127,6 @@ export function MessagesInterface({ currentUserId, conversations, allUsers, init
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter creates new line (default behavior)
-    // No special handling needed - let the default textarea behavior work
-  }
-
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase()
   }
@@ -138,19 +134,24 @@ export function MessagesInterface({ currentUserId, conversations, allUsers, init
   const selectedUserData = conversations.find(u => u.id === selectedUser) || allUsers.find(u => u.id === selectedUser)
 
   return (
-    <div className="h-full flex">
-      {/* Conversations Sidebar */}
-      <div className="w-80 border-l border-nude-200 flex flex-col">
-        <div className="p-4 border-b border-nude-200">
-          <h2 className="font-bold text-nude-900 flex items-center gap-2 mb-3">
-            <MessageSquare className="w-5 h-5" />
+    // Master/detail: on phones only one pane is on screen at a time, so the
+    // thread gets the full width instead of a squeezed column.
+    <div className="flex h-full">
+      {/* Conversations */}
+      <div
+        className={`flex w-full flex-col border-e border-border md:w-80 md:shrink-0 ${
+          selectedUser ? "hidden md:flex" : "flex"
+        }`}
+      >
+        <div className="space-y-3 border-b border-border p-4">
+          <h2 className="flex items-center gap-2 font-semibold text-foreground">
+            <MessageSquare className="size-5 text-foreground-subtle" aria-hidden />
             پیام‌ها
           </h2>
-          
-          {/* New Conversation */}
+
           <Select value={selectedUser || ""} onValueChange={setSelectedUser}>
-            <SelectTrigger className="bg-nude-50 border-nude-200">
-              <SelectValue placeholder="پیام جدید" />
+            <SelectTrigger aria-label="شروع گفتگوی جدید">
+              <SelectValue placeholder="گفتگوی جدید…" />
             </SelectTrigger>
             <SelectContent>
               {allUsers.map((user) => (
@@ -168,91 +169,119 @@ export function MessagesInterface({ currentUserId, conversations, allUsers, init
               <button
                 key={user.id}
                 onClick={() => setSelectedUser(user.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all mb-1 ${
+                aria-current={selectedUser === user.id ? "true" : undefined}
+                className={`mb-1 flex w-full items-center gap-3 rounded-xl p-3 text-start transition-colors duration-fast ease-out ${
                   selectedUser === user.id
-                    ? 'bg-primary/10 border border-primary/30'
-                    : 'hover:bg-nude-50'
+                    ? "bg-primary-subtle"
+                    : "hover:bg-surface-hover"
                 }`}
               >
-                <Avatar className="h-12 w-12 border border-nude-200">
-                  <AvatarImage src={user.image || undefined} />
-                  <AvatarFallback className="bg-nude-200 text-nude-700">
+                <Avatar className="size-11 ring-1 ring-border">
+                  <AvatarImage src={user.image || undefined} alt="" />
+                  <AvatarFallback>
                     {getInitials(user.firstName, user.lastName)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 text-right">
-                  <p className="font-semibold text-nude-900 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-foreground">
                     {user.firstName} {user.lastName}
                   </p>
-                  <p className="text-xs text-nude-600">{user.email}</p>
+                  <p dir="ltr" className="truncate text-start text-xs text-foreground-muted">
+                    {user.email}
+                  </p>
                 </div>
                 {user.unreadCount > 0 && (
-                  <div className="w-6 h-6 rounded-full bg-destructive text-white text-xs flex items-center justify-center font-bold">
-                    {user.unreadCount}
-                  </div>
+                  <span
+                    data-numeric
+                    aria-label={`${user.unreadCount} پیام خوانده‌نشده`}
+                    className="grid size-6 shrink-0 place-items-center rounded-full bg-danger text-xs font-bold text-danger-foreground"
+                  >
+                    {user.unreadCount.toLocaleString("fa-IR")}
+                  </span>
                 )}
               </button>
             ))}
 
             {conversations.length === 0 && (
-              <div className="text-center py-12">
-                <MessageSquare className="w-12 h-12 text-nude-400 mx-auto mb-2" />
-                <p className="text-sm text-nude-600">هنوز گفتگویی ندارید</p>
-              </div>
+              <EmptyState
+                icon={<MessageSquare />}
+                title="هنوز گفتگویی ندارید"
+                description="از فهرست بالا یک همکار را انتخاب کنید تا گفتگو شروع شود."
+                size="sm"
+              />
             )}
           </div>
         </ScrollArea>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 flex flex-col">
+      {/* Thread */}
+      <div
+        className={`min-w-0 flex-1 flex-col ${selectedUser ? "flex" : "hidden md:flex"}`}
+      >
         {selectedUser && selectedUserData ? (
           <>
-            {/* Chat Header */}
-            <div className="p-4 border-b border-nude-200 bg-nude-50">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 border border-nude-200">
-                  <AvatarImage src={selectedUserData.image || undefined} />
-                  <AvatarFallback className="bg-nude-200 text-nude-700">
-                    {getInitials(selectedUserData.firstName, selectedUserData.lastName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold text-nude-900">
-                    {selectedUserData.firstName} {selectedUserData.lastName}
-                  </p>
-                  <p className="text-xs text-nude-600">{selectedUserData.email}</p>
-                </div>
+            <div className="flex items-center gap-3 border-b border-border p-4">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setSelectedUser(null)}
+                aria-label="بازگشت به فهرست گفتگوها"
+                className="md:hidden"
+              >
+                <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
+              </Button>
+
+              <Avatar className="size-10 ring-1 ring-border">
+                <AvatarImage src={selectedUserData.image || undefined} alt="" />
+                <AvatarFallback>
+                  {getInitials(selectedUserData.firstName, selectedUserData.lastName)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-foreground">
+                  {selectedUserData.firstName} {selectedUserData.lastName}
+                </p>
+                <p dir="ltr" className="truncate text-start text-xs text-foreground-muted">
+                  {selectedUserData.email}
+                </p>
               </div>
             </div>
 
-            {/* Messages */}
             <ScrollArea className="flex-1 p-4">
               {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <Loader2 className="w-8 h-8 animate-spin text-nude-400" />
+                <div className="flex h-full items-center justify-center">
+                  <Loader2
+                    className="size-7 animate-spin text-foreground-subtle"
+                    aria-label="در حال بارگذاری پیام‌ها"
+                  />
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {messages.map((message) => {
                     const isSent = message.senderId === currentUserId
                     return (
                       <div
                         key={message.id}
-                        className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${isSent ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                          className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                             isSent
-                              ? 'bg-primary text-white'
-                              : 'bg-nude-100 text-nude-900'
+                              ? "rounded-ee-md bg-primary text-primary-foreground"
+                              : "rounded-es-md bg-surface-sunken text-foreground"
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          <p className={`text-xs mt-1 ${isSent ? 'text-white/70' : 'text-nude-600'}`}>
-                            {new Date(message.createdAt).toLocaleTimeString('fa-IR', {
-                              hour: '2-digit',
-                              minute: '2-digit',
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {message.content}
+                          </p>
+                          <p
+                            className={`mt-1 text-2xs ${
+                              isSent ? "text-primary-foreground/70" : "text-foreground-subtle"
+                            }`}
+                          >
+                            {new Date(message.createdAt).toLocaleTimeString("fa-IR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </p>
                         </div>
@@ -264,44 +293,40 @@ export function MessagesInterface({ currentUserId, conversations, allUsers, init
               )}
             </ScrollArea>
 
-            {/* Message Input */}
-            <form onSubmit={handleSend} className="p-4 border-t border-nude-200">
-              <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <Textarea
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="پیام خود را بنویسید... (Enter برای خط جدید، روی ارسال کلیک کنید)"
-                    className="bg-nude-50 border-nude-200 resize-none min-h-[60px] max-h-[120px]"
-                    disabled={isSending}
-                    rows={1}
-                  />
-                </div>
+            <form onSubmit={handleSend} className="border-t border-border p-4">
+              <div className="flex items-end gap-2">
+                <Textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  aria-label="متن پیام"
+                  placeholder="پیام خود را بنویسید…"
+                  className="max-h-32 min-h-[52px] flex-1 resize-none"
+                  disabled={isSending}
+                  rows={1}
+                />
                 <Button
                   type="submit"
-                  disabled={isSending || !newMessage.trim()}
-                  className="bg-nude-500 hover:bg-nude-600 text-white h-[60px] px-4"
+                  size="icon-lg"
+                  loading={isSending}
+                  disabled={!newMessage.trim()}
+                  aria-label="ارسال پیام"
+                  title="ارسال"
                 >
-                  {isSending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
+                  {!isSending && <Send className="size-4" aria-hidden />}
                 </Button>
               </div>
             </form>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <MessageSquare className="w-16 h-16 text-nude-400 mx-auto mb-4" />
-              <p className="text-nude-600">یک مکالمه را انتخاب کنید</p>
-            </div>
+          <div className="flex flex-1 items-center justify-center">
+            <EmptyState
+              icon={<MessageSquare />}
+              title="یک گفتگو را انتخاب کنید"
+              description="از فهرست کنار صفحه یک همکار را انتخاب کنید تا پیام‌ها نمایش داده شوند."
+            />
           </div>
         )}
       </div>
     </div>
   )
 }
-

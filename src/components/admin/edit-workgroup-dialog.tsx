@@ -9,9 +9,11 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { CheckboxField } from "@/components/ui/checkbox-field"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
@@ -84,24 +86,22 @@ export function EditWorkgroupDialog({
               rows={3}
             />
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isActive"
-              name="isActive"
-              defaultChecked={workgroup.isActive}
-              className="h-4 w-4"
-            />
-            <Label htmlFor="isActive" className="cursor-pointer">فعال</Label>
-          </div>
-          <div className="flex justify-end gap-2">
+          <CheckboxField
+            id="isActive"
+            label="کارگروه فعال"
+            hint="کارگروه‌های غیرفعال در فرم‌های ارزیابی نمایش داده نمی‌شوند"
+            defaultChecked={workgroup.isActive}
+            className="border border-border bg-surface-sunken"
+          />
+
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               انصراف
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "در حال ویرایش..." : "ذخیره تغییرات"}
+            <Button type="submit" loading={loading}>
+              ذخیره تغییرات
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

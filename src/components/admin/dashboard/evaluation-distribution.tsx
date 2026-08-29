@@ -1,7 +1,14 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts"
+import {
+  AXIS_PROPS,
+  ChartFrame,
+  ChartTooltip,
+  GRID_PROPS,
+} from "@/components/ui/chart"
+import { chartColor } from "@/lib/design-tokens"
 import { Badge } from "@/components/ui/badge"
 
 interface EvaluationDistributionProps {
@@ -79,70 +86,99 @@ export function EvaluationDistribution({ strategistEvaluations, writerEvaluation
 
   return (
     <>
-      {/* Strategist Metrics Chart */}
-      <Card className="border-2 border-nude-200 shadow-lg bg-white">
-        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
-          <CardTitle className="text-nude-900 text-xl font-bold">📊 تحلیل معیارهای استراتژیست‌ها</CardTitle>
-          <CardDescription className="text-nude-600">میانگین امتیاز هر معیار (از 10)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={strategistData} layout="horizontal">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="category" dataKey="metric" angle={-45} textAnchor="end" height={100} />
-              <YAxis type="number" domain={[0, 10]} />
-              <Tooltip />
-              <Bar dataKey="score" fill="#a78b71" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium">وضعیت ارزیابی‌ها</p>
-              <div className="flex gap-2">
-                <Badge variant="outline" className="bg-nude-50 text-nude-700">
-                  تکمیل شده: {completedStrategist}
-                </Badge>
-                <Badge variant="outline" className="bg-orange-50 text-orange-700">
-                  در انتظار: {pendingStrategist}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Writer Metrics Chart */}
-      <Card className="border-2 border-nude-200 shadow-lg bg-white">
-        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
-          <CardTitle className="text-nude-900 text-xl font-bold">📝 تحلیل معیارهای نویسندگان</CardTitle>
-          <CardDescription className="text-nude-600">میانگین امتیاز هر معیار (از 10)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={writerData} layout="horizontal">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="category" dataKey="metric" angle={-45} textAnchor="end" height={100} />
-              <YAxis type="number" domain={[0, 10]} />
-              <Tooltip />
-              <Bar dataKey="score" fill="#8d7a68" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium">وضعیت ارزیابی‌ها</p>
-              <div className="flex gap-2">
-                <Badge variant="outline" className="bg-nude-50 text-nude-700">
-                  تکمیل شده: {completedWriter}
-                </Badge>
-                <Badge variant="outline" className="bg-orange-50 text-orange-700">
-                  در انتظار: {pendingWriter}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <MetricsCard
+        title="تحلیل معیارهای استراتژیست‌ها"
+        data={strategistData}
+        slot={1}
+        completed={completedStrategist}
+        pending={pendingStrategist}
+      />
+      <MetricsCard
+        title="تحلیل معیارهای نویسندگان"
+        data={writerData}
+        slot={3}
+        completed={completedWriter}
+        pending={pendingWriter}
+      />
     </>
   )
 }
 
+/**
+ * One card per role: the average of each metric, as horizontal bars.
+ *
+ * Horizontal because the metric names are long Persian phrases — rotating
+ * them under a vertical axis makes them unreadable on a phone.
+ */
+function MetricsCard({
+  title,
+  data,
+  slot,
+  completed,
+  pending,
+}: {
+  title: string
+  data: Array<{ metric: string; score: string }>
+  slot: 1 | 3
+  completed: number
+  pending: number
+}) {
+  const rows = data.map((d) => ({ metric: d.metric, score: parseFloat(d.score) }))
+  const isEmpty = rows.every((r) => !r.score)
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>میانگین امتیاز هر معیار، از ۱۰</CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Single series: the title names it, so no legend box is needed. */}
+        <ChartFrame
+          height={300}
+          isEmpty={isEmpty}
+          emptyMessage="هنوز ارزیابی‌ای ثبت نشده است"
+          summary={`میانگین ${rows.length} معیار برای این نقش.`}
+        >
+          <BarChart
+            data={rows}
+            layout="vertical"
+            margin={{ top: 4, right: 8, left: 8, bottom: 4 }}
+          >
+            <CartesianGrid {...GRID_PROPS} horizontal={false} vertical />
+            <XAxis type="number" domain={[0, 10]} reversed {...AXIS_PROPS} />
+            <YAxis
+              type="category"
+              dataKey="metric"
+              orientation="right"
+              width={130}
+              {...AXIS_PROPS}
+            />
+            <Tooltip
+              cursor={{ fill: "rgb(var(--surface-hover))" }}
+              content={<ChartTooltip unit="از ۱۰" />}
+            />
+            <Bar
+              dataKey="score"
+              name="میانگین"
+              fill={chartColor(slot)}
+              radius={4}
+              maxBarSize={22}
+            />
+          </BarChart>
+        </ChartFrame>
+
+        <div className="flex flex-wrap items-center gap-2 border-t border-border-subtle pt-4">
+          <span className="text-sm text-foreground-muted">وضعیت ارزیابی‌ها:</span>
+          <Badge variant="success" dot="bg-success">
+            {completed.toLocaleString("fa-IR")} تکمیل‌شده
+          </Badge>
+          <Badge variant="warning" dot="bg-warning">
+            {pending.toLocaleString("fa-IR")} در انتظار
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

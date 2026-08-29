@@ -13,8 +13,6 @@ export default async function NewRoleEvaluationPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-nude-50 via-white to-nude-100 py-4 sm:py-6 lg:py-8">
-      <RoleEvaluationForm workgroups={workgroups} />
-    </div>
+    <RoleEvaluationForm workgroups={workgroups} />
   )
 }

@@ -3,11 +3,12 @@
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import { Loader2, Eye, EyeOff } from "lucide-react"
 
 export function LoginForm() {
   const router = useRouter()
@@ -50,82 +51,61 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      {/* Email */}
-      <div className="space-y-3">
-        <Label htmlFor="email" className="text-[#6b5d54] text-sm font-semibold">
-          ایمیل
-        </Label>
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div className="space-y-2">
+        <Label htmlFor="email">ایمیل</Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="نام@example.com"
+          inputMode="email"
+          // Lets the password manager fill both fields.
+          autoComplete="username"
+          placeholder="name@company.com"
+          dir="ltr"
+          className="text-start"
           required
           disabled={isLoading}
-          className="h-12 text-base bg-white/90 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl transition-all shadow-sm"
         />
       </div>
 
-      {/* Password */}
-      <div className="space-y-3">
-        <Label htmlFor="password" className="text-[#6b5d54] text-sm font-semibold">
-          رمز عبور
-        </Label>
+      <div className="space-y-2">
+        <Label htmlFor="password">رمز عبور</Label>
         <div className="relative">
           <Input
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
             placeholder="رمز عبور خود را وارد کنید"
             required
             disabled={isLoading}
-            className="h-12 text-base bg-white/90 border-[#d4c5b9] text-[#3d3530] placeholder:text-[#b5a59a] focus:bg-white focus:border-[#9b8b7e] focus:ring-2 focus:ring-[#d4c5b9]/50 rounded-xl pr-12 transition-all shadow-sm"
+            className="pe-11"
           />
           <button
             type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#b5a59a] hover:text-[#6b5d54] transition-colors p-1 rounded-md hover:bg-[#f5f1eb]"
-            tabIndex={-1}
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "پنهان کردن رمز عبور" : "نمایش رمز عبور"}
+            aria-pressed={showPassword}
+            className="absolute inset-y-0 end-0 grid w-11 place-items-center rounded-e-lg text-foreground-subtle transition-colors duration-fast hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {showPassword ? (
-              <EyeOff className="w-5 h-5" />
+              <EyeOff className="size-[18px]" aria-hidden />
             ) : (
-              <Eye className="w-5 h-5" />
+              <Eye className="size-[18px]" aria-hidden />
             )}
           </button>
         </div>
       </div>
 
-      {/* Remember & Forgot */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <input 
-            type="checkbox" 
-            className="w-4 h-4 rounded border-[#d4c5b9] text-[#9b8b7e] focus:ring-[#d4c5b9] focus:ring-2 transition-all" 
-          />
-          <span className="text-sm text-[#8a7a6f] font-medium">مرا به خاطر بسپار</span>
-        </label>
-        <a href="#" className="text-sm text-[#9b8b7e] hover:text-[#6b5d54] font-semibold transition-colors hover:underline">
-          فراموشی رمز عبور؟
-        </a>
-      </div>
-
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        disabled={isLoading}
-        className="w-full h-12 text-base bg-[#9b8b7e] hover:bg-[#8a7a6f] text-white font-semibold rounded-xl shadow-lg shadow-[#9b8b7e]/20 hover:shadow-[#9b8b7e]/30 transition-all duration-300 mt-6"
-      >
-        {isLoading ? (
-          <div className="flex items-center gap-3">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span>در حال ورود...</span>
-          </div>
-        ) : (
-          <span>ورود به سیستم</span>
-        )}
+      <Button type="submit" size="lg" loading={isLoading} className="mt-2 w-full">
+        {isLoading ? "در حال ورود…" : "ورود به سامانه"}
       </Button>
+
+      <p className="text-center text-xs leading-relaxed text-foreground-subtle">
+        حساب کاربری توسط مدیر سیستم ساخته می‌شود. اگر رمز عبور خود را فراموش
+        کرده‌اید، با مدیر سامانه تماس بگیرید.
+      </p>
     </form>
   )
 }

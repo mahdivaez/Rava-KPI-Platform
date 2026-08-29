@@ -9,9 +9,11 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { CheckboxField } from "@/components/ui/checkbox-field"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 
@@ -97,48 +99,36 @@ export function EditUserDialog({
               placeholder="برای تغییر وارد کنید"
             />
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isAdmin"
-                name="isAdmin"
-                defaultChecked={user.isAdmin}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="isAdmin" className="cursor-pointer">مدیر سیستم</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isTechnicalDeputy"
-                name="isTechnicalDeputy"
-                defaultChecked={user.isTechnicalDeputy}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="isTechnicalDeputy" className="cursor-pointer">
-                معاون فنی
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                name="isActive"
-                defaultChecked={user.isActive}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="isActive" className="cursor-pointer">فعال</Label>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
+          <fieldset className="space-y-1 rounded-xl border border-border bg-surface-sunken p-3">
+            <legend className="sr-only">سطح دسترسی و وضعیت</legend>
+            <CheckboxField
+              id="isAdmin"
+              label="مدیر سیستم"
+              hint="دسترسی کامل به همه بخش‌ها"
+              defaultChecked={user.isAdmin}
+            />
+            <CheckboxField
+              id="isTechnicalDeputy"
+              label="معاون فنی"
+              hint="ثبت ارزیابی استراتژیست‌ها"
+              defaultChecked={user.isTechnicalDeputy}
+            />
+            <CheckboxField
+              id="isActive"
+              label="حساب فعال"
+              hint="کاربران غیرفعال نمی‌توانند وارد شوند"
+              defaultChecked={user.isActive}
+            />
+          </fieldset>
+
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               انصراف
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "در حال ویرایش..." : "ذخیره تغییرات"}
+            <Button type="submit" loading={loading}>
+              ذخیره تغییرات
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

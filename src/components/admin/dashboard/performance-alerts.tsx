@@ -298,44 +298,44 @@ export function PerformanceAlerts({ strategistEvaluations, writerEvaluations, us
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <AlertTriangle className="w-8 h-8 text-amber-600" />
+        <AlertTriangle className="w-8 h-8 text-warning" />
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">هشدارها و بینش‌های عملکردی</h2>
-          <p className="text-slate-600">تشخیص خودکار الگوهای عملکردی مهم</p>
+          <h2 className="text-2xl font-bold text-foreground">هشدارها و بینش‌های عملکردی</h2>
+          <p className="text-foreground-muted">تشخیص خودکار الگوهای عملکردی مهم</p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Declining Performance */}
-        <Card className="border-2 border-red-200 bg-white shadow-lg">
-          <CardHeader className="border-b border-red-200 bg-gradient-to-r from-red-50 to-white">
-            <CardTitle className="text-red-900 text-lg font-bold flex items-center gap-2">
-              <TrendingDown className="w-5 h-5 text-red-600" />
+        <Card>
+          <CardHeader className="border-b border-danger/25 bg-surface">
+            <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
+              <TrendingDown className="w-5 h-5 text-danger" />
               افت عملکرد (3 ماه اخیر)
             </CardTitle>
-            <CardDescription className="text-red-600">
+            <CardDescription className="text-danger">
               کاربران با کاهش عملکرد نیازمند پشتیبانی
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             {decliningUsers.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">🎉 هیچ کاهش عملکردی شناسایی نشد</p>
+              <p className="text-center text-foreground-subtle py-8">هیچ کاهش عملکردی شناسایی نشد</p>
             ) : (
               <div className="space-y-2">
                 {decliningUsers.slice(0, 5).map((item: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div key={index} className="flex items-center justify-between p-3 bg-danger-subtle rounded-lg border border-danger/25">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-9 h-9 border-2 border-red-300">
+                      <Avatar className="size-9 ring-1 ring-border">
                         <AvatarImage src={item.user.image} />
-                        <AvatarFallback className="bg-red-100 text-red-700 text-xs font-bold">
+                        <AvatarFallback className="bg-danger-subtle text-danger text-xs font-bold">
                           {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">
+                        <p className="font-semibold text-foreground text-sm">
                           {item.user.firstName} {item.user.lastName}
                         </p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-foreground-muted">
                           {item.role} • {item.oldScore.toFixed(1)} → {item.newScore.toFixed(1)}
                         </p>
                       </div>
@@ -351,42 +351,42 @@ export function PerformanceAlerts({ strategistEvaluations, writerEvaluations, us
         </Card>
 
         {/* Outstanding Achievers */}
-        <Card className="border-2 border-yellow-200 bg-white shadow-lg">
-          <CardHeader className="border-b border-yellow-200 bg-gradient-to-r from-yellow-50 to-white">
-            <CardTitle className="text-yellow-900 text-lg font-bold flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-600" />
+        <Card className="border border-border bg-surface shadow-lg">
+          <CardHeader className="border-b border-border-subtle">
+            <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
+              <Star className="w-5 h-5 text-warning" />
               ستارگان عملکرد (90%+)
             </CardTitle>
-            <CardDescription className="text-yellow-600">
+            <CardDescription className="text-warning">
               دارندگان بالاترین امتیازات
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             {outstandingAchievers.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">هنوز کسی به 9+ نرسیده</p>
+              <p className="text-center text-foreground-subtle py-8">هنوز کسی به 9+ نرسیده</p>
             ) : (
               <div className="space-y-2">
                 {outstandingAchievers.map((item: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div key={index} className="flex items-center justify-between p-3 bg-warning-subtle rounded-lg border border-border">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-9 h-9 border-2 border-yellow-300">
+                      <Avatar className="w-9 h-9 border border-border">
                         <AvatarImage src={item.user.image} />
-                        <AvatarFallback className="bg-yellow-100 text-yellow-700 text-xs font-bold">
+                        <AvatarFallback className="bg-warning-subtle text-warning text-xs font-bold">
                           {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">
+                        <p className="font-semibold text-foreground text-sm">
                           {item.user.firstName} {item.user.lastName}
                         </p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-foreground-muted">
                           {item.role} • {item.month}/{item.year}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      <span className="text-lg font-bold text-yellow-900">{item.score.toFixed(2)}</span>
+                      <Star className="w-4 h-4 text-foreground-subtle fill-yellow-500" />
+                      <span className="text-lg font-bold text-foreground">{item.score.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
@@ -396,40 +396,40 @@ export function PerformanceAlerts({ strategistEvaluations, writerEvaluations, us
         </Card>
 
         {/* Low Performers */}
-        <Card className="border-2 border-orange-200 bg-white shadow-lg">
-          <CardHeader className="border-b border-orange-200 bg-gradient-to-r from-orange-50 to-white">
-            <CardTitle className="text-orange-900 text-lg font-bold flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-600" />
+        <Card className="border border-border bg-surface shadow-lg">
+          <CardHeader className="border-b border-border-subtle">
+            <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-warning" />
               نیازمند پشتیبانی (&lt;5)
             </CardTitle>
-            <CardDescription className="text-orange-600">
+            <CardDescription className="text-warning">
               کاربران با میانگین پایین
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             {lowPerformers.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">✅ همه کاربران عملکرد مناسب دارند</p>
+              <p className="text-center text-foreground-subtle py-8">همه کاربران عملکرد مناسب دارند</p>
             ) : (
               <div className="space-y-2">
                 {lowPerformers.slice(0, 5).map((item: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <div key={index} className="flex items-center justify-between p-3 bg-warning-subtle rounded-lg border border-border">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-9 h-9 border-2 border-orange-300">
+                      <Avatar className="w-9 h-9 border border-border">
                         <AvatarImage src={item.user.image} />
-                        <AvatarFallback className="bg-orange-100 text-orange-700 text-xs font-bold">
+                        <AvatarFallback className="bg-warning-subtle text-warning text-xs font-bold">
                           {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">
+                        <p className="font-semibold text-foreground text-sm">
                           {item.user.firstName} {item.user.lastName}
                         </p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-foreground-muted">
                           {item.role} • {item.evalCount} ارزیابی
                         </p>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-orange-300 font-bold">
+                    <Badge variant="secondary" className="bg-warning-subtle text-warning border-border-strong font-bold">
                       {item.avgScore.toFixed(2)}
                     </Badge>
                   </div>
@@ -440,40 +440,40 @@ export function PerformanceAlerts({ strategistEvaluations, writerEvaluations, us
         </Card>
 
         {/* Rapid Improvers */}
-        <Card className="border-2 border-green-200 bg-white shadow-lg">
-          <CardHeader className="border-b border-green-200 bg-gradient-to-r from-green-50 to-white">
-            <CardTitle className="text-green-900 text-lg font-bold flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+        <Card>
+          <CardHeader className="border-b border-success/25 bg-surface">
+            <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-success" />
               رشد سریع (+2 در 2 ماه)
             </CardTitle>
-            <CardDescription className="text-green-600">
+            <CardDescription className="text-success">
               کاربران با بهبود چشمگیر
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             {rapidImprovers.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">هنوز رشد سریعی مشاهده نشده</p>
+              <p className="text-center text-foreground-subtle py-8">هنوز رشد سریعی مشاهده نشده</p>
             ) : (
               <div className="space-y-2">
                 {rapidImprovers.slice(0, 5).map((item: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div key={index} className="flex items-center justify-between p-3 bg-success-subtle rounded-lg border border-success/25">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-9 h-9 border-2 border-green-300">
+                      <Avatar className="size-9 ring-1 ring-border">
                         <AvatarImage src={item.user.image} />
-                        <AvatarFallback className="bg-green-100 text-green-700 text-xs font-bold">
+                        <AvatarFallback className="bg-success-subtle text-success text-xs font-bold">
                           {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">
+                        <p className="font-semibold text-foreground text-sm">
                           {item.user.firstName} {item.user.lastName}
                         </p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-foreground-muted">
                           {item.role} • {item.oldScore.toFixed(1)} → {item.newScore.toFixed(1)}
                         </p>
                       </div>
                     </div>
-                    <Badge className="bg-green-100 text-green-700 border-green-300 font-bold">
+                    <Badge className="bg-success-subtle text-success border-success/30 font-bold">
                       +{item.improvement.toFixed(1)}
                     </Badge>
                   </div>
@@ -485,38 +485,38 @@ export function PerformanceAlerts({ strategistEvaluations, writerEvaluations, us
       </div>
 
       {/* Inactive Users - Full Width */}
-      <Card className="border-2 border-slate-200 bg-white shadow-lg">
-        <CardHeader className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
-            <Clock className="w-5 h-5 text-slate-600" />
+      <Card className="border border-border bg-surface shadow-lg">
+        <CardHeader className="border-b border-border-subtle">
+          <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
+            <Clock className="w-5 h-5 text-foreground-muted" />
             کاربران غیرفعال (60+ روز بدون ارزیابی)
           </CardTitle>
-          <CardDescription className="text-slate-600">
+          <CardDescription className="text-foreground-muted">
             نیازمند پیگیری و بررسی
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4">
           {inactiveUsers.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">✅ همه کاربران فعال هستند</p>
+            <p className="text-center text-foreground-subtle py-8">همه کاربران فعال هستند</p>
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
               {inactiveUsers.slice(0, 6).map((item: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div key={index} className="flex items-center justify-between p-3 bg-surface-sunken rounded-lg border border-border">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-9 h-9 border-2 border-slate-300">
+                    <Avatar className="w-9 h-9 border border-border">
                       <AvatarImage src={item.user.image} />
-                      <AvatarFallback className="bg-slate-100 text-slate-700 text-xs font-bold">
+                      <AvatarFallback className="bg-surface-sunken text-foreground-secondary text-xs font-bold">
                         {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-semibold text-slate-900 text-sm">
+                      <p className="font-semibold text-foreground text-sm">
                         {item.user.firstName} {item.user.lastName}
                       </p>
-                      <p className="text-xs text-slate-600">{item.role}</p>
+                      <p className="text-xs text-foreground-muted">{item.role}</p>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 border-slate-300">
+                  <Badge variant="secondary" className="bg-surface-sunken text-foreground-secondary border-border-strong">
                     {item.daysSinceEval > 365 ? '1+ سال' : `${item.daysSinceEval} روز`}
                   </Badge>
                 </div>

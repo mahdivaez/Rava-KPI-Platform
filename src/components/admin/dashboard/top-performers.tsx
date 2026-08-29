@@ -1,7 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/ui/empty-state"
+import { RankBadge } from "@/components/ui/rank"
+import { ScoreBadge } from "@/components/ui/score"
 import { Award, TrendingUp, Star } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
@@ -69,20 +71,6 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
     .sort((a, b) => b.avg - a.avg)
     .slice(0, 5)
 
-  const getMedalEmoji = (index: number) => {
-    if (index === 0) return "🥇"
-    if (index === 1) return "🥈"
-    if (index === 2) return "🥉"
-    return `${index + 1}.`
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 8) return "badge-success"
-    if (score >= 6) return "bg-info/10 text-info border border-info/30"
-    if (score >= 4) return "badge-warning"
-    return "badge-error"
-  }
-
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase()
   }
@@ -90,41 +78,39 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
   return (
     <>
       {/* Top Strategists */}
-      <Card className="border-2 border-nude-200 shadow-lg bg-white">
-        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+      <Card className="">
+        <CardHeader className="border-b border-border-subtle">
           <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-yellow-500" />
-            🏆 برترین استراتژیست‌ها
+            <Award className="size-5 text-foreground-subtle" aria-hidden />
+            برترین استراتژیست‌ها
           </CardTitle>
-          <CardDescription className="text-nude-600">افراد با بالاترین میانگین امتیاز</CardDescription>
+          <CardDescription className="text-foreground-muted">افراد با بالاترین میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {topStrategists.length > 0 ? topStrategists.map((strategist, index) => (
               <div 
                 key={strategist.id}
-                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent transition-colors"
+                className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-sunken p-3 transition-colors duration-fast hover:bg-surface-hover"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl w-8 text-center">{getMedalEmoji(index)}</span>
+                  <RankBadge rank={index + 1} />
                   <Avatar>
-                    <AvatarFallback className="bg-nude-200 text-nude-700">
+                    <AvatarFallback className="bg-muted text-foreground-secondary">
                       {getInitials(strategist.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">{strategist.name}</p>
-                    <p className="text-xs text-slate-500">
-                      {strategist.count} ارزیابی
+                    <p className="text-xs text-foreground-subtle">
+                      {strategist.count.toLocaleString("fa-IR")} ارزیابی
                     </p>
                   </div>
                 </div>
-                <Badge className={`${getScoreColor(strategist.avg)} font-bold`}>
-                  {strategist.avg.toFixed(2)}/10
-                </Badge>
+                <ScoreBadge score={strategist.avg} />
               </div>
             )) : (
-              <p className="text-center text-slate-500 py-8">
+              <p className="text-center text-foreground-subtle py-8">
                 هنوز ارزیابی ثبت نشده است
               </p>
             )}
@@ -133,9 +119,9 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
           {topStrategists.length > 0 && (
             <div className="mt-4 pt-4 border-t">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">میانگین کلی:</span>
-                <span className="font-bold text-nude-700">
-                  {(topStrategists.reduce((sum, s) => sum + s.avg, 0) / topStrategists.length).toFixed(2)}/10
+                <span className="text-foreground-muted">میانگین کلی:</span>
+                <span className="font-bold text-foreground-secondary">
+                  {(topStrategists.reduce((sum, s) => sum + s.avg, 0) / topStrategists.length).toLocaleString("fa-IR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} از ۱۰
                 </span>
               </div>
             </div>
@@ -144,41 +130,39 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
       </Card>
 
       {/* Top Writers */}
-      <Card className="border-2 border-nude-200 shadow-lg bg-white">
-        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+      <Card className="">
+        <CardHeader className="border-b border-border-subtle">
           <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-nude-500" />
-            ⭐ برترین نویسندگان
+            <Star className="size-5 text-foreground-subtle" aria-hidden />
+            برترین نویسندگان
           </CardTitle>
-          <CardDescription className="text-nude-600">افراد با بالاترین میانگین امتیاز</CardDescription>
+          <CardDescription className="text-foreground-muted">افراد با بالاترین میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {topWriters.length > 0 ? topWriters.map((writer, index) => (
               <div 
                 key={writer.id}
-                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent transition-colors"
+                className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-sunken p-3 transition-colors duration-fast hover:bg-surface-hover"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl w-8 text-center">{getMedalEmoji(index)}</span>
+                  <RankBadge rank={index + 1} />
                   <Avatar>
-                    <AvatarFallback className="bg-nude-200 text-nude-700">
+                    <AvatarFallback className="bg-muted text-foreground-secondary">
                       {getInitials(writer.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">{writer.name}</p>
-                    <p className="text-xs text-slate-500">
-                      {writer.count} ارزیابی
+                    <p className="text-xs text-foreground-subtle">
+                      {writer.count.toLocaleString("fa-IR")} ارزیابی
                     </p>
                   </div>
                 </div>
-                <Badge className={`${getScoreColor(writer.avg)} font-bold`}>
-                  {writer.avg.toFixed(2)}/10
-                </Badge>
+                <ScoreBadge score={writer.avg} />
               </div>
             )) : (
-              <p className="text-center text-slate-500 py-8">
+              <p className="text-center text-foreground-subtle py-8">
                 هنوز ارزیابی ثبت نشده است
               </p>
             )}
@@ -187,9 +171,9 @@ export function TopPerformers({ strategistEvaluations, writerEvaluations }: TopP
           {topWriters.length > 0 && (
             <div className="mt-4 pt-4 border-t">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">میانگین کلی:</span>
-                <span className="font-bold text-nude-700">
-                  {(topWriters.reduce((sum, w) => sum + w.avg, 0) / topWriters.length).toFixed(2)}/10
+                <span className="text-foreground-muted">میانگین کلی:</span>
+                <span className="font-bold text-foreground-secondary">
+                  {(topWriters.reduce((sum, w) => sum + w.avg, 0) / topWriters.length).toLocaleString("fa-IR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} از ۱۰
                 </span>
               </div>
             </div>

@@ -54,7 +54,7 @@ export interface RoleDefinition {
   labelPlural: string
   /** URL-safe identifier. */
   slug: string
-  /** Tailwind classes for the role badge. */
+  /** Tailwind classes for the role chip; one categorical slot per role. */
   badgeClass: string
   metrics: RoleMetric[]
   questions: RoleQuestions
@@ -71,7 +71,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "استراتژیست",
     labelPlural: "استراتژیست‌ها",
     slug: "strategist",
-    badgeClass: "bg-info/10 text-info border border-info/30",
+    badgeClass: "bg-role-1/10 text-role-1-ink",
     metrics: [
       {
         key: "contentStrategy",
@@ -120,7 +120,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "دستیار استراتژیست",
     labelPlural: "دستیاران استراتژیست",
     slug: "strategist-assistant",
-    badgeClass: "bg-info/10 text-info border border-info/30",
+    badgeClass: "bg-role-2/10 text-role-2-ink",
     metrics: [
       {
         key: "followUp",
@@ -168,7 +168,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "نویسنده",
     labelPlural: "نویسنده‌ها",
     slug: "writer",
-    badgeClass: "bg-success/10 text-success border border-success/30",
+    badgeClass: "bg-role-3/10 text-role-3-ink",
     metrics: [
       {
         key: "contentQuality",
@@ -216,7 +216,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "گرافیست",
     labelPlural: "گرافیست‌ها",
     slug: "designer",
-    badgeClass: "bg-purple-100 text-purple-700 border border-purple-300",
+    badgeClass: "bg-role-4/10 text-role-4-ink",
     metrics: [
       {
         key: "briefUnderstanding",
@@ -265,7 +265,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "تدوینگر",
     labelPlural: "تدوینگرها",
     slug: "editor",
-    badgeClass: "bg-amber-100 text-amber-700 border border-amber-300",
+    badgeClass: "bg-role-5/10 text-role-5-ink",
     metrics: [
       {
         key: "briefUnderstanding",
@@ -314,7 +314,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "تصویربردار",
     labelPlural: "تصویربردارها",
     slug: "videographer",
-    badgeClass: "bg-sky-100 text-sky-700 border border-sky-300",
+    badgeClass: "bg-role-6/10 text-role-6-ink",
     metrics: [
       {
         key: "briefUnderstanding",
@@ -364,7 +364,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "ادمین",
     labelPlural: "ادمین‌ها",
     slug: "social-admin",
-    badgeClass: "bg-rose-100 text-rose-700 border border-rose-300",
+    badgeClass: "bg-role-7/10 text-role-7-ink",
     metrics: [
       {
         key: "publishingAccuracy",
@@ -413,7 +413,7 @@ export const ROLE_DEFINITIONS: Record<TeamRole, RoleDefinition> = {
     label: "ادمین حضوری",
     labelPlural: "ادمین‌های حضوری",
     slug: "onsite-admin",
-    badgeClass: "bg-teal-100 text-teal-700 border border-teal-300",
+    badgeClass: "bg-role-8/10 text-role-8-ink",
     metrics: [
       {
         key: "productionReadiness",
@@ -518,7 +518,7 @@ export function getRoleLabel(role: string): string {
 export function getRoleBadgeClass(role: string): string {
   return isTeamRole(role)
     ? ROLE_DEFINITIONS[role].badgeClass
-    : "bg-nude-100 text-nude-700 border border-nude-300"
+    : "bg-muted text-foreground-secondary"
 }
 
 export function getRoleMetrics(role: TeamRole): RoleMetric[] {

@@ -1,11 +1,19 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PageHeader } from "@/components/ui/page-header"
+import {
+  Activity,
+  LayoutGrid,
+  PieChart,
+  TrendingUp,
+  TriangleAlert,
+  Trophy,
+  Users,
+} from "lucide-react"
 import { OverviewStats } from "@/components/admin/dashboard/overview-stats-redesigned"
 import { PerformanceTrends } from "@/components/admin/dashboard/performance-trends"
-import { UserActivity } from "@/components/admin/dashboard/user-activity"
 import { WorkgroupAnalytics } from "@/components/admin/dashboard/workgroup-analytics"
 import { TopPerformers } from "@/components/admin/dashboard/top-performers"
 import { RecentActivity } from "@/components/admin/dashboard/recent-activity"
@@ -156,97 +164,100 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-nude-50 via-white to-nude-100 min-h-screen">
-      <div className="flex items-center gap-3 sm:gap-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/20">
-          <span className="text-2xl sm:text-3xl">📊</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-nude-900 truncate">داشبورد جامع مدیریت</h1>
-          <p className="text-nude-600 mt-1 text-sm sm:text-base lg:text-lg">
-            تحلیل کامل عملکرد، آمار و گزارشات سیستم
-          </p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="داشبورد تحلیلی"
+        description="تحلیل کامل عملکرد، آمار و گزارشات سامانه"
+        icon={<PieChart />}
+        breadcrumbs={[
+          { label: "داشبورد", href: "/dashboard" },
+          { label: "داشبورد تحلیلی" },
+        ]}
+      />
 
       {/* Main Overview Stats */}
       <OverviewStats stats={stats} />
 
       {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        <div className="w-full overflow-x-auto pb-2 -mx-3 sm:mx-0 px-3 sm:px-0">
-          <TabsList className="inline-flex w-full min-w-max lg:grid lg:grid-cols-6 h-auto bg-white border-2 border-nude-200 p-1 sm:p-1.5 lg:p-2 rounded-lg sm:rounded-xl shadow-sm">
-            <TabsTrigger value="overview" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              📈 نمای کلی
-            </TabsTrigger>
-            <TabsTrigger value="performance" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              🎯 روند عملکرد
-            </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              🏆 رتبه‌بندی
-            </TabsTrigger>
-            <TabsTrigger value="alerts" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              ⚠️ هشدارها
-            </TabsTrigger>
-            <TabsTrigger value="workgroups" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              👥 کارگروه‌ها
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="py-2 px-2 sm:py-2.5 sm:px-3 lg:py-4 lg:px-6 data-[state=active]:bg-nude-500 data-[state=active]:text-white data-[state=active]:shadow-md rounded-md sm:rounded-lg font-semibold transition-all text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-              ⚡ فعالیت‌ها
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        {/* The list scrolls on its own so the page never scrolls sideways. */}
+        <TabsList className="w-full justify-start lg:w-fit">
+          <TabsTrigger value="overview">
+            <LayoutGrid aria-hidden />
+            نمای کلی
+          </TabsTrigger>
+          <TabsTrigger value="performance">
+            <TrendingUp aria-hidden />
+            روند عملکرد
+          </TabsTrigger>
+          <TabsTrigger value="leaderboard">
+            <Trophy aria-hidden />
+            رتبه‌بندی
+          </TabsTrigger>
+          <TabsTrigger value="alerts">
+            <TriangleAlert aria-hidden />
+            هشدارها
+          </TabsTrigger>
+          <TabsTrigger value="workgroups">
+            <Users aria-hidden />
+            کارگروه‌ها
+          </TabsTrigger>
+          <TabsTrigger value="activity">
+            <Activity aria-hidden />
+            فعالیت‌ها
+          </TabsTrigger>
+        </TabsList>
 
-        <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-            <EvaluationDistribution 
+        <TabsContent value="overview" className="space-y-5">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <EvaluationDistribution
               strategistEvaluations={strategistEvaluations}
               writerEvaluations={writerEvaluations}
             />
-            <TopPerformers 
+            <TopPerformers
               strategistEvaluations={strategistEvaluations}
               writerEvaluations={writerEvaluations}
             />
           </div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+        <TabsContent value="performance" className="space-y-5">
           {/* Performance Insights - Month over Month Growth */}
-          <PerformanceInsights 
+          <PerformanceInsights
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
           />
-          
+
           {/* Performance Trends Charts */}
-          <PerformanceTrends 
+          <PerformanceTrends
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
             feedbacks={writerFeedbacks}
           />
         </TabsContent>
 
-        <TabsContent value="leaderboard" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-          <TeamLeaderboard 
+        <TabsContent value="leaderboard" className="space-y-5">
+          <TeamLeaderboard
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
             workgroups={workgroups}
           />
         </TabsContent>
 
-        <TabsContent value="alerts" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-          <PerformanceAlerts 
+        <TabsContent value="alerts" className="space-y-5">
+          <PerformanceAlerts
             strategistEvaluations={strategistEvaluations}
             writerEvaluations={writerEvaluations}
             users={allUsers}
           />
         </TabsContent>
 
-        <TabsContent value="workgroups" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+        <TabsContent value="workgroups" className="space-y-5">
           <WorkgroupAnalytics workgroups={workgroups} />
         </TabsContent>
 
-        <TabsContent value="activity" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-          <RecentActivity 
+        <TabsContent value="activity" className="space-y-5">
+          <RecentActivity
             recentEvaluations={recentEvaluations}
             recentUsers={recentUsers}
           />
@@ -255,4 +266,3 @@ export default async function AdminDashboardPage() {
     </div>
   )
 }
-

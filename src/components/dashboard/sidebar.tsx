@@ -1,190 +1,218 @@
-'use client'
+"use client"
+
+import * as React from "react"
 import Link from "next/link"
-import {
-  LayoutDashboard,
-  Users,
-  FolderKanban,
-  ClipboardCheck,
-  BarChart3,
-  Target,
-  PieChart,
-  TrendingUp,
-  UserCog,
-  X
-} from "lucide-react"
 import { usePathname } from "next/navigation"
-import { useEffect } from "react"
+import { PanelRightClose, PanelRightOpen, X } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { BrandLockup } from "@/components/dashboard/brand"
+import {
+  buildNavigation,
+  isActivePath,
+  type NavItem,
+} from "@/components/dashboard/nav-config"
 
 interface SidebarProps {
   session: any
   memberships: any[]
+  /** Mobile drawer state. On desktop the rail is always mounted. */
   isOpen?: boolean
   onClose?: () => void
+  collapsed?: boolean
+  onToggleCollapsed?: () => void
 }
 
-export function SidebarContent({ session, memberships, isOpen, onClose }: SidebarProps) {
-  const pathname = usePathname()
-  
-  // Anyone holding a workgroup role takes part in the role-based team evaluations.
-  const isTeamMember = memberships.length > 0
+export function SidebarContent({
+  session,
+  memberships,
+  isOpen,
+  onClose,
+  collapsed = false,
+  onToggleCollapsed,
+}: SidebarProps) {
+  const pathname = usePathname() ?? ""
 
-  // Close sidebar on route change for mobile
-  useEffect(() => {
-    if (onClose) {
-      onClose()
+  const sections = React.useMemo(
+    () =>
+      buildNavigation({
+        isAdmin: Boolean(session?.user?.isAdmin),
+        isTechnicalDeputy: Boolean(session?.user?.isTechnicalDeputy),
+        isTeamMember: memberships.length > 0,
+      }),
+    [session?.user?.isAdmin, session?.user?.isTechnicalDeputy, memberships.length]
+  )
+
+  // Dismiss the mobile drawer once navigation actually happens — not on mount,
+  // which would fight a deliberate open.
+  const previousPath = React.useRef(pathname)
+  React.useEffect(() => {
+    if (previousPath.current !== pathname) {
+      previousPath.current = pathname
+      onClose?.()
     }
-  }, [pathname])
+  }, [pathname, onClose])
+
+  // Escape closes the drawer, per the escape-routes rule.
+  React.useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose?.()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [isOpen, onClose])
 
   return (
     <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <aside className={`
-        fixed lg:static inset-y-0 right-0 z-50
-        w-72 bg-white flex flex-col shadow-sm border-l border-nude-200
-        transform transition-transform duration-300 ease-in-out
-        lg:transform-none
-        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
-      `}>
-      {/* Header */}
-      <div className="p-6 border-b border-nude-200">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-md shadow-nude-500/20">
-              <Target className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-nude-900">سیستم KPI</h1>
-              <p className="text-sm text-nude-500">مدیریت عملکرد</p>
-            </div>
-          </div>
-          {/* Close button for mobile */}
-          <button
-            onClick={onClose}
-            className="lg:hidden p-2 hover:bg-nude-100 rounded-lg transition-colors"
+      {/* Scrim: strong enough to isolate the drawer, and dismisses on tap. */}
+      <div
+        onClick={onClose}
+        aria-hidden
+        className={cn(
+          "fixed inset-0 z-drawer bg-overlay/50 backdrop-blur-sm transition-opacity duration-base ease-out lg:hidden",
+          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        )}
+      />
+
+      <aside
+        aria-label="ناوبری اصلی"
+        className={cn(
+          // Anchored to the reading-start edge: the right in RTL, the left in
+          // LTR. The closed transform has to be spelled out per direction —
+          // translate percentages are physical, not logical.
+          "fixed inset-y-0 start-0 z-drawer flex translate-x-0 flex-col",
+          "border-e border-sidebar-border bg-sidebar",
+          "transition-[transform,width] duration-slow ease-out",
+          "lg:static lg:z-base",
+          collapsed ? "w-[76px]" : "w-[272px]",
+          // Scoped to `max-lg` on purpose: the rtl/ltr variants outrank the
+          // breakpoint ones, so an unscoped `rtl:translate-x-full` would keep
+          // the desktop rail pushed off-screen.
+          !isOpen && "max-lg:rtl:translate-x-full max-lg:ltr:-translate-x-full"
+        )}
+      >
+        {/* Brand */}
+        <div
+          className={cn(
+            "flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border",
+            collapsed ? "justify-center px-3" : "justify-between ps-5 pe-3"
+          )}
+        >
+          <Link
+            href="/dashboard"
+            className="min-w-0 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            <X className="w-5 h-5 text-nude-600" />
+            <BrandLockup compact={collapsed} />
+          </Link>
+
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="بستن منو"
+              className="grid size-9 shrink-0 place-items-center rounded-lg text-foreground-muted transition-colors duration-fast hover:bg-surface-hover hover:text-foreground lg:hidden"
+            >
+              <X className="size-5" aria-hidden />
+            </button>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+          {sections.map((section, i) => (
+            <div key={section.title ?? `section-${i}`} className="space-y-1">
+              {section.title && !collapsed && (
+                <p className="section-label px-3 pb-1.5">{section.title}</p>
+              )}
+              {section.title && collapsed && (
+                <div className="mx-auto mb-2 h-px w-8 bg-sidebar-border" aria-hidden />
+              )}
+              <ul className="space-y-1">
+                {section.items.map((item) => (
+                  <li key={item.href}>
+                    <NavLink
+                      item={item}
+                      active={isActivePath(pathname, item.href)}
+                      collapsed={collapsed}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        {/* Collapse control — desktop only; the drawer has its own close. */}
+        <div className="hidden shrink-0 border-t border-sidebar-border p-3 lg:block">
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            aria-label={collapsed ? "باز کردن منو" : "جمع کردن منو"}
+            title={collapsed ? "باز کردن منو" : "جمع کردن منو"}
+            className={cn(
+              "flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium",
+              "text-foreground-muted transition-colors duration-fast ease-out",
+              "hover:bg-surface-hover hover:text-foreground",
+              collapsed && "justify-center px-0"
+            )}
+          >
+            {collapsed ? (
+              <PanelRightOpen className="size-[18px] shrink-0" aria-hidden />
+            ) : (
+              <PanelRightClose className="size-[18px] shrink-0" aria-hidden />
+            )}
+            {!collapsed && <span>جمع کردن منو</span>}
           </button>
         </div>
-      </div>
-      
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <NavLink href="/dashboard" icon={<LayoutDashboard size={20} />} pathname={pathname}>
-          داشبورد
-        </NavLink>
-
-        {(isTeamMember || session.user.isAdmin) && (
-          <>
-            <div className="pt-6 pb-3">
-              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
-                ارزیابی تیم
-              </div>
-            </div>
-            <NavLink href="/evaluations/team" icon={<ClipboardCheck size={20} />} pathname={pathname}>
-              ارزیابی همکاران
-            </NavLink>
-          </>
-        )}
-
-        {session.user.isAdmin && (
-          <>
-            <div className="pt-6 pb-3">
-              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
-                مدیریت
-              </div>
-            </div>
-            <NavLink href="/admin/dashboard" icon={<PieChart size={20} />} pathname={pathname}>
-              داشبورد تحلیلی
-            </NavLink>
-            <NavLink href="/admin/users" icon={<Users size={20} />} pathname={pathname}>
-              کاربران
-            </NavLink>
-            <NavLink href="/admin/workgroups" icon={<FolderKanban size={20} />} pathname={pathname}>
-              کارگروه‌ها
-            </NavLink>
-            <NavLink href="/admin/roles" icon={<UserCog size={20} />} pathname={pathname}>
-              نقش‌ها و دسترسی‌ها
-            </NavLink>
-            <NavLink href="/admin/reports" icon={<BarChart3 size={20} />} pathname={pathname}>
-              گزارشات
-            </NavLink>
-          </>
-        )}
-
-        {session.user.isTechnicalDeputy && (
-          <>
-            <div className="pt-6 pb-3">
-              <div className="px-3 text-xs font-semibold text-nude-500 uppercase tracking-wider">
-                معاون فنی
-              </div>
-            </div>
-            <NavLink href="/evaluations/strategist" icon={<ClipboardCheck size={20} />} pathname={pathname}>
-              ارزیابی‌های معاون فنی
-            </NavLink>
-          </>
-        )}
-
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-nude-200">
-        <div className="text-xs text-center text-nude-500 space-y-1">
-          <p className="font-medium">نسخه 1.0.0</p>
-          <p>© 2024 تمام حقوق محفوظ است</p>
-        </div>
-      </div>
-    </aside>
+      </aside>
     </>
   )
 }
 
-function NavLink({ href, icon, children, pathname }: any) {
-  const active = pathname === href || pathname?.startsWith(href + '/')
-  
+function NavLink({
+  item,
+  active,
+  collapsed,
+}: {
+  item: NavItem
+  active: boolean
+  collapsed: boolean
+}) {
+  const Icon = item.icon
+
   return (
     <Link
-      href={href}
-      className={`
-        group flex items-center gap-3 px-3 py-3 rounded-xl font-medium text-sm
-        transition-all duration-200 relative w-full
-        ${active 
-          ? 'bg-nude-100 text-nude-900 shadow-sm border-r-2 border-nude-500' 
-          : 'text-nude-600 hover:text-nude-900 hover:bg-nude-50'
-        }
-      `}
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      title={collapsed ? item.label : undefined}
+      className={cn(
+        "group relative flex h-11 items-center gap-3 rounded-lg text-sm font-medium",
+        "transition-colors duration-fast ease-out",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        collapsed ? "justify-center px-0" : "px-3",
+        active
+          ? "bg-sidebar-active text-sidebar-active-foreground"
+          : "text-sidebar-foreground hover:bg-surface-hover hover:text-foreground"
+      )}
     >
-      <div className={`
-        flex-shrink-0 transition-all duration-200
-        ${active ? 'text-nude-700' : 'text-nude-400 group-hover:text-nude-600'}
-      `}>
-        {icon}
-      </div>
-      <span className="text-sm leading-tight">{children}</span>
+      {/* Current location is marked by a bar as well as by colour. The bar
+          sits on the rail's outer edge, clear of the divider on the inner one. */}
+      <span
+        aria-hidden
+        className={cn(
+          "absolute inset-y-2 start-0 w-[3px] rounded-full bg-primary transition-opacity duration-fast",
+          active ? "opacity-100" : "opacity-0"
+        )}
+      />
+      <Icon
+        className={cn(
+          "size-[18px] shrink-0 transition-colors duration-fast",
+          active ? "text-primary" : "text-foreground-subtle group-hover:text-foreground-secondary"
+        )}
+        aria-hidden
+      />
+      {!collapsed && <span className="truncate">{item.label}</span>}
     </Link>
   )
-}
-
-// Server Component Wrapper
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-
-export async function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
-  const session = await auth()
-  if (!session) return null
-
-  if (!prisma) return null
-
-  const memberships = await prisma.workgroupMember.findMany({
-    where: { userId: session.user.id },
-  })
-
-  return <SidebarContent session={session} memberships={memberships} isOpen={isOpen} onClose={onClose} />
 }

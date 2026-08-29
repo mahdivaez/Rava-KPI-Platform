@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
@@ -58,7 +59,7 @@ export function CreateWorkgroupDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full sm:w-auto">
-          <Plus className="h-4 w-4 ml-2" />
+          <Plus className="size-4" />
           <span className="text-xs sm:text-sm">کارگروه جدید</span>
         </Button>
       </DialogTrigger>
@@ -78,14 +79,14 @@ export function CreateWorkgroupDialog() {
             <Label htmlFor="description">توضیحات (اختیاری)</Label>
             <Textarea id="description" name="description" rows={3} />
           </div>
-          <div className="flex justify-end gap-2">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               انصراف
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "در حال ایجاد..." : "ایجاد کارگروه"}
+            <Button type="submit" loading={loading}>
+              ایجاد کارگروه
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

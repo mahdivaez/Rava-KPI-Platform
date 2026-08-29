@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
+import { CheckCircle2, ClipboardCheck, ClipboardList, Plus, UserPlus } from "lucide-react"
+
 import {
   Card,
   CardContent,
@@ -9,12 +11,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, ClipboardList, Plus } from "lucide-react"
+import { EmptyState } from "@/components/ui/empty-state"
+import { PageHeader } from "@/components/ui/page-header"
+import { Progress } from "@/components/ui/progress"
+import { RoleBadge } from "@/components/ui/role-badge"
+import { StatCard, StatGrid } from "@/components/ui/stat-card"
 import { RoleEvaluationsTable } from "@/components/evaluations/role-evaluations-table"
 import { getEvaluableWorkgroups } from "@/lib/team-evaluations"
-import { getRoleBadgeClass, getRoleLabel } from "@/lib/roles"
+import { faNumber, faPercent } from "@/lib/design-tokens"
 import moment from "moment-jalaali"
 
 const PERSIAN_MONTHS = [
@@ -56,110 +61,130 @@ export default async function TeamEvaluationsPage() {
 
   const totalTargets = workgroups.reduce((sum, w) => sum + w.members.length, 0)
   const completedCount = totalTargets - pending.length
+  const completionPct = totalTargets > 0 ? (completedCount / totalTargets) * 100 : 0
+
+  const periodLabel = `${PERSIAN_MONTHS[currentMonth - 1]} ${faNumber(currentYear)}`
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-nude-900">ارزیابی تیم</h1>
-          <p className="text-sm sm:text-base text-nude-600 mt-1">
-            ارزیابی ماهانه اعضای تیم و خودارزیابی بر اساس نقش —{" "}
-            {PERSIAN_MONTHS[currentMonth - 1]} {currentYear}
-          </p>
-        </div>
-        {workgroups.length > 0 && (
-          <Link href="/evaluations/team/new" className="flex-shrink-0">
-            <Button className="bg-nude-600 hover:bg-nude-700 text-white w-full sm:w-auto text-sm sm:text-base">
-              <Plus className="h-4 w-4 ml-2" />
-              ارزیابی جدید
+    <div className="space-y-6">
+      <PageHeader
+        title="ارزیابی تیم"
+        description={`ارزیابی ماهانه اعضای تیم و خودارزیابی بر اساس نقش — ${periodLabel}`}
+        icon={<ClipboardCheck />}
+        breadcrumbs={[
+          { label: "داشبورد", href: "/dashboard" },
+          { label: "ارزیابی تیم" },
+        ]}
+        actions={
+          workgroups.length > 0 ? (
+            <Button asChild>
+              <Link href="/evaluations/team/new">
+                <Plus aria-hidden />
+                ارزیابی جدید
+              </Link>
             </Button>
-          </Link>
-        )}
-      </div>
+          ) : null
+        }
+      />
 
       {workgroups.length === 0 ? (
-        <Card className="border-nude-200">
-          <CardContent className="p-8 text-center space-y-2">
-            <p className="text-nude-900 font-semibold">
-              در حال حاضر کسی برای ارزیابی به شما تخصیص داده نشده است
-            </p>
-            <p className="text-nude-600 text-sm">
-              نقش‌های کارگروهی توسط مدیر سیستم تعیین می‌شوند.
-            </p>
+        <Card>
+          <CardContent className="p-0">
+            <EmptyState
+              icon={<UserPlus />}
+              title="کسی برای ارزیابی به شما تخصیص داده نشده است"
+              description="نقش‌های کارگروهی و ماتریس دسترسی ارزیابی توسط مدیر سیستم تعیین می‌شوند. پس از تخصیص نقش، اعضای قابل ارزیابی اینجا فهرست می‌شوند."
+            />
           </CardContent>
         </Card>
       ) : (
         <>
           {/* Progress this month */}
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3">
-            <Card className="card-nude border-nude-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-nude-700">
-                  افراد قابل ارزیابی
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-nude-900">{totalTargets}</div>
-              </CardContent>
-            </Card>
-            <Card className="card-nude border-nude-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-nude-700">
-                  ثبت‌شده در این ماه
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-success">{completedCount}</div>
-              </CardContent>
-            </Card>
-            <Card className="card-nude border-nude-200 col-span-2 lg:col-span-1">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-nude-700">باقی‌مانده</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-nude-900">{pending.length}</div>
-              </CardContent>
-            </Card>
-          </div>
+          <StatGrid className="xl:grid-cols-3">
+            <StatCard
+              label="افراد قابل ارزیابی"
+              value={faNumber(totalTargets)}
+              hint={`در ${faNumber(workgroups.length)} کارگروه`}
+              icon={<ClipboardList />}
+              tone="neutral"
+            />
+            <StatCard
+              label="ثبت‌شده در این ماه"
+              value={faNumber(completedCount)}
+              hint={periodLabel}
+              icon={<CheckCircle2 />}
+              tone={completedCount === totalTargets ? "success" : "neutral"}
+            />
+            <StatCard
+              label="باقی‌مانده"
+              value={faNumber(pending.length)}
+              hint={
+                pending.length === 0
+                  ? "همه ارزیابی‌های این ماه انجام شده"
+                  : "هنوز ثبت نشده‌اند"
+              }
+              icon={<ClipboardCheck />}
+              tone={pending.length > 0 ? "warning" : "success"}
+            />
+          </StatGrid>
 
           {/* Pending checklist */}
-          <Card className="border-nude-200">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-nude-600" />
-                در انتظار ارزیابی شما
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                افرادی که هنوز برای {PERSIAN_MONTHS[currentMonth - 1]} ارزیابی نکرده‌اید
+          <Card>
+            <CardHeader>
+              <CardTitle>در انتظار ارزیابی شما</CardTitle>
+              <CardDescription>
+                افرادی که هنوز برای {PERSIAN_MONTHS[currentMonth - 1]} ارزیابی
+                نکرده‌اید
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+
+            <CardContent className="space-y-5">
+              {/* Progress reads as a number and a bar, not colour alone. */}
+              <div className="space-y-2">
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="text-foreground-secondary">پیشرفت این ماه</span>
+                  <span data-numeric className="font-semibold text-foreground">
+                    {faNumber(completedCount)} از {faNumber(totalTargets)}
+                    <span className="ms-2 font-normal text-foreground-muted">
+                      ({faPercent(completionPct)})
+                    </span>
+                  </span>
+                </div>
+                <Progress
+                  value={completionPct}
+                  aria-label="پیشرفت ارزیابی‌های این ماه"
+                  indicatorClassName={
+                    completionPct === 100 ? "bg-success" : "bg-primary"
+                  }
+                />
+              </div>
+
               {pending.length === 0 ? (
-                <div className="flex items-center gap-2 text-success py-4">
-                  <CheckCircle2 className="w-5 h-5" />
+                <div className="flex items-center gap-2 rounded-xl bg-success-subtle px-4 py-3 text-success">
+                  <CheckCircle2 className="size-5 shrink-0" aria-hidden />
                   <span className="text-sm font-medium">
                     ارزیابی همه اعضا برای این ماه تکمیل شده است
                   </span>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <ul className="flex flex-wrap gap-2">
                   {pending.map((person) => (
-                    <div
+                    <li
                       key={`${person.workgroupName}-${person.id}-${person.role}`}
-                      className="flex items-center gap-2 border border-nude-200 rounded-lg px-3 py-2 bg-nude-50/60"
+                      className="flex items-center gap-2 rounded-lg border border-border bg-surface-sunken px-3 py-2"
                     >
-                      <span className="text-sm font-medium text-nude-900">
+                      <span className="text-sm font-medium text-foreground">
                         {person.isSelf
                           ? "خودارزیابی"
                           : `${person.firstName} ${person.lastName}`}
                       </span>
-                      <Badge className={`text-xs ${getRoleBadgeClass(person.role)}`}>
-                        {getRoleLabel(person.role)}
-                      </Badge>
-                      <span className="text-xs text-nude-500">{person.workgroupName}</span>
-                    </div>
+                      <RoleBadge role={person.role} size="sm" />
+                      <span className="text-xs text-foreground-subtle">
+                        {person.workgroupName}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </CardContent>
           </Card>
@@ -167,14 +192,14 @@ export default async function TeamEvaluationsPage() {
       )}
 
       {/* Submitted evaluations */}
-      <Card className="overflow-hidden border-nude-200">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-base sm:text-lg">ارزیابی‌های ثبت‌شده توسط شما</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            تعداد کل: {evaluations.length} ارزیابی
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle>ارزیابی‌های ثبت‌شده توسط شما</CardTitle>
+          <CardDescription>
+            تعداد کل: {faNumber(evaluations.length)} ارزیابی
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 sm:p-6">
+        <CardContent className="px-0 pb-0 sm:px-0">
           <RoleEvaluationsTable evaluations={evaluations} />
         </CardContent>
       </Card>

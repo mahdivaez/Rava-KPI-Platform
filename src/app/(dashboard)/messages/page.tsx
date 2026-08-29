@@ -94,8 +94,10 @@ export default async function MessagesPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-10rem)] sm:h-[calc(100vh-9rem)] lg:h-[calc(100vh-8rem)]">
-      <Card className="h-full border-nude-200 overflow-hidden">
+    // The shell is a 64px navbar plus the main region's vertical padding;
+    // dvh keeps this honest when mobile browser chrome collapses.
+    <div className="h-[calc(100dvh-7rem)] lg:h-[calc(100dvh-8rem)]">
+      <Card className="h-full overflow-hidden">
         <MessagesInterface
           currentUserId={session.user.id}
           conversations={conversationsWithUnread}

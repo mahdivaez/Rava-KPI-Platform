@@ -1,14 +1,16 @@
 "use client"
 
+import { useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { User } from "@prisma/client"
+import { Mail, Pencil, Search, ShieldCheck, Trash2, UserRound, Users } from "lucide-react"
+import { toast } from "sonner"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Pencil, Trash2, Mail, User as UserIcon } from "lucide-react"
-import { EditUserDialog } from "./edit-user-dialog"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -17,10 +19,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { EditUserDialog } from "./edit-user-dialog"
 
 export function UsersTable({ users }: { users: User[] }) {
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [query, setQuery] = useState("")
   const router = useRouter()
+
+  // Client-side filter over the rows already on the page — no refetch.
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return users
+    return users.filter((u) =>
+      `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q)
+    )
+  }, [users, query])
 
   async function handleDelete(userId: string) {
     if (!confirm("آیا از حذف این کاربر اطمینان دارید؟")) return
@@ -41,130 +54,175 @@ export function UsersTable({ users }: { users: User[] }) {
     }
   }
 
+  const initialsOf = (u: User) =>
+    `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}` || "؟"
+
   return (
     <>
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-right">نام</TableHead>
-              <TableHead className="text-right">ایمیل</TableHead>
-              <TableHead className="text-center">نقش</TableHead>
-              <TableHead className="text-center">وضعیت</TableHead>
-              <TableHead className="text-left">عملیات</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium text-sm">
-                  {user.firstName} {user.lastName}
-                </TableCell>
-                <TableCell className="text-slate-600 text-sm">{user.email}</TableCell>
-                <TableCell>
-                  <div className="flex justify-center gap-1 flex-wrap">
-                    {user.isAdmin && <Badge className="badge-error text-xs">مدیر</Badge>}
-                    {user.isTechnicalDeputy && (
-                      <Badge className="badge-neutral text-xs">معاون فنی</Badge>
-                    )}
-                    {!user.isAdmin && !user.isTechnicalDeputy && (
-                      <Badge variant="outline" className="text-xs">کاربر</Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-center">
-                    {user.isActive ? (
-                      <Badge variant="default" className="bg-green-500 text-xs">فعال</Badge>
-                    ) : (
-                      <Badge variant="destructive" className="text-xs">غیرفعال</Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-left">
-                  <div className="flex gap-1 sm:gap-2 justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingUser(user)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(user.id)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-4 sm:px-6">
+        <div className="relative w-full sm:max-w-xs">
+          <Search
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 start-3 my-auto size-4 text-foreground-subtle"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="جستجوی نام یا ایمیل…"
+            aria-label="جستجوی کاربران"
+            className="ps-9"
+          />
+        </div>
+        <p className="text-sm text-foreground-muted" aria-live="polite">
+          {filtered.length.toLocaleString("fa-IR")} از{" "}
+          {users.length.toLocaleString("fa-IR")} کاربر
+        </p>
       </div>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
-        {users.map((user) => (
-          <Card key={user.id} className="border border-slate-200 shadow-sm">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <UserIcon className="h-4 w-4 text-slate-500 flex-shrink-0" />
-                    <h3 className="font-semibold text-sm text-slate-900 truncate">
-                      {user.firstName} {user.lastName}
-                    </h3>
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={<Users />}
+          title={query ? "کاربری با این مشخصات پیدا نشد" : "هنوز کاربری ثبت نشده است"}
+          description={
+            query
+              ? "عبارت جستجو را تغییر دهید یا آن را پاک کنید."
+              : "با دکمه «کاربر جدید» اولین حساب کاربری را بسازید."
+          }
+          action={
+            query ? (
+              <Button variant="outline" onClick={() => setQuery("")}>
+                پاک کردن جستجو
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : (
+        <>
+          {/* Desktop */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>نام</TableHead>
+                  <TableHead>ایمیل</TableHead>
+                  <TableHead>سطح دسترسی</TableHead>
+                  <TableHead>وضعیت</TableHead>
+                  <TableHead className="text-end">عملیات</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <span className="flex items-center gap-2.5">
+                        <Avatar className="size-8">
+                          <AvatarImage src={user.image || undefined} alt="" />
+                          <AvatarFallback className="text-2xs">
+                            {initialsOf(user)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium text-foreground">
+                          {user.firstName} {user.lastName}
+                        </span>
+                      </span>
+                    </TableCell>
+                    <TableCell dir="ltr" className="text-start text-foreground-muted">
+                      {user.email}
+                    </TableCell>
+                    <TableCell>
+                      <AccessBadges user={user} />
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge active={user.isActive} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setEditingUser(user)}
+                          aria-label={`ویرایش ${user.firstName} ${user.lastName}`}
+                          title="ویرایش"
+                        >
+                          <Pencil className="size-4" aria-hidden />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleDelete(user.id)}
+                          aria-label={`حذف ${user.firstName} ${user.lastName}`}
+                          title="حذف"
+                          className="text-danger hover:bg-danger-subtle hover:text-danger"
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile */}
+          <ul className="space-y-3 px-5 pb-5 md:hidden">
+            {filtered.map((user) => (
+              <li
+                key={user.id}
+                className="rounded-xl border border-border bg-surface-sunken p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar className="size-10">
+                      <AvatarImage src={user.image || undefined} alt="" />
+                      <AvatarFallback>{initialsOf(user)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-foreground">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p
+                        dir="ltr"
+                        className="flex items-center gap-1.5 truncate text-xs text-foreground-muted"
+                      >
+                        <Mail className="size-3 shrink-0" aria-hidden />
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Mail className="h-3 w-3 text-slate-400 flex-shrink-0" />
-                    <p className="text-xs text-slate-600 truncate">{user.email}</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {user.isAdmin && <Badge className="badge-error text-xs">مدیر</Badge>}
-                    {user.isTechnicalDeputy && (
-                      <Badge className="badge-neutral text-xs">معاون فنی</Badge>
-                    )}
-                    {!user.isAdmin && !user.isTechnicalDeputy && (
-                      <Badge variant="outline" className="text-xs">کاربر</Badge>
-                    )}
-                    {user.isActive ? (
-                      <Badge variant="default" className="bg-green-500 text-xs">فعال</Badge>
-                    ) : (
-                      <Badge variant="destructive" className="text-xs">غیرفعال</Badge>
-                    )}
+
+                  <div className="flex shrink-0 gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setEditingUser(user)}
+                      aria-label={`ویرایش ${user.firstName} ${user.lastName}`}
+                    >
+                      <Pencil className="size-4" aria-hidden />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => handleDelete(user.id)}
+                      aria-label={`حذف ${user.firstName} ${user.lastName}`}
+                      className="text-danger hover:bg-danger-subtle hover:text-danger"
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditingUser(user)}
-                    className="h-8 w-8 p-0"
-                    title="ویرایش"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(user.id)}
-                    className="h-8 w-8 p-0"
-                    title="حذف"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <AccessBadges user={user} />
+                  <StatusBadge active={user.isActive} />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {editingUser && (
         <EditUserDialog
@@ -177,3 +235,34 @@ export function UsersTable({ users }: { users: User[] }) {
   )
 }
 
+function AccessBadges({ user }: { user: User }) {
+  if (user.isAdmin) {
+    return (
+      <Badge variant="info">
+        <ShieldCheck aria-hidden />
+        مدیر
+      </Badge>
+    )
+  }
+  if (user.isTechnicalDeputy) {
+    return <Badge variant="secondary">معاون فنی</Badge>
+  }
+  return (
+    <Badge variant="neutral">
+      <UserRound aria-hidden />
+      کاربر
+    </Badge>
+  )
+}
+
+function StatusBadge({ active }: { active: boolean }) {
+  return active ? (
+    <Badge variant="success" dot="bg-success">
+      فعال
+    </Badge>
+  ) : (
+    <Badge variant="neutral" dot="bg-foreground-subtle">
+      غیرفعال
+    </Badge>
+  )
+}

@@ -1,8 +1,12 @@
 "use client"
 
 import { StrategistEvaluation, User } from "@prisma/client"
+import { CheckCircle2, ClipboardList, Clock } from "lucide-react"
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+import { EmptyState } from "@/components/ui/empty-state"
+import { ScoreBadge } from "@/components/ui/score"
 import {
   Table,
   TableBody,
@@ -11,6 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+
+const PERSIAN_MONTHS = [
+  "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+  "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند",
+]
 
 type EvaluationWithRelations = StrategistEvaluation & {
   strategist: User
@@ -24,123 +33,123 @@ export function StrategistEvaluationsTable({
 }) {
   if (evaluations.length === 0) {
     return (
-      <p className="text-slate-500 text-center py-8">
-        هنوز ارزیابی ثبت نشده است
-      </p>
+      <EmptyState
+        icon={<ClipboardList />}
+        title="هنوز ارزیابی ثبت نشده است"
+        description="پس از ثبت اولین ارزیابی، سابقه آن در این جدول نمایش داده می‌شود."
+      />
     )
   }
 
+  // The seven metrics are stored on a 1–10 scale.
+  const averageOf = (evaluation: EvaluationWithRelations) =>
+    (evaluation.ideation +
+      evaluation.avgViews +
+      evaluation.qualityControl +
+      evaluation.teamRelations +
+      evaluation.clientRelations +
+      evaluation.responsiveness +
+      evaluation.clientSatisfaction) /
+    7
+
+  const initials = (first: string, last: string) =>
+    `${first?.[0] ?? ""}${last?.[0] ?? ""}` || "؟"
+
   return (
     <>
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
+      {/* Desktop */}
+      <div className="hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">استراتژیست</TableHead>
-              <TableHead className="text-right">دوره</TableHead>
-              <TableHead className="text-right">ارزیاب</TableHead>
+              <TableHead>استراتژیست</TableHead>
+              <TableHead>دوره</TableHead>
+              <TableHead>ارزیاب</TableHead>
               <TableHead className="text-center">میانگین امتیاز</TableHead>
               <TableHead className="text-center">وضعیت</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {evaluations.map((evaluation) => {
-              const avgScore = Math.round(
-                (evaluation.ideation +
-                  evaluation.avgViews +
-                  evaluation.qualityControl +
-                  evaluation.teamRelations +
-                  evaluation.clientRelations +
-                  evaluation.responsiveness +
-                  evaluation.clientSatisfaction) / 7
-              )
-
-              return (
-                <TableRow key={evaluation.id}>
-                  <TableCell className="font-medium text-sm">
-                    {evaluation.strategist.firstName} {evaluation.strategist.lastName}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {evaluation.month}/{evaluation.year}
-                  </TableCell>
-                  <TableCell className="text-slate-600 text-sm">
-                    {evaluation.evaluator.firstName} {evaluation.evaluator.lastName}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge
-                      variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                      className="text-xs"
-                    >
-                      {avgScore}/10
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge
-                      variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
-                      className={evaluation.status === "COMPLETED" ? "bg-green-500 text-xs" : "text-xs"}
-                    >
-                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+            {evaluations.map((evaluation) => (
+              <TableRow key={evaluation.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <Avatar className="size-8">
+                      <AvatarFallback className="text-2xs">
+                        {initials(
+                          evaluation.strategist.firstName,
+                          evaluation.strategist.lastName
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-foreground">
+                      {evaluation.strategist.firstName} {evaluation.strategist.lastName}
+                    </span>
+                  </span>
+                </TableCell>
+                <TableCell className="whitespace-nowrap text-foreground-secondary">
+                  {PERSIAN_MONTHS[evaluation.month - 1] ?? evaluation.month}{" "}
+                  {evaluation.year.toLocaleString("fa-IR", { useGrouping: false })}
+                </TableCell>
+                <TableCell className="text-foreground-muted">
+                  {evaluation.evaluator.firstName} {evaluation.evaluator.lastName}
+                </TableCell>
+                <TableCell className="text-center">
+                  <ScoreBadge score={averageOf(evaluation)} />
+                </TableCell>
+                <TableCell className="text-center">
+                  <StatusBadge status={evaluation.status} />
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
-        {evaluations.map((evaluation) => {
-          const avgScore = Math.round(
-            (evaluation.ideation +
-              evaluation.avgViews +
-              evaluation.qualityControl +
-              evaluation.teamRelations +
-              evaluation.clientRelations +
-              evaluation.responsiveness +
-              evaluation.clientSatisfaction) / 7
-          )
+      {/* Mobile */}
+      <ul className="space-y-3 p-4 md:hidden">
+        {evaluations.map((evaluation) => (
+          <li
+            key={evaluation.id}
+            className="rounded-xl border border-border bg-surface-sunken p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-foreground">
+                  {evaluation.strategist.firstName} {evaluation.strategist.lastName}
+                </p>
+                <p className="mt-0.5 text-xs text-foreground-muted">
+                  ارزیاب: {evaluation.evaluator.firstName}{" "}
+                  {evaluation.evaluator.lastName}
+                </p>
+              </div>
+              <ScoreBadge score={averageOf(evaluation)} className="shrink-0" />
+            </div>
 
-          return (
-            <Card key={evaluation.id} className="border border-slate-200">
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-slate-900">
-                      {evaluation.strategist.firstName} {evaluation.strategist.lastName}
-                    </h3>
-                    <p className="text-xs text-slate-600 mt-1">
-                      ارزیاب: {evaluation.evaluator.firstName} {evaluation.evaluator.lastName}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      دوره: {evaluation.month}/{evaluation.year}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end space-y-2">
-                    <Badge
-                      variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
-                      className="text-xs"
-                    >
-                      {avgScore}/10
-                    </Badge>
-                    <Badge
-                      variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
-                      className={`text-xs ${
-                        evaluation.status === "COMPLETED" ? "bg-green-500" : ""
-                      }`}
-                    >
-                      {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <StatusBadge status={evaluation.status} />
+              <span className="text-xs text-foreground-muted">
+                {PERSIAN_MONTHS[evaluation.month - 1] ?? evaluation.month}{" "}
+                {evaluation.year.toLocaleString("fa-IR", { useGrouping: false })}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
     </>
   )
 }
 
+function StatusBadge({ status }: { status: string }) {
+  return status === "COMPLETED" ? (
+    <Badge variant="success">
+      <CheckCircle2 aria-hidden />
+      تکمیل شده
+    </Badge>
+  ) : (
+    <Badge variant="warning">
+      <Clock aria-hidden />
+      در انتظار
+    </Badge>
+  )
+}

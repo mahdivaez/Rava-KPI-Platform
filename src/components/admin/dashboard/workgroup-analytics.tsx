@@ -2,7 +2,15 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts"
+import {
+  AXIS_PROPS,
+  ChartFrame,
+  ChartTooltip,
+  GRID_PROPS,
+} from "@/components/ui/chart"
+import { ScoreBadge } from "@/components/ui/score"
+import { chartColor } from "@/lib/design-tokens"
 import { Users, TrendingUp, Activity } from "lucide-react"
 
 interface WorkgroupAnalyticsProps {
@@ -57,53 +65,109 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
     'تعداد اعضا': wg.totalMembers,
   }))
 
-  const getScoreColor = (score: number) => {
-    if (score >= 8) return "bg-nude-100 text-nude-800"
-    if (score >= 6) return "bg-nude-100 text-nude-800"
-    if (score >= 4) return "bg-orange-100 text-orange-800"
-    return "bg-red-100 text-red-800"
-  }
 
   return (
     <div className="grid gap-6">
-      {/* Workgroup Performance Chart */}
-      <Card className="col-span-full border-2 border-nude-200 shadow-lg bg-white">
-        <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
-          <CardTitle className="text-nude-900 text-xl font-bold">📊 عملکرد کارگروه‌ها</CardTitle>
-          <CardDescription className="text-nude-600">مقایسه میانگین امتیازات و تعداد اعضا</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={120} />
-              <YAxis yAxisId="left" orientation="left" stroke="#14b8a6" />
-              <YAxis yAxisId="right" orientation="right" stroke="#8b5cf6" />
-              <Tooltip />
-              <Legend />
-              <Bar yAxisId="left" dataKey="میانگین امتیاز" fill="#14b8a6" radius={[8, 8, 0, 0]} />
-              <Bar yAxisId="right" dataKey="تعداد اعضا" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {/* Two measures on different scales get two charts, never two y-axes:
+          a dual-axis plot invites false correlations between them. */}
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>میانگین امتیاز کارگروه‌ها</CardTitle>
+            <CardDescription>میانگین ارزیابی‌های هر کارگروه، از ۱۰</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartFrame
+              height={Math.max(220, chartData.length * 44)}
+              isEmpty={chartData.length === 0}
+              emptyMessage="هنوز کارگروهی برای مقایسه وجود ندارد"
+              summary="مقایسه میانگین امتیاز میان کارگروه‌ها."
+            >
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 4, right: 8, left: 8, bottom: 4 }}
+              >
+                <CartesianGrid {...GRID_PROPS} horizontal={false} vertical />
+                <XAxis type="number" domain={[0, 10]} reversed {...AXIS_PROPS} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  orientation="right"
+                  width={130}
+                  {...AXIS_PROPS}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgb(var(--surface-hover))" }}
+                  content={<ChartTooltip unit="از ۱۰" />}
+                />
+                <Bar dataKey="میانگین امتیاز" fill={chartColor(1)} radius={4} maxBarSize={22} />
+              </BarChart>
+            </ChartFrame>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>اندازه کارگروه‌ها</CardTitle>
+            <CardDescription>تعداد اعضای هر کارگروه</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartFrame
+              height={Math.max(220, chartData.length * 44)}
+              isEmpty={chartData.length === 0}
+              emptyMessage="هنوز کارگروهی ایجاد نشده است"
+              summary="تعداد اعضای هر کارگروه."
+            >
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 4, right: 8, left: 8, bottom: 4 }}
+              >
+                <CartesianGrid {...GRID_PROPS} horizontal={false} vertical />
+                <XAxis type="number" allowDecimals={false} reversed {...AXIS_PROPS} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  orientation="right"
+                  width={130}
+                  {...AXIS_PROPS}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgb(var(--surface-hover))" }}
+                  content={<ChartTooltip unit="نفر" />}
+                />
+                <Bar dataKey="تعداد اعضا" fill={chartColor(7)} radius={4} maxBarSize={22} />
+              </BarChart>
+            </ChartFrame>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Workgroup Details Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {sortedWorkgroups.map((wg, index) => (
           <Card key={wg.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="border-b border-nude-200 bg-gradient-to-r from-nude-50 to-white">
+            <CardHeader className="border-b border-border-subtle">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    {index < 3 && <span>{['🥇', '🥈', '🥉'][index]}</span>}
+                    {index < 3 && (
+                      <span
+                        data-numeric
+                        aria-label={`رتبه ${index + 1}`}
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-primary-subtle text-2xs font-bold text-primary-subtle-foreground"
+                      >
+                        {(index + 1).toLocaleString("fa-IR")}
+                      </span>
+                    )}
                     {wg.name}
                   </CardTitle>
                   <CardDescription className="mt-1">
                     {wg.isActive ? (
-                      <Badge variant="outline" className="bg-nude-50 text-nude-700">فعال</Badge>
+                      <Badge variant="outline" className="bg-surface-sunken text-foreground-secondary">فعال</Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-slate-100 text-slate-600">غیرفعال</Badge>
+                      <Badge variant="outline" className="bg-surface-sunken text-foreground-muted">غیرفعال</Badge>
                     )}
                   </CardDescription>
                 </div>
@@ -111,23 +175,23 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Users className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-sm text-foreground-muted">
+                  <Users className="size-4" />
                   <span>اعضا</span>
                 </div>
                 <span className="font-semibold">{wg.totalMembers}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">استراتژیست‌ها</span>
-                <Badge variant="outline" className="bg-nude-50 text-nude-700">
+                <span className="text-foreground-muted">استراتژیست‌ها</span>
+                <Badge variant="outline" className="bg-surface-sunken text-foreground-secondary">
                   {wg.strategistCount}
                 </Badge>
               </div>
               
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600">نویسندگان</span>
-                <Badge variant="outline" className="bg-nude-50 text-nude-700">
+                <span className="text-foreground-muted">نویسندگان</span>
+                <Badge variant="outline" className="bg-surface-sunken text-foreground-secondary">
                   {wg.writerCount}
                 </Badge>
               </div>
@@ -135,11 +199,11 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
               {/* Members List */}
               {wg.members.length > 0 && (
                 <div className="pt-3 border-t">
-                  <div className="text-sm font-medium text-slate-700 mb-2">اعضا:</div>
+                  <div className="text-sm font-medium text-foreground-secondary mb-2">اعضا:</div>
                   <div className="space-y-1">
                     {wg.members.map((member: any, idx: number) => (
                       <div key={idx} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600">{member.name}</span>
+                        <span className="text-foreground-muted">{member.name}</span>
                         <Badge variant="outline" className="text-xs">
                           {member.role}
                         </Badge>
@@ -151,12 +215,12 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
 
               <div className="pt-3 border-t space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">ارزیابی‌ها</span>
+                  <span className="text-foreground-muted">ارزیابی‌ها</span>
                   <span className="font-medium">{wg.evaluationsCount}</span>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">بازخوردها</span>
+                  <span className="text-foreground-muted">بازخوردها</span>
                   <span className="font-medium">{wg.feedbacksCount}</span>
                 </div>
               </div>
@@ -164,10 +228,8 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
               {wg.avgScore > 0 && (
                 <div className="pt-3 border-t">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">میانگین امتیاز</span>
-                    <Badge className={`${getScoreColor(wg.avgScore)} font-bold`}>
-                      {wg.avgScore.toFixed(2)}/10
-                    </Badge>
+                    <span className="text-sm font-medium text-foreground-secondary">میانگین امتیاز</span>
+                    <ScoreBadge score={wg.avgScore} />
                   </div>
                 </div>
               )}
@@ -177,9 +239,9 @@ export function WorkgroupAnalytics({ workgroups }: WorkgroupAnalyticsProps) {
       </div>
 
       {workgroupData.length === 0 && (
-        <Card className="border-2 border-nude-200 shadow-lg bg-white">
+        <Card className="">
           <CardContent className="py-12">
-            <p className="text-center text-slate-500">
+            <p className="text-center text-foreground-subtle">
               هنوز کارگروهی ایجاد نشده است
             </p>
           </CardContent>

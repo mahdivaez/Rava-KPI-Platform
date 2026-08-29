@@ -5,42 +5,79 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  [
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1.5 whitespace-nowrap",
+    "rounded-full border px-2.5 py-0.5 text-xs font-semibold leading-5",
+    "transition-colors duration-fast ease-out",
+    "[&>svg]:pointer-events-none [&>svg]:size-3",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        default: "border-transparent bg-primary text-primary-foreground",
+        secondary: "border-transparent bg-secondary text-secondary-foreground",
+        outline: "border-border bg-transparent text-foreground-secondary",
+        neutral: "border-transparent bg-muted text-foreground-secondary",
+        // Status variants always appear beside an icon or a word, so the
+        // colour is reinforcement rather than the only signal.
+        success: "border-transparent bg-success-subtle text-success",
+        warning: "border-transparent bg-warning-subtle text-warning",
+        danger: "border-transparent bg-danger-subtle text-danger",
+        /** Alias of `danger`, kept for shadcn call-site compatibility. */
+        destructive: "border-transparent bg-danger-subtle text-danger",
+        info: "border-transparent bg-info-subtle text-info",
+      },
+      size: {
+        sm: "px-2 py-0 text-2xs",
+        default: "px-2.5 py-0.5 text-xs",
+        lg: "px-3 py-1 text-sm",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "neutral",
+      size: "default",
     },
   }
 )
 
+interface BadgeProps
+  extends React.ComponentProps<"span">,
+    VariantProps<typeof badgeVariants> {
+  asChild?: boolean
+  /** Renders a leading colour dot. Pass a background utility, e.g. `bg-role-3`. */
+  dot?: string
+}
+
 function Badge({
   className,
   variant,
+  size,
   asChild = false,
+  dot,
+  children,
   ...props
-}: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+}: BadgeProps) {
   const Comp = asChild ? Slot : "span"
 
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, size }), className)}
       {...props}
-    />
+    >
+      {dot && (
+        <span
+          aria-hidden
+          className={cn(
+            "size-1.5 shrink-0 rounded-full ring-1 ring-inset ring-black/10",
+            dot
+          )}
+        />
+      )}
+      {children}
+    </Comp>
   )
 }
 
 export { Badge, badgeVariants }
+export type { BadgeProps }

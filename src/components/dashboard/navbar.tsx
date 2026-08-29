@@ -1,164 +1,182 @@
-'use client'
+"use client"
 
+import * as React from "react"
+import Link from "next/link"
+import { LogOut, Menu, MessageSquareText, UserRound } from "lucide-react"
+
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LogOut, User, Bell, Settings, Search, Menu } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { ThemeToggleCompact } from "@/components/theme/theme-toggle"
 import { formatPersianDateWithWeekday } from "@/lib/utils"
 
 interface NavbarContentProps {
   session: any
+  avatarUrl?: string | null
   onMenuClick?: () => void
   signOutAction: () => Promise<void>
 }
 
-export function NavbarContent({ session, onMenuClick, signOutAction }: NavbarContentProps) {
-  const initials = session.user.name
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
+function initialsOf(name?: string | null) {
+  if (!name) return "؟"
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part: string) => part[0])
+    .join("")
+}
+
+/** The account's highest-privilege label, for the header and the menu. */
+function roleLabel(user: any) {
+  if (user?.isAdmin) return "مدیر سیستم"
+  if (user?.isTechnicalDeputy) return "معاون فنی"
+  return "عضو تیم"
+}
+
+export function NavbarContent({
+  session,
+  avatarUrl,
+  onMenuClick,
+  signOutAction,
+}: NavbarContentProps) {
+  const user = session?.user ?? {}
+  const initials = initialsOf(user.name)
+
+  // Rendered client-side only: the server and the browser can disagree on the
+  // current day across a midnight boundary, which would trip hydration.
+  const [today, setToday] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    setToday(formatPersianDateWithWeekday(new Date()))
+  }, [])
 
   return (
-    <header className="h-16 sm:h-18 bg-white border-b border-nude-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-      {/* Left Section - Welcome */}
-      <div className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0">
-        {/* Hamburger Menu Button - Mobile Only */}
+    <header
+      className={cn(
+        "sticky top-0 z-sticky flex h-16 shrink-0 items-center justify-between gap-3",
+        "border-b border-border bg-navbar/85 px-4 backdrop-blur-xl sm:px-6"
+      )}
+    >
+      {/* Start side */}
+      <div className="flex min-w-0 items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden hover:bg-nude-50 rounded-xl w-10 h-10 text-nude-600 hover:text-nude-900"
           onClick={onMenuClick}
+          aria-label="باز کردن منو"
+          className="lg:hidden"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="size-5" aria-hidden />
         </Button>
-        
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-nude-900 truncate">
-            خوش آمدید، {session.user.name?.split(' ')[0]}
-          </h2>
-          <p className="text-xs sm:text-sm text-nude-500 mt-0.5 hidden sm:block">
-            {formatPersianDateWithWeekday(new Date())}
+
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {user.name}
+          </p>
+          <p className="truncate text-xs text-foreground-muted" suppressHydrationWarning>
+            {today ?? " "}
           </p>
         </div>
       </div>
-      
-      {/* Right Section */}
-      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-        {/* Profile Link Button */}
-        <Button 
-          variant="ghost" 
+
+      {/* End side */}
+      <div className="flex shrink-0 items-center gap-1">
+        <Button
+          variant="ghost"
           size="icon"
-          onClick={() => window.location.href = '/profile'}
-          className="hover:bg-nude-50 rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-nude-600 hover:text-nude-900"
-          title="پروفایل"
+          asChild
+          className="hidden sm:inline-flex"
         >
-          <User className="h-4 w-4 sm:h-5 sm:w-5" />
+          <Link href="/messages" aria-label="پیام‌ها" title="پیام‌ها">
+            <MessageSquareText className="size-[18px]" aria-hidden />
+          </Link>
         </Button>
 
-        {/* Search Button - Hidden on small mobile */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="hidden sm:flex hover:bg-nude-50 rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-nude-600 hover:text-nude-900"
-        >
-          <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-        </Button>
+        <ThemeToggleCompact />
 
-        {/* Notifications */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="relative hover:bg-nude-50 rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-nude-600 hover:text-nude-900"
-        >
-          <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 w-2 h-2 bg-nude-500 rounded-full ring-2 ring-white"></span>
-        </Button>
+        <div className="mx-1 h-6 w-px bg-border" aria-hidden />
 
-        {/* Settings - Hidden on small mobile */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="hidden sm:flex hover:bg-nude-50 rounded-xl w-9 h-9 sm:w-10 sm:h-10 text-nude-600 hover:text-nude-900"
-        >
-          <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-        </Button>
-
-        {/* Divider */}
-        <div className="h-6 sm:h-8 w-px bg-nude-200 mx-1 sm:mx-2"></div>
-
-        {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-2 sm:gap-3 hover:bg-nude-50 rounded-xl px-2 sm:px-3 h-10 sm:h-12"
+            <button
+              type="button"
+              className={cn(
+                "flex h-11 items-center gap-2 rounded-xl px-1.5 transition-colors duration-fast ease-out",
+                "hover:bg-surface-hover",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              )}
+              aria-label="منوی حساب کاربری"
             >
-              <div className="text-right hidden md:block">
-                <p className="text-sm font-semibold text-nude-900">{session.user.name}</p>
-                <p className="text-xs text-nude-500">
-                  {session.user.isAdmin ? 'مدیر سیستم' : 
-                   session.user.isTechnicalDeputy ? 'معاون فنی' : 'کاربر'}
-                </p>
-              </div>
-              <Avatar className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 border-2 border-nude-200 shadow-sm">
-                <AvatarFallback className="bg-gradient-to-br from-nude-400 to-nude-600 text-white font-semibold text-xs sm:text-sm">
-                  {initials}
-                </AvatarFallback>
+              <Avatar className="size-9 ring-1 ring-border">
+                <AvatarImage src={avatarUrl || undefined} alt="" />
+                <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
-            </Button>
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 rounded-xl shadow-lg border-nude-200">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1 py-2">
-                <p className="text-sm font-semibold text-nude-900">{session.user.name}</p>
-                <p className="text-xs text-nude-500">{session.user.email}</p>
-                {session.user.isAdmin && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-nude-100 text-nude-700 w-fit mt-1">
-                    مدیر سیستم
-                  </span>
-                )}
+
+          <DropdownMenuContent align="end" sideOffset={8} className="w-64">
+            <DropdownMenuLabel className="normal-case">
+              <div className="flex items-center gap-3 px-1 py-1.5">
+                <Avatar className="size-10 ring-1 ring-border">
+                  <AvatarImage src={avatarUrl || undefined} alt="" />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {user.name}
+                  </p>
+                  <p className="truncate text-xs font-normal text-foreground-muted">
+                    {user.email}
+                  </p>
+                </div>
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-nude-200" />
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-nude-700 hover:text-nude-900 hover:bg-nude-50">
-              <User className="ml-2 h-4 w-4" />
-              <span>پروفایل من</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-nude-700 hover:text-nude-900 hover:bg-nude-50">
-              <Settings className="ml-2 h-4 w-4" />
-              <span>تنظیمات</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-nude-200" />
-            <DropdownMenuItem asChild>
-              <button 
-                onClick={() => signOutAction()} 
-                className="w-full flex items-center text-destructive cursor-pointer rounded-lg hover:bg-red-50"
+              <Badge
+                variant={user.isAdmin ? "info" : "neutral"}
+                size="sm"
+                className="mx-1 mt-1"
               >
-                <LogOut className="ml-2 h-4 w-4" />
-                <span>خروج از حساب</span>
-              </button>
+                {roleLabel(user)}
+              </Badge>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem asChild>
+              <Link href="/profile">
+                <UserRound aria-hidden />
+                پروفایل من
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/messages">
+                <MessageSquareText aria-hidden />
+                پیام‌ها
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={() => {
+                void signOutAction()
+              }}
+            >
+              <LogOut aria-hidden />
+              خروج از حساب
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>
   )
-}
-
-// Server Component Wrapper
-import { auth } from "@/lib/auth"
-import { handleSignOut } from "@/app/actions/auth"
-
-export async function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
-  const session = await auth()
-  if (!session) return null
-
-  return <NavbarContent session={session} onMenuClick={onMenuClick} signOutAction={handleSignOut} />
 }

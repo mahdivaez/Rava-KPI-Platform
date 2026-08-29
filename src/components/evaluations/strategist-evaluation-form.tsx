@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { User } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Label, RequiredMark } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -14,14 +14,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { PageHeader } from "@/components/ui/page-header"
+import { Progress } from "@/components/ui/progress"
+import { ScoreScale } from "@/components/ui/score"
+import { getScoreBand } from "@/lib/design-tokens"
 import { toast } from "sonner"
-import { Calculator, TrendingUp, ChevronRight, Save, X, Search } from "lucide-react"
+import {
+  CalendarDays,
+  Calculator,
+  Check,
+  Image as ImageIcon,
+  Save,
+  Search,
+  TrendingUp,
+  Upload,
+  X,
+} from "lucide-react"
 import Link from "next/link"
 import { usePersianDate } from "@/hooks/use-persian-date"
 import moment from 'moment-jalaali'
 import { ImageModal } from "@/components/ui/image-modal"
-import { ScoreSelector } from "@/components/ui/score-selector"
 
 // Evaluation metrics
 const STRATEGIST_METRICS = [
@@ -266,104 +286,119 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
     }
   }
 
+  const completedMetrics = STRATEGIST_METRICS.filter((m) => scores[m.key]).length
+  // Metrics are scored 1–5 here but stored doubled, so bands read on the 1–10 scale.
+  const averageBand = getScoreBand(parseFloat(averageScore) * 2)
+  const previewImage =
+    localImagePreview ||
+    (imageUrl ? (imageUrl.startsWith("/uploads") ? imageUrl : `/${imageUrl}`) : "")
+
+  const NOTES = [
+    {
+      id: "strengths",
+      label: "نقاط قوت",
+      dot: "bg-success",
+      placeholder: "نقاط قوت استراتژیست را به تفصیل شرح دهید…",
+    },
+    {
+      id: "improvements",
+      label: "نقاط قابل بهبود",
+      dot: "bg-warning",
+      placeholder: "نقاط قابل بهبود را با پیشنهادات مشخص ذکر کنید…",
+    },
+    {
+      id: "suggestions",
+      label: "پیشنهادات",
+      dot: "bg-primary",
+      placeholder: "پیشنهادات خود برای بهبود عملکرد را بنویسید…",
+    },
+  ] as const
+
   return (
-    <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6">
-      {/* Breadcrumb */}
-      <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-nude-600">
-        <Link href="/dashboard" className="hover:text-nude-900 transition-colors truncate">
-          داشبورد
-        </Link>
-        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-        <Link href="/evaluations/strategist" className="hover:text-nude-900 transition-colors truncate">
-          ارزیابی استراتژیست‌ها
-        </Link>
-        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-        <span className="text-nude-900 font-semibold truncate">ارزیابی جدید</span>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="ارزیابی عملکرد استراتژیست‌ها"
+        description="فرم ارزیابی ماهانه عملکرد و شاخص‌های کلیدی — امتیاز ۱ تا ۵"
+        icon={<TrendingUp />}
+        breadcrumbs={[
+          { label: "داشبورد", href: "/dashboard" },
+          { label: "ارزیابی استراتژیست‌ها", href: "/evaluations/strategist" },
+          { label: "ارزیابی جدید" },
+        ]}
+        actions={
+          <>
+            <Button type="button" variant="outline" asChild>
+              <Link href="/evaluations/strategist">
+                <X aria-hidden />
+                انصراف
+              </Link>
+            </Button>
+            <Button type="submit" form="strategist-evaluation-form" loading={loading}>
+              <Save aria-hidden />
+              ثبت ارزیابی
+            </Button>
+          </>
+        }
+      />
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        {/* Page Header */}
-        <Card className="border-2 border-nude-200 shadow-xl bg-white">
-          <CardContent className="p-4 sm:p-6 lg:p-8">
-            {/* Mobile-first header layout */}
-            <div className="flex flex-col space-y-4 mb-6 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-nude-500 to-nude-600 flex items-center justify-center shadow-lg shadow-nude-500/30">
-                  <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 leading-tight">ارزیابی عملکرد استراتژیست‌ها</h1>
-                  <p className="text-nude-600 text-xs sm:text-sm lg:text-base mt-1">فرم ارزیابی ماهانه عملکرد و شاخص‌های کلیدی</p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <Link href="/evaluations/strategist" className="order-2 sm:order-1">
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-4 sm:px-6 w-full sm:w-auto text-sm"
-                  >
-                    <X className="w-4 h-4 ml-2" />
-                    انصراف
-                  </Button>
-                </Link>
-                <Button 
-                  type="submit" 
-                  disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-6 sm:px-8 w-full sm:w-auto shadow-lg shadow-nude-500/30 text-sm"
-                >
-                  <Save className="w-4 h-4 ml-2" />
-                  {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
-                </Button>
-              </div>
-            </div>
+      <form id="strategist-evaluation-form" onSubmit={handleSubmit} className="space-y-5">
+        {/* ---------------------------------------------------------------
+            Who and when
+            --------------------------------------------------------------- */}
+        <Card>
+          <CardHeader>
+            <CardTitle>مشخصات ارزیابی</CardTitle>
+            <CardDescription>
+              استراتژیست و دوره‌ای که ارزیابی می‌کنید
+            </CardDescription>
+          </CardHeader>
 
-            {/* Metadata Section - Mobile-first responsive grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 bg-gradient-to-br from-nude-50 to-nude-100/50 rounded-xl border border-nude-200">
-              {/* Strategist Selection */}
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="strategistId" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
-                  نام استراتژیست:
+                <Label htmlFor="strategistId">
+                  نام استراتژیست <RequiredMark />
                 </Label>
-                <div className="relative">
-                  <select
-                    name="strategistId"
-                    required
-                    className="w-full h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-white rounded-md px-3 text-xs sm:text-sm"
-                    style={{ appearance: 'none' }}
-                  >
-                    <option value="">استراتژیست را انتخاب کنید</option>
+                <Select name="strategistId" required>
+                  <SelectTrigger id="strategistId">
+                    <SelectValue placeholder="استراتژیست را انتخاب کنید" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {filteredStrategists.map((strategist) => (
-                      <option key={strategist.id} value={strategist.id}>
+                      <SelectItem key={strategist.id} value={strategist.id}>
                         {strategist.firstName} {strategist.lastName}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </select>
-                  {strategists.length > 5 && (
-                    <div className="mt-2">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-nude-400" />
-                        <Input
-                          placeholder="جستجوی استراتژیست..."
-                          value={strategistSearch}
-                          onChange={(e) => setStrategistSearch(e.target.value)}
-                          className="pl-8 sm:pl-9 h-8 sm:h-9 border-nude-300 focus:border-nude-500 text-xs sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </SelectContent>
+                </Select>
+
+                {strategists.length > 5 && (
+                  <div className="relative">
+                    <Search
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-0 start-3 my-auto size-4 text-foreground-subtle"
+                    />
+                    <Input
+                      aria-label="جستجوی استراتژیست"
+                      placeholder="جستجوی استراتژیست…"
+                      value={strategistSearch}
+                      onChange={(e) => setStrategistSearch(e.target.value)}
+                      className="h-9 ps-9 text-sm sm:h-9"
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Month Selection */}
               <div className="space-y-2">
-                <Label htmlFor="month" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
-                  ماه:
+                <Label htmlFor="month">
+                  ماه <RequiredMark />
                 </Label>
-                <Select name="month" defaultValue={effectiveCurrentMonth.toString()} required>
-                  <SelectTrigger className="h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50">
+                <Select
+                  name="month"
+                  defaultValue={effectiveCurrentMonth.toString()}
+                  required
+                >
+                  <SelectTrigger id="month">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -376,30 +411,24 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
                 </Select>
               </div>
 
-              {/* Year Input */}
               <div className="space-y-2">
-                <Label htmlFor="year" className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
-                  سال:
-                </Label>
+                <Label htmlFor="year">سال</Label>
                 <Input
                   id="year"
                   name="year"
                   type="number"
                   value={currentPersianYear}
                   readOnly
-                  className="h-10 sm:h-12 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 bg-nude-50 text-nude-700 font-bold text-xs sm:text-sm"
+                  // Read-only rather than disabled: the value must still submit.
+                  className="bg-surface-sunken font-medium"
                   required
                 />
               </div>
 
-              {/* Evaluation Period */}
               <div className="space-y-2">
-                <Label className="text-nude-900 font-bold text-xs sm:text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-nude-500"></span>
-                  بازهٔ زمانی ارزیابی:
-                </Label>
-                <div className="h-10 sm:h-12 flex items-center px-3 sm:px-4 bg-nude-100 border-2 border-nude-300 rounded-lg text-xs sm:text-sm text-nude-700 font-bold">
+                <Label>بازهٔ زمانی</Label>
+                <div className="flex h-11 items-center gap-2 rounded-lg border border-border bg-surface-sunken px-3.5 text-sm font-medium text-foreground-secondary sm:h-10">
+                  <CalendarDays className="size-4 shrink-0 text-foreground-subtle" aria-hidden />
                   ماهانه
                 </div>
               </div>
@@ -407,318 +436,257 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
           </CardContent>
         </Card>
 
-        {/* Evaluation Table */}
-        <Card className="border-2 border-nude-200 shadow-xl overflow-hidden bg-white">
-          {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gradient-to-l from-nude-500 to-nude-600">
-                  <th className="text-right p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[22%]">
-                    شاخص ارزیابی
-                  </th>
-                  <th className="text-right p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[38%]">
-                    توضیح
-                  </th>
-                  <th className="text-center p-3 lg:p-5 text-white font-bold border-l border-nude-400 text-sm lg:text-base w-[15%]">
-                    امتیاز از 1 تا 5
-                  </th>
-                  <th className="text-right p-3 lg:p-5 text-white font-bold text-sm lg:text-base w-[25%]">
-                    یادداشت ارزیاب
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {STRATEGIST_METRICS.map((metric, index) => (
-                  <tr 
-                    key={metric.key}
-                    className={`${
-                      index % 2 === 0 ? 'bg-nude-50/50' : 'bg-white'
-                    } hover:bg-nude-100/50 transition-all duration-200`}
-                  >
-                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
-                      <span className="font-bold text-nude-900 text-sm lg:text-base leading-relaxed block">
-                        {metric.title}
-                      </span>
-                    </td>
-                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
-                      <span className="text-nude-700 text-xs lg:text-sm leading-relaxed block">
-                        {metric.description}
-                      </span>
-                    </td>
-                    <td className="p-3 lg:p-5 border-l border-t border-nude-200">
-                      <Input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={scores[metric.key] || ''}
-                        onChange={(e) => handleScoreChange(metric.key, e.target.value)}
-                        className="w-20 lg:w-24 mx-auto text-center font-bold text-lg lg:text-xl h-12 lg:h-14 border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500"
-                        placeholder="1-5"
-                        required
-                      />
-                    </td>
-                    <td className="p-3 lg:p-5 border-t border-nude-200">
-                      <Input
-                        type="text"
-                        value={notes[metric.key] || ''}
-                        onChange={(e) => handleNoteChange(metric.key, e.target.value)}
-                        className="w-full border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 text-xs lg:text-sm h-10 lg:h-12"
-                        placeholder="یادداشت (اختیاری)"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* ---------------------------------------------------------------
+            Metrics
+            --------------------------------------------------------------- */}
+        <Card>
+          <CardHeader>
+            <CardTitle>شاخص‌های ارزیابی</CardTitle>
+            <CardDescription>همه شاخص‌ها الزامی هستند — امتیاز ۱ تا ۵</CardDescription>
+            <CardAction>
+              <span
+                data-numeric
+                className="rounded-full bg-surface-sunken px-3 py-1 text-xs font-semibold text-foreground-secondary"
+              >
+                {completedMetrics.toLocaleString("fa-IR")} از{" "}
+                {STRATEGIST_METRICS.length.toLocaleString("fa-IR")} تکمیل‌شده
+              </span>
+            </CardAction>
+          </CardHeader>
 
-          {/* Mobile Card View */}
-          <div className="md:hidden p-4 space-y-4">
+          <CardContent className="space-y-4">
             {STRATEGIST_METRICS.map((metric, index) => (
-              <Card key={metric.key} className="border border-nude-200">
-                <CardContent className="p-4 space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-nude-900 text-sm leading-tight">{metric.title}</h3>
-                    <p className="text-nude-700 text-xs leading-relaxed">{metric.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 gap-3">
-                    <div>
-                      <Label className="text-nude-900 font-bold text-xs mb-2 block">
-                        امتیاز از 1 تا 5:
-                      </Label>
-                      <ScoreSelector
-                        value={scores[metric.key]}
-                        onChange={(value) => handleScoreChange(metric.key, value)}
-                        min={1}
-                        max={5}
-                      />
+              <fieldset
+                key={metric.key}
+                className="rounded-xl border border-border bg-surface-sunken p-4 sm:p-5"
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+                  <legend className="contents">
+                    <div className="min-w-0 lg:w-[38%]">
+                      <p className="flex items-start gap-2 font-semibold text-foreground">
+                        <span
+                          data-numeric
+                          aria-hidden
+                          className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-md bg-surface text-2xs font-bold text-foreground-muted"
+                        >
+                          {(index + 1).toLocaleString("fa-IR")}
+                        </span>
+                        {metric.title}
+                      </p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-foreground-muted">
+                        {metric.description}
+                      </p>
                     </div>
-                    
-                    <div>
-                      <Label className="text-nude-900 font-bold text-xs mb-2 block">
-                        یادداشت ارزیاب:
-                      </Label>
-                      <Input
-                        type="text"
-                        value={notes[metric.key] || ''}
-                        onChange={(e) => handleNoteChange(metric.key, e.target.value)}
-                        className="w-full border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 text-sm h-12"
-                        placeholder="یادداشت (اختیاری)"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </Card>
+                  </legend>
 
-        {/* Score Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-nude-50 shadow-lg">
-            <CardContent className="p-4 sm:p-6 lg:p-8">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-nude-700 font-bold text-sm sm:text-base mb-2">امتیاز کل استراتژیست:</p>
-                  <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-nude-900 mb-2">
-                    {totalScore}
-                  </p>
-                  <p className="text-nude-600 font-semibold text-xs sm:text-sm">از {maxTotalScore} امتیاز</p>
-                  {/* Progress bar */}
-                  <div className="mt-3 sm:mt-4 w-full bg-nude-200 rounded-full h-2 sm:h-3 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${scorePercentage}%` }}
-                    ></div>
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <ScoreScale
+                      name={`score-${metric.key}`}
+                      label={metric.title}
+                      value={scores[metric.key]}
+                      onChange={(value) => handleScoreChange(metric.key, value)}
+                      min={1}
+                      max={5}
+                      bandMultiplier={2}
+                    />
+                    <Input
+                      type="text"
+                      aria-label={`یادداشت ارزیاب برای ${metric.title}`}
+                      value={notes[metric.key] || ""}
+                      onChange={(e) => handleNoteChange(metric.key, e.target.value)}
+                      placeholder="یادداشت (اختیاری)"
+                    />
                   </div>
                 </div>
-                <Calculator className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-nude-500 ml-3 sm:ml-4 flex-shrink-0" />
+              </fieldset>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* ---------------------------------------------------------------
+            Running total
+            --------------------------------------------------------------- */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card>
+            <CardContent className="pt-5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium text-foreground-muted">امتیاز کل</p>
+                <span
+                  aria-hidden
+                  className="grid size-9 place-items-center rounded-lg bg-muted text-foreground-secondary"
+                >
+                  <Calculator className="size-[18px]" />
+                </span>
               </div>
+              <p className="mt-3 flex items-baseline gap-2">
+                <span
+                  data-numeric
+                  className="font-display text-4xl font-bold leading-none text-foreground"
+                >
+                  {totalScore.toLocaleString("fa-IR")}
+                </span>
+                <span className="text-sm text-foreground-subtle">
+                  از {maxTotalScore.toLocaleString("fa-IR")}
+                </span>
+              </p>
+              <Progress value={scorePercentage} className="mt-3" aria-label="درصد امتیاز کل" />
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-nude-300 bg-gradient-to-br from-white to-nude-50 shadow-lg">
-            <CardContent className="p-4 sm:p-6 lg:p-8">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-nude-700 font-bold text-sm sm:text-base mb-2">میانگین نهایی:</p>
-                  <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-nude-900 mb-2">
-                    {averageScore}
-                  </p>
-                  <p className="text-nude-600 font-semibold text-xs sm:text-sm">از 5 امتیاز</p>
-                  {/* Progress bar */}
-                  <div className="mt-3 sm:mt-4 w-full bg-nude-200 rounded-full h-2 sm:h-3 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-nude-500 to-nude-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${scorePercentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-nude-500 ml-3 sm:ml-4 flex-shrink-0" />
+          <Card>
+            <CardContent className="pt-5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium text-foreground-muted">میانگین نهایی</p>
+                <span
+                  aria-hidden
+                  className="grid size-9 place-items-center rounded-lg bg-muted text-foreground-secondary"
+                >
+                  <TrendingUp className="size-[18px]" />
+                </span>
+              </div>
+              <p className="mt-3 flex items-baseline gap-2">
+                <span
+                  data-numeric
+                  className={`font-display text-4xl font-bold leading-none ${averageBand.text}`}
+                >
+                  {parseFloat(averageScore).toLocaleString("fa-IR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+                <span className="text-sm text-foreground-subtle">از ۵</span>
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <Progress
+                  value={scorePercentage}
+                  className="flex-1"
+                  aria-label="درصد میانگین"
+                  indicatorClassName={averageBand.fill}
+                />
+                <span className={`shrink-0 text-xs font-semibold ${averageBand.text}`}>
+                  {totalScore > 0 ? averageBand.label : "—"}
+                </span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Additional Notes */}
-        <Card className="border-2 border-nude-200 shadow-xl bg-white">
-          <CardContent className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-            <h3 className="text-lg sm:text-xl font-bold text-nude-900 mb-4">توضیحات تکمیلی</h3>
-            
-            <div className="space-y-3">
-              <Label htmlFor="strengths" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                نقاط قوت:
-              </Label>
-              <Textarea 
-                id="strengths" 
-                name="strengths" 
-                rows={3}
-                className="border-2 border-nude-300 focus:border-green-500 focus:ring-green-500 resize-none text-sm sm:text-base"
-                placeholder="نقاط قوت استراتژیست را به تفصیل شرح دهید..."
-              />
-            </div>
+        {/* ---------------------------------------------------------------
+            Narrative
+            --------------------------------------------------------------- */}
+        <Card>
+          <CardHeader>
+            <CardTitle>توضیحات تکمیلی</CardTitle>
+            <CardDescription>
+              اختیاری، ولی بیشترین کمک را به فرد مقابل می‌کند
+            </CardDescription>
+          </CardHeader>
 
-            <div className="space-y-3">
-              <Label htmlFor="improvements" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-                نقاط قابل بهبود:
-              </Label>
-              <Textarea 
-                id="improvements" 
-                name="improvements" 
-                rows={3}
-                className="border-2 border-nude-300 focus:border-orange-500 focus:ring-orange-500 resize-none text-sm sm:text-base"
-                placeholder="نقاط قابل بهبود را با پیشنهادات مشخص ذکر کنید..."
-              />
-            </div>
+          <CardContent className="space-y-6">
+            {NOTES.map((item) => (
+              <div key={item.id} className="space-y-2">
+                <Label htmlFor={item.id}>
+                  <span aria-hidden className={`size-2 shrink-0 rounded-full ${item.dot}`} />
+                  {item.label}
+                </Label>
+                <Textarea
+                  id={item.id}
+                  name={item.id}
+                  rows={3}
+                  placeholder={item.placeholder}
+                />
+              </div>
+            ))}
 
-            <div className="space-y-3">
-              <Label htmlFor="suggestions" className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-nude-500"></span>
-                پیشنهادات:
+            <div className="space-y-2">
+              <Label htmlFor="image-upload">
+                <ImageIcon className="size-4 text-foreground-subtle" aria-hidden />
+                تصویر ارزیابی (اختیاری)
               </Label>
-              <Textarea 
-                id="suggestions" 
-                name="suggestions" 
-                rows={3}
-                className="border-2 border-nude-300 focus:border-nude-500 focus:ring-nude-500 resize-none text-sm sm:text-base"
-                placeholder="پیشنهادات خود برای بهبود عملکرد را بنویسید..."
-              />
-            </div>
 
-            <div className="space-y-3">
-              <Label className="text-nude-900 font-bold text-sm sm:text-base flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                تصویر ارزیابی (اختیاری):
-              </Label>
-              <div className="border-2 border-nude-300 rounded-lg p-4 bg-nude-50/50">
-                <div className="space-y-3">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                    disabled={uploadingImage}
-                  />
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <label
-                      htmlFor="image-upload"
-                      className={`cursor-pointer inline-flex items-center justify-center px-4 py-2 border-2 border-nude-300 rounded-md shadow-sm text-sm font-medium text-nude-700 bg-white hover:bg-nude-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nude-500 transition-colors ${
-                        uploadingImage ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      {uploadingImage ? 'در حال آپلود...' : 'انتخاب تصویر'}
-                    </label>
-                    {(imageUrl || localImagePreview) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-600 font-medium">
-                          {localImagePreview ? 'تصویر انتخاب شد' : 'تصویر آپلود شد'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={removeImage}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {(imageUrl || localImagePreview) && (
-                    <div className="mt-3 relative">
-                      <img
-                        src={localImagePreview || (imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`)}
-                        alt="تصویر ارزیابی"
-                        className="max-w-full h-32 object-cover rounded-lg border-2 border-nude-200 cursor-pointer hover:opacity-80 transition-opacity"
-                        style={{
-                          borderColor: '#10b981', // Green border to indicate clickable
-                          boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
-                        }}
-                        onClick={() => handleImageClick(localImagePreview || (imageUrl.startsWith('/uploads') ? imageUrl : `/${imageUrl}`))}
-                        onError={(e) => {
-                          console.error('Image failed to load:', localImagePreview || imageUrl)
-                          // Don't hide the image, just log the error
-                          // e.currentTarget.style.display = 'none'
-                        }}
-                        onLoad={() => {
-                          console.log('Image loaded successfully:', localImagePreview || imageUrl)
-                        }}
-                      />
-                      {/* Click indicator */}
-                      <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full shadow-lg">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </div>
-                    </div>
+              <div className="rounded-xl border border-dashed border-border-strong bg-surface-sunken p-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="sr-only"
+                  id="image-upload"
+                  disabled={uploadingImage}
+                />
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <label
+                    htmlFor="image-upload"
+                    className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-medium text-foreground-secondary shadow-xs transition-colors duration-fast hover:bg-surface-hover ${
+                      uploadingImage ? "pointer-events-none opacity-50" : ""
+                    }`}
+                  >
+                    <Upload className="size-4" aria-hidden />
+                    {uploadingImage ? "در حال آپلود…" : "انتخاب تصویر"}
+                  </label>
+
+                  {previewImage && (
+                    <span className="flex items-center gap-2 text-sm">
+                      <span className="flex items-center gap-1.5 font-medium text-success">
+                        <Check className="size-4" aria-hidden />
+                        {localImagePreview ? "تصویر انتخاب شد" : "تصویر آپلود شد"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="rounded font-medium text-danger transition-colors hover:underline"
+                      >
+                        حذف
+                      </button>
+                    </span>
                   )}
-                  <p className="text-xs text-nude-600">
-                    فرمت‌های مجاز: JPG, PNG, GIF | حداکثر حجم: ۵ مگابایت
-                  </p>
                 </div>
+
+                {previewImage && (
+                  <button
+                    type="button"
+                    onClick={() => handleImageClick(previewImage)}
+                    className="mt-3 block overflow-hidden rounded-lg border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <img
+                      src={previewImage}
+                      alt="پیش‌نمایش تصویر ارزیابی"
+                      className="h-32 w-auto object-cover transition-opacity duration-base hover:opacity-85"
+                    />
+                  </button>
+                )}
+
+                <p className="mt-3 text-xs text-foreground-subtle">
+                  فرمت‌های مجاز: JPG، PNG، GIF · حداکثر حجم: ۵ مگابایت
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Bottom Actions */}
-        <Card className="border-2 border-nude-200 shadow-xl bg-gradient-to-r from-nude-50 to-white">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
-              <p className="text-nude-700 text-xs sm:text-sm order-2 sm:order-1">
-                همه فیلدهای ستاره‌دار (*) الزامی هستند
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 order-1 sm:order-2">
-                <Link href="/evaluations/strategist" className="order-2 sm:order-1">
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="border-2 border-nude-300 hover:bg-nude-100 text-nude-700 font-semibold px-6 sm:px-8 w-full sm:w-auto h-10 sm:h-12 text-sm"
-                  >
-                    <X className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                    انصراف
-                  </Button>
+        {/* ---------------------------------------------------------------
+            Submit
+            --------------------------------------------------------------- */}
+        <Card>
+          <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-foreground-muted">
+              امتیاز همه شاخص‌ها الزامی است؛ توضیحات تکمیلی اختیاری هستند.
+            </p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button type="button" variant="outline" asChild>
+                <Link href="/evaluations/strategist">
+                  <X aria-hidden />
+                  انصراف
                 </Link>
-                <Button 
-                  type="submit" 
-                  disabled={loading}
-                  className="bg-gradient-to-l from-nude-500 to-nude-600 hover:from-nude-600 hover:to-nude-700 text-white font-semibold px-6 sm:px-10 h-10 sm:h-12 shadow-lg shadow-nude-500/30 w-full sm:w-auto text-sm"
-                >
-                  <Save className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  {loading ? "در حال ثبت..." : "ثبت ارزیابی"}
-                </Button>
-              </div>
+              </Button>
+              <Button type="submit" loading={loading}>
+                <Save aria-hidden />
+                ثبت ارزیابی
+              </Button>
             </div>
           </CardContent>
         </Card>
       </form>
 
-      {/* Image Modal */}
       <ImageModal
         isOpen={imageModalOpen}
         onClose={() => setImageModalOpen(false)}
@@ -728,4 +696,3 @@ export function StrategistEvaluationForm({ strategists }: { strategists: User[] 
     </div>
   )
 }
-

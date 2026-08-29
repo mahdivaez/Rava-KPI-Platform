@@ -2,6 +2,13 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import moment from "moment-jalaali"
 
+/**
+ * Without this, moment-jalaali formats weekday and month names in English —
+ * «Saturday 1405/06/07» instead of «شنبه ۷ شهریور ۱۴۰۵». Persian digits are on
+ * because every date here is display-only.
+ */
+moment.loadPersian({ dialect: "persian-modern", usePersianDigits: true })
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -39,10 +46,10 @@ export function formatPersianDateTime(date: Date | string, formatString: string 
 /**
  * Format a date with weekday in Persian/Shamsi calendar
  * @param date - The date to format
- * @param formatString - The format string (default: 'dddd jYYYY/jMM/jDD')
+ * @param formatString - The format string (default: 'dddd jD jMMMM jYYYY')
  * @returns Formatted Persian date with weekday string
  */
-export function formatPersianDateWithWeekday(date: Date | string, formatString: string = 'dddd jYYYY/jMM/jDD'): string {
+export function formatPersianDateWithWeekday(date: Date | string, formatString: string = 'dddd jD jMMMM jYYYY'): string {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return moment(dateObj).format(formatString)

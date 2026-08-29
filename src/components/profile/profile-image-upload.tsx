@@ -31,7 +31,7 @@ export function ProfileImageUpload({ currentImage, userId }: ProfileImageUploadP
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("خطا", {
-        description: "حجم فایل باید کمتر از 5 مگابایت باشد"
+        description: "حجم فایل باید کمتر از ۵ مگابایت باشد"
       })
       return
     }
@@ -115,16 +115,16 @@ export function ProfileImageUpload({ currentImage, userId }: ProfileImageUploadP
           type="button"
           onClick={() => document.getElementById('profile-upload')?.click()}
           disabled={isUploading || isDeleting}
-          className="w-full bg-nude-500 hover:bg-nude-600 text-white"
+          className="w-full bg-primary hover:bg-primary text-white"
         >
           {isUploading ? (
             <>
               <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-              در حال آپلود...
+              در حال آپلود…
             </>
           ) : (
             <>
-              <Upload className="w-4 h-4 ml-2" />
+              <Upload className="size-4" />
               آپلود تصویر
             </>
           )}
@@ -146,15 +146,15 @@ export function ProfileImageUpload({ currentImage, userId }: ProfileImageUploadP
             </>
           ) : (
             <>
-              <Trash2 className="w-4 h-4 ml-2" />
+              <Trash2 className="size-4" />
               حذف تصویر
             </>
           )}
         </Button>
       )}
 
-      <p className="text-xs text-nude-600 text-center">
-        حداکثر 5 مگابایت - JPG, PNG, GIF
+      <p className="text-xs text-foreground-muted text-center">
+        حداکثر ۵ مگابایت · JPG، PNG، GIF
       </p>
     </div>
   )

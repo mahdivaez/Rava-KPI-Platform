@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card"
-import { MessageSquare, Send, Loader2 } from "lucide-react"
+import { MessageSquare, Send } from "lucide-react"
+import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { formatPersianDateTime } from "@/lib/utils"
@@ -73,38 +74,45 @@ export function CommentSection({
   }
 
   return (
-    <Card className="p-6 border-nude-200 bg-white">
-      <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="w-5 h-5 text-nude-600" />
-        <h3 className="font-semibold text-nude-900">نظرات ({comments.length})</h3>
+    <Card className="p-5 sm:p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <MessageSquare className="size-5 text-foreground-subtle" aria-hidden />
+        <h3 className="font-semibold text-foreground">
+          نظرات{" "}
+          <span data-numeric className="text-foreground-muted">
+            ({comments.length.toLocaleString("fa-IR")})
+          </span>
+        </h3>
       </div>
 
       {/* Comments List */}
       <div className="space-y-4 mb-6">
         {comments.length === 0 ? (
-          <div className="text-center py-8">
-            <MessageSquare className="w-12 h-12 text-nude-400 mx-auto mb-2" />
-            <p className="text-nude-600 text-sm">هنوز نظری ثبت نشده است</p>
-          </div>
+          <EmptyState
+            icon={<MessageSquare />}
+            title="هنوز نظری ثبت نشده است"
+            description="اولین نفری باشید که درباره این ارزیابی نظر می‌دهد."
+            size="sm"
+          />
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className="flex gap-3 p-4 bg-nude-50 rounded-xl">
-              <Avatar className="h-10 w-10 border border-nude-200">
+            <div key={comment.id} className="flex gap-3 p-4 bg-surface-sunken rounded-xl">
+              <Avatar className="size-10 ring-1 ring-border">
                 <AvatarImage src={comment.author.image || undefined} />
-                <AvatarFallback className="bg-nude-200 text-nude-700 text-sm">
+                <AvatarFallback className="bg-muted text-foreground-secondary text-sm">
                   {getInitials(comment.author.firstName, comment.author.lastName)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-baseline justify-between mb-1">
-                  <span className="font-semibold text-nude-900 text-sm">
+                  <span className="font-semibold text-foreground text-sm">
                     {comment.author.firstName} {comment.author.lastName}
                   </span>
-                  <span className="text-xs text-nude-500">
+                  <span className="text-xs text-foreground-subtle">
                     {formatPersianDateTime(comment.createdAt, 'yyyy/MM/dd HH:mm')}
                   </span>
                 </div>
-                <p className="text-nude-700 text-sm leading-relaxed whitespace-pre-wrap">
+                <p className="text-foreground-secondary text-sm leading-relaxed whitespace-pre-wrap">
                   {comment.content}
                 </p>
               </div>
@@ -118,27 +126,14 @@ export function CommentSection({
         <Textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="نظر خود را بنویسید..."
-          className="bg-nude-50 border-nude-200 min-h-[100px]"
+          placeholder="نظر خود را بنویسید…"
+          className="min-h-[100px]"
           disabled={isSubmitting}
         />
         <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={isSubmitting || !newComment.trim()}
-            className="bg-nude-500 hover:bg-nude-600 text-white"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                در حال ثبت...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4 ml-2" />
-                ثبت نظر
-              </>
-            )}
+          <Button type="submit" loading={isSubmitting} disabled={!newComment.trim()}>
+            {!isSubmitting && <Send aria-hidden />}
+            {isSubmitting ? "در حال ثبت…" : "ثبت نظر"}
           </Button>
         </div>
       </form>

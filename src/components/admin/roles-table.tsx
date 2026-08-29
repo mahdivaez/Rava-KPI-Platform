@@ -105,10 +105,10 @@ export function RolesTable({ users, workgroups }: RolesTableProps) {
 
   return (
     <>
-      <div className="rounded-lg border border-nude-200 overflow-x-auto">
+      <div className="rounded-lg border border-border overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-nude-50">
+            <TableRow className="bg-surface-sunken">
               <TableHead>کاربر</TableHead>
               <TableHead>ایمیل</TableHead>
               <TableHead className="text-center">مدیر سیستم</TableHead>
@@ -119,23 +119,23 @@ export function RolesTable({ users, workgroups }: RolesTableProps) {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} className="hover:bg-nude-50">
+              <TableRow key={user.id} className="hover:bg-surface-hover">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-nude-200">
+                    <Avatar className="h-10 w-10 border border-border">
                       <AvatarImage src={user.image || undefined} />
-                      <AvatarFallback className="bg-nude-200 text-nude-700">
+                      <AvatarFallback className="bg-muted text-foreground-secondary">
                         {getInitials(user.firstName, user.lastName)}
                       </AvatarFallback>
                     </Avatar>
-                    <p className="font-semibold text-nude-900">
+                    <p className="font-semibold text-foreground">
                       {user.firstName} {user.lastName}
                     </p>
                   </div>
                 </TableCell>
 
                 <TableCell>
-                  <span className="text-sm text-nude-600">{user.email}</span>
+                  <span className="text-sm text-foreground-muted">{user.email}</span>
                 </TableCell>
 
                 <TableCell>
@@ -164,10 +164,10 @@ export function RolesTable({ users, workgroups }: RolesTableProps) {
                         )
                       }
                       disabled={updating === user.id}
-                      className="data-[state=checked]:bg-nude-500"
+                      className="data-[state=checked]:bg-primary"
                     />
                     {user.isTechnicalDeputy && (
-                      <Building2 className="w-4 h-4 text-nude-600" />
+                      <Building2 className="w-4 h-4 text-foreground-muted" />
                     )}
                   </div>
                 </TableCell>
@@ -186,12 +186,12 @@ export function RolesTable({ users, workgroups }: RolesTableProps) {
                           className="opacity-60 hover:opacity-100 transition-opacity"
                           aria-label="حذف نقش"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="size-3" />
                         </button>
                       </Badge>
                     ))}
                     {user.workgroupMemberships.length === 0 && (
-                      <span className="text-sm text-nude-500">بدون نقش</span>
+                      <span className="text-sm text-foreground-subtle">بدون نقش</span>
                     )}
                   </div>
                 </TableCell>
@@ -202,9 +202,9 @@ export function RolesTable({ users, workgroups }: RolesTableProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => setAssignFor(user)}
-                      className="text-nude-600 hover:text-nude-900 hover:bg-nude-100 gap-1"
+                      className="text-foreground-muted hover:text-foreground hover:bg-surface-hover gap-1"
                     >
-                      <UserCog className="h-4 w-4" />
+                      <UserCog className="size-4" />
                       <span className="text-xs">تخصیص نقش</span>
                     </Button>
                   </div>
@@ -331,8 +331,8 @@ function AssignRoleDialog({
           </div>
 
           <Button onClick={handleAssign} disabled={loading} className="w-full">
-            <Plus className="h-4 w-4 ml-2" />
-            {loading ? "در حال ثبت..." : "تخصیص نقش"}
+            <Plus className="size-4" />
+            {loading ? "در حال ثبت…" : "تخصیص نقش"}
           </Button>
         </div>
       </DialogContent>

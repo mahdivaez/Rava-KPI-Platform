@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { RankBadge } from "@/components/ui/rank"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Trophy, TrendingUp, Medal, Award, Crown } from "lucide-react"
+import { Award, TrendingUp, Trophy } from "lucide-react"
 
 interface TeamLeaderboardProps {
   strategistEvaluations: any[]
@@ -135,56 +136,48 @@ export function TeamLeaderboard({ strategistEvaluations, writerEvaluations, work
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
-  const getMedalIcon = (rank: number) => {
-    if (rank === 0) return <Crown className="w-5 h-5 text-yellow-500" />
-    if (rank === 1) return <Medal className="w-5 h-5 text-slate-400" />
-    if (rank === 2) return <Medal className="w-5 h-5 text-amber-700" />
-    return <span className="text-sm font-bold text-slate-500">#{rank + 1}</span>
-  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Top Strategists */}
-      <Card className="border-2 border-teal-200 bg-white shadow-lg">
-        <CardHeader className="border-b border-teal-200 bg-gradient-to-r from-teal-50 to-white">
-          <CardTitle className="text-teal-900 text-xl font-bold flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-teal-600" />
+      <Card className="border border-border bg-surface shadow-lg">
+        <CardHeader className="border-b border-border bg-surface">
+          <CardTitle className="text-foreground text-xl font-bold flex items-center gap-2">
+            <Trophy className="w-6 h-6 text-primary" />
             برترین استراتژیست‌ها
           </CardTitle>
-          <CardDescription className="text-teal-600">رتبه‌بندی بر اساس میانگین امتیاز</CardDescription>
+          <CardDescription className="text-primary">رتبه‌بندی بر اساس میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-3">
             {topStrategists.map((item: any, index: number) => (
               <div 
                 key={item.user.id}
-                className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all hover:shadow-md ${
-                  index === 0 ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' :
-                  index === 1 ? 'bg-gradient-to-r from-slate-50 to-slate-100 border-slate-300' :
-                  index === 2 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300' :
-                  'bg-white border-teal-200'
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all hover:shadow-md ${
+                  index === 0 ? 'bg-primary-subtle border-border-strong' :
+                  index === 1 ? 'bg-surface-sunken border-border-strong' :
+                  index === 2 ? 'bg-warning-subtle border-border-strong' :
+                  'bg-surface border-border'
                 }`}
               >
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="flex items-center justify-center w-8">
-                    {getMedalIcon(index)}
-                  </div>
-                  <Avatar className="w-10 h-10 border-2 border-teal-200">
+                  <RankBadge rank={index + 1} />
+                  <Avatar className="w-10 h-10 border border-border">
                     <AvatarImage src={item.user.image} />
-                    <AvatarFallback className="bg-teal-100 text-teal-700 font-bold">
+                    <AvatarFallback className="bg-primary-subtle text-primary font-bold">
                       {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-foreground">
                       {item.user.firstName} {item.user.lastName}
                     </p>
-                    <p className="text-xs text-slate-600">{item.count} ارزیابی</p>
+                    <p className="text-xs text-foreground-muted">{item.count} ارزیابی</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-teal-900">{item.average.toFixed(2)}</p>
-                  <p className="text-xs text-slate-600">از 10</p>
+                <div className="text-start">
+                  <p className="text-2xl font-bold text-foreground">{item.average.toFixed(2)}</p>
+                  <p className="text-xs text-foreground-muted">از ۱۰</p>
                 </div>
               </div>
             ))}
@@ -193,46 +186,44 @@ export function TeamLeaderboard({ strategistEvaluations, writerEvaluations, work
       </Card>
 
       {/* Top Writers */}
-      <Card className="border-2 border-purple-200 bg-white shadow-lg">
-        <CardHeader className="border-b border-purple-200 bg-gradient-to-r from-purple-50 to-white">
-          <CardTitle className="text-purple-900 text-xl font-bold flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-purple-600" />
+      <Card className="border border-border bg-surface shadow-lg">
+        <CardHeader className="border-b border-border bg-surface">
+          <CardTitle className="text-foreground text-xl font-bold flex items-center gap-2">
+            <Trophy className="w-6 h-6 text-primary" />
             برترین نویسندگان
           </CardTitle>
-          <CardDescription className="text-purple-600">رتبه‌بندی بر اساس میانگین امتیاز</CardDescription>
+          <CardDescription className="text-primary">رتبه‌بندی بر اساس میانگین امتیاز</CardDescription>
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-3">
             {topWriters.map((item: any, index: number) => (
               <div 
                 key={item.user.id}
-                className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all hover:shadow-md ${
-                  index === 0 ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' :
-                  index === 1 ? 'bg-gradient-to-r from-slate-50 to-slate-100 border-slate-300' :
-                  index === 2 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300' :
-                  'bg-white border-purple-200'
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all hover:shadow-md ${
+                  index === 0 ? 'bg-primary-subtle border-border-strong' :
+                  index === 1 ? 'bg-surface-sunken border-border-strong' :
+                  index === 2 ? 'bg-warning-subtle border-border-strong' :
+                  'bg-surface border-border'
                 }`}
               >
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="flex items-center justify-center w-8">
-                    {getMedalIcon(index)}
-                  </div>
-                  <Avatar className="w-10 h-10 border-2 border-purple-200">
+                  <RankBadge rank={index + 1} />
+                  <Avatar className="w-10 h-10 border border-border">
                     <AvatarImage src={item.user.image} />
-                    <AvatarFallback className="bg-purple-100 text-purple-700 font-bold">
+                    <AvatarFallback className="bg-primary-subtle text-primary font-bold">
                       {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-foreground">
                       {item.user.firstName} {item.user.lastName}
                     </p>
-                    <p className="text-xs text-slate-600">{item.count} ارزیابی</p>
+                    <p className="text-xs text-foreground-muted">{item.count} ارزیابی</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-purple-900">{item.average.toFixed(2)}</p>
-                  <p className="text-xs text-slate-600">از 10</p>
+                <div className="text-start">
+                  <p className="text-2xl font-bold text-foreground">{item.average.toFixed(2)}</p>
+                  <p className="text-xs text-foreground-muted">از ۱۰</p>
                 </div>
               </div>
             ))}
@@ -241,61 +232,61 @@ export function TeamLeaderboard({ strategistEvaluations, writerEvaluations, work
       </Card>
 
       {/* Most Improved */}
-      <Card className="border-2 border-amber-200 bg-white shadow-lg">
-        <CardHeader className="border-b border-amber-200 bg-gradient-to-r from-amber-50 to-white">
-          <CardTitle className="text-amber-900 text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-amber-600" />
+      <Card className="border border-border bg-surface shadow-lg">
+        <CardHeader className="border-b border-border bg-surface">
+          <CardTitle className="text-foreground text-xl font-bold flex items-center gap-2">
+            <TrendingUp className="w-6 h-6 text-warning" />
             بیشترین پیشرفت
           </CardTitle>
-          <CardDescription className="text-amber-600">کاربران با بیشترین رشد</CardDescription>
+          <CardDescription className="text-warning">کاربران با بیشترین رشد</CardDescription>
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-700 mb-2">استراتژیست‌ها:</p>
+            <p className="text-sm font-semibold text-foreground-secondary mb-2">استراتژیست‌ها:</p>
             {mostImprovedStrategists.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-white rounded-xl border-2 border-green-200">
+              <div key={index} className="flex items-center justify-between gap-3 rounded-xl border border-success/25 bg-success-subtle p-3">
                 <div className="flex items-center gap-3">
-                  <Avatar className="w-8 h-8 border-2 border-green-300">
+                  <Avatar className="size-8 ring-1 ring-border">
                     <AvatarImage src={item.user.image} />
-                    <AvatarFallback className="bg-green-100 text-green-700 text-xs font-bold">
+                    <AvatarFallback className="bg-success-subtle text-success text-xs font-bold">
                       {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">
+                    <p className="font-semibold text-foreground text-sm">
                       {item.user.firstName} {item.user.lastName}
                     </p>
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-foreground-muted">
                       {item.oldScore.toFixed(1)} → {item.newScore.toFixed(1)}
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-300">
+                <Badge className="bg-success-subtle text-success border-success/30">
                   +{item.improvement.toFixed(2)}
                 </Badge>
               </div>
             ))}
             
-            <p className="text-sm font-semibold text-slate-700 mt-4 mb-2">نویسندگان:</p>
+            <p className="text-sm font-semibold text-foreground-secondary mt-4 mb-2">نویسندگان:</p>
             {mostImprovedWriters.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-white rounded-xl border-2 border-green-200">
+              <div key={index} className="flex items-center justify-between gap-3 rounded-xl border border-success/25 bg-success-subtle p-3">
                 <div className="flex items-center gap-3">
-                  <Avatar className="w-8 h-8 border-2 border-green-300">
+                  <Avatar className="size-8 ring-1 ring-border">
                     <AvatarImage src={item.user.image} />
-                    <AvatarFallback className="bg-green-100 text-green-700 text-xs font-bold">
+                    <AvatarFallback className="bg-success-subtle text-success text-xs font-bold">
                       {getInitials(`${item.user.firstName} ${item.user.lastName}`)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">
+                    <p className="font-semibold text-foreground text-sm">
                       {item.user.firstName} {item.user.lastName}
                     </p>
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-foreground-muted">
                       {item.oldScore.toFixed(1)} → {item.newScore.toFixed(1)}
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-300">
+                <Badge className="bg-success-subtle text-success border-success/30">
                   +{item.improvement.toFixed(2)}
                 </Badge>
               </div>
@@ -305,40 +296,38 @@ export function TeamLeaderboard({ strategistEvaluations, writerEvaluations, work
       </Card>
 
       {/* Top Workgroups */}
-      <Card className="border-2 border-rose-200 bg-white shadow-lg">
-        <CardHeader className="border-b border-rose-200 bg-gradient-to-r from-rose-50 to-white">
-          <CardTitle className="text-rose-900 text-xl font-bold flex items-center gap-2">
-            <Award className="w-6 h-6 text-rose-600" />
+      <Card className="border border-border bg-surface shadow-lg">
+        <CardHeader className="border-b border-border bg-surface">
+          <CardTitle className="text-foreground text-xl font-bold flex items-center gap-2">
+            <Award className="w-6 h-6 text-danger" />
             برترین کارگروه‌ها
           </CardTitle>
-          <CardDescription className="text-rose-600">رتبه‌بندی بر اساس عملکرد تیمی</CardDescription>
+          <CardDescription className="text-danger">رتبه‌بندی بر اساس عملکرد تیمی</CardDescription>
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-3">
             {workgroupScores.map((item: any, index: number) => (
               <div 
                 key={index}
-                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-md ${
-                  index === 0 ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' :
-                  index === 1 ? 'bg-gradient-to-r from-slate-50 to-slate-100 border-slate-300' :
-                  index === 2 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300' :
-                  'bg-white border-rose-200'
+                className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:shadow-md ${
+                  index === 0 ? 'bg-primary-subtle border-border-strong' :
+                  index === 1 ? 'bg-surface-sunken border-border-strong' :
+                  index === 2 ? 'bg-warning-subtle border-border-strong' :
+                  'bg-surface border-border'
                 }`}
               >
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="flex items-center justify-center w-8">
-                    {getMedalIcon(index)}
-                  </div>
+                  <RankBadge rank={index + 1} />
                   <div className="flex-1">
-                    <p className="font-bold text-slate-900">{item.name}</p>
-                    <p className="text-xs text-slate-600">
+                    <p className="font-bold text-foreground">{item.name}</p>
+                    <p className="text-xs text-foreground-muted">
                       {item.memberCount} عضو • {item.evaluationCount} ارزیابی
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-rose-900">{item.average.toFixed(2)}</p>
-                  <p className="text-xs text-slate-600">میانگین</p>
+                <div className="text-start">
+                  <p className="text-2xl font-bold text-foreground">{item.average.toFixed(2)}</p>
+                  <p className="text-xs text-foreground-muted">میانگین</p>
                 </div>
               </div>
             ))}

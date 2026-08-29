@@ -25,7 +25,7 @@ export function StrategistEvaluationsReport({
     return (
       <Card>
         <CardContent className="py-8">
-          <p className="text-center text-slate-500">
+          <p className="text-center text-foreground-subtle">
             هنوز ارزیابی استراتژیستی ثبت نشده است
           </p>
         </CardContent>
@@ -55,7 +55,7 @@ export function StrategistEvaluationsReport({
         return (
           <Card key={evaluation.id} className="overflow-hidden">
             <CardHeader 
-              className="cursor-pointer hover:bg-slate-50 transition-colors p-4 sm:p-6"
+              className="cursor-pointer hover:bg-surface-hover transition-colors p-4 sm:p-6"
               onClick={() => toggleExpand(evaluation.id)}
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
@@ -63,7 +63,7 @@ export function StrategistEvaluationsReport({
                   <CardTitle className="text-base sm:text-lg truncate">
                     {evaluation.strategist.firstName} {evaluation.strategist.lastName}
                   </CardTitle>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-slate-600">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-foreground-muted">
                     <span>دوره: {evaluation.month}/{evaluation.year}</span>
                     <span className="truncate">ارزیاب: {evaluation.evaluator.firstName} {evaluation.evaluator.lastName}</span>
                   </div>
@@ -73,18 +73,18 @@ export function StrategistEvaluationsReport({
                     variant={avgScore >= 7 ? "default" : avgScore >= 5 ? "secondary" : "destructive"}
                     className="text-xs sm:text-base px-2 sm:px-3 py-1"
                   >
-                    میانگین: {avgScore}/10
+                    میانگین: {avgScore} از ۱۰
                   </Badge>
                   <Badge
                     variant={evaluation.status === "COMPLETED" ? "default" : "secondary"}
-                    className="bg-green-500 text-xs sm:text-sm px-2 sm:px-3"
+                    className="bg-success text-xs sm:text-sm px-2 sm:px-3"
                   >
                     {evaluation.status === "COMPLETED" ? "تکمیل شده" : "در انتظار"}
                   </Badge>
                   {isExpanded ? (
-                    <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500 flex-shrink-0" />
+                    <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-foreground-subtle flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500 flex-shrink-0" />
+                    <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-foreground-subtle flex-shrink-0" />
                   )}
                 </div>
               </div>
@@ -95,7 +95,7 @@ export function StrategistEvaluationsReport({
                 <div className="grid gap-4 sm:gap-6">
                   {/* Scores Grid */}
                   <div>
-                    <h3 className="font-semibold text-sm sm:text-base text-slate-900 mb-3">امتیازات جزئی</h3>
+                    <h3 className="font-semibold text-sm sm:text-base text-foreground mb-3">امتیازات جزئی</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                       <ScoreItem label="ایده‌پردازی" score={evaluation.ideation} />
                       <ScoreItem label="میانگین بازدید" score={evaluation.avgViews} />
@@ -111,8 +111,8 @@ export function StrategistEvaluationsReport({
                   <div className="space-y-3 sm:space-y-4">
                     {evaluation.strengths && (
                       <div>
-                        <h4 className="font-semibold text-sm sm:text-base text-green-700 mb-2">💪 نقاط قوت</h4>
-                        <p className="text-xs sm:text-sm text-slate-700 bg-green-50 p-2 sm:p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-success mb-2">💪 نقاط قوت</h4>
+                        <p className="text-xs sm:text-sm text-foreground-secondary bg-success-subtle p-2 sm:p-3 rounded-lg">
                           {evaluation.strengths}
                         </p>
                       </div>
@@ -120,8 +120,8 @@ export function StrategistEvaluationsReport({
 
                     {evaluation.improvements && (
                       <div>
-                        <h4 className="font-semibold text-sm sm:text-base text-orange-700 mb-2">📈 نقاط قابل بهبود</h4>
-                        <p className="text-xs sm:text-sm text-slate-700 bg-orange-50 p-2 sm:p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-warning mb-2">نقاط قابل بهبود</h4>
+                        <p className="text-xs sm:text-sm text-foreground-secondary bg-warning-subtle p-2 sm:p-3 rounded-lg">
                           {evaluation.improvements}
                         </p>
                       </div>
@@ -129,8 +129,8 @@ export function StrategistEvaluationsReport({
 
                     {evaluation.suggestions && (
                       <div>
-                        <h4 className="font-semibold text-sm sm:text-base text-blue-700 mb-2">💡 پیشنهادات</h4>
-                        <p className="text-xs sm:text-sm text-slate-700 bg-blue-50 p-2 sm:p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-info mb-2">پیشنهادات</h4>
+                        <p className="text-xs sm:text-sm text-foreground-secondary bg-info-subtle p-2 sm:p-3 rounded-lg">
                           {evaluation.suggestions}
                         </p>
                       </div>
@@ -138,8 +138,8 @@ export function StrategistEvaluationsReport({
 
                     {evaluation.evaluatorNotes && (
                       <div>
-                        <h4 className="font-semibold text-sm sm:text-base text-purple-700 mb-2">🔒 یادداشت ارزیاب (خصوصی)</h4>
-                        <p className="text-xs sm:text-sm text-slate-700 bg-purple-50 p-2 sm:p-3 rounded-lg">
+                        <h4 className="font-semibold text-sm sm:text-base text-primary mb-2">یادداشت ارزیاب (خصوصی)</h4>
+                        <p className="text-xs sm:text-sm text-foreground-secondary bg-primary-subtle p-2 sm:p-3 rounded-lg">
                           {evaluation.evaluatorNotes}
                         </p>
                       </div>
@@ -149,15 +149,15 @@ export function StrategistEvaluationsReport({
                   {/* Image Display */}
                   {evaluation.imageUrl && (
                     <div>
-                      <h4 className="font-semibold text-sm sm:text-base text-indigo-700 mb-2">📷 تصویر ارزیابی</h4>
+                      <h4 className="font-semibold text-sm sm:text-base text-primary mb-2">📷 تصویر ارزیابی</h4>
                       <ImageWithModal
                         src={evaluation.imageUrl}
                         alt="تصویر ارزیابی"
-                        className="max-w-full h-auto rounded-lg border-2 border-indigo-200 shadow-md"
+                        className="max-w-full h-auto rounded-lg border border-border shadow-md"
                         style={{
                           maxHeight: '400px',
                           objectFit: 'contain',
-                          borderColor: '#10b981', // Green border to indicate clickable
+                          borderColor: 'rgb(var(--success))', // Green border to indicate clickable
                           boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
                         }}
                       />
@@ -165,7 +165,7 @@ export function StrategistEvaluationsReport({
                   )}
 
                   {/* Metadata */}
-                  <div className="text-xs text-slate-500 pt-3 sm:pt-4 border-t">
+                  <div className="text-xs text-foreground-subtle pt-3 sm:pt-4 border-t">
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
                       <span>تاریخ ایجاد: {formatPersianDateTime(evaluation.createdAt)}</span>
                       <span>آخرین بروزرسانی: {formatPersianDateTime(evaluation.updatedAt)}</span>
@@ -184,15 +184,15 @@ export function StrategistEvaluationsReport({
 
 function ScoreItem({ label, score }: { label: string; score: number }) {
   const getColor = (score: number) => {
-    if (score >= 8) return "text-green-700 bg-green-100"
-    if (score >= 6) return "text-blue-700 bg-blue-100"
-    if (score >= 4) return "text-orange-700 bg-orange-100"
-    return "text-red-700 bg-red-100"
+    if (score >= 8) return "text-success bg-success-subtle"
+    if (score >= 6) return "text-info bg-info-subtle"
+    if (score >= 4) return "text-warning bg-warning-subtle"
+    return "text-danger bg-danger-subtle"
   }
 
   return (
     <div className="flex items-center justify-between p-2 sm:p-3 rounded-lg border">
-      <span className="text-xs sm:text-sm text-slate-600 truncate">{label}</span>
+      <span className="text-xs sm:text-sm text-foreground-muted truncate">{label}</span>
       <span className={`font-bold text-base sm:text-lg px-2 py-1 rounded flex-shrink-0 ${getColor(score)}`}>
         {score}
       </span>

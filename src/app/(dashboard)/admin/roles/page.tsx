@@ -10,7 +10,10 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { RolesTable } from "@/components/admin/roles-table"
-import { UserCog, Network } from "lucide-react"
+import { PageHeader } from "@/components/ui/page-header"
+import { RoleBadge } from "@/components/ui/role-badge"
+import { StatCard, StatGrid } from "@/components/ui/stat-card"
+import { ShieldCheck, UserCog, Users } from "lucide-react"
 import {
   EVALUATION_MATRIX,
   TEAM_ROLES,
@@ -50,110 +53,110 @@ export default async function RolesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-nude-900">ویرایش نقش‌های کاربران</h1>
-        <p className="text-nude-600 mt-1">مدیریت دسترسی‌ها و نقش‌های کاربران سیستم</p>
-      </div>
+      <PageHeader
+        title="نقش‌ها و دسترسی‌ها"
+        description="تخصیص نقش‌های کارگروهی و مدیریت سطوح دسترسی کاربران"
+        icon={<UserCog />}
+        breadcrumbs={[
+          { label: "داشبورد", href: "/dashboard" },
+          { label: "نقش‌ها و دسترسی‌ها" },
+        ]}
+      />
 
-      {/* System-level roles */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
-        <Card className="card-nude border-nude-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-nude-700">کل کاربران</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-nude-900">{users.length}</div>
-          </CardContent>
-        </Card>
-        <Card className="card-nude border-nude-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-nude-700">مدیران</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">
-              {users.filter((u) => u.isAdmin).length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="card-nude border-nude-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-nude-700">معاونین فنی</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-nude-900">
-              {users.filter((u) => u.isTechnicalDeputy).length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* System-level access */}
+      <StatGrid className="xl:grid-cols-3">
+        <StatCard
+          label="کل کاربران"
+          value={users.length.toLocaleString("fa-IR")}
+          icon={<Users />}
+          tone="primary"
+        />
+        <StatCard
+          label="مدیران سیستم"
+          value={users.filter((u) => u.isAdmin).length.toLocaleString("fa-IR")}
+          hint="دسترسی کامل به همه بخش‌ها"
+          icon={<ShieldCheck />}
+          tone="info"
+        />
+        <StatCard
+          label="معاونین فنی"
+          value={users
+            .filter((u) => u.isTechnicalDeputy)
+            .length.toLocaleString("fa-IR")}
+          hint="ارزیابی استراتژیست‌ها"
+          icon={<UserCog />}
+          tone="neutral"
+        />
+      </StatGrid>
 
       {/* Team roles */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-        {TEAM_ROLES.map((role) => (
-          <Card key={role} className="card-nude border-nude-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-nude-700">
-                {getRoleLabel(role)}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-nude-900">{roleCounts[role]}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Roles Table */}
-      <Card className="border-nude-200">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-nude-900 flex items-center gap-2">
-            <UserCog className="w-5 h-5" />
-            مدیریت نقش‌ها
-          </CardTitle>
+          <CardTitle>پراکندگی نقش‌های تیمی</CardTitle>
+          <CardDescription>
+            تعداد افراد یکتا در هر نقش، در همه کارگروه‌ها
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {TEAM_ROLES.map((role) => (
+              <li
+                key={role}
+                className="rounded-xl border border-border bg-surface-sunken p-4"
+              >
+                <RoleBadge role={role} size="sm" />
+                <p
+                  data-numeric
+                  className="mt-2.5 font-display text-2xl font-bold text-foreground"
+                >
+                  {roleCounts[role].toLocaleString("fa-IR")}
+                </p>
+                <p className="text-xs text-foreground-muted">نفر</p>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
+      {/* Roles table */}
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle>مدیریت نقش‌ها</CardTitle>
           <CardDescription>
             ویرایش دسترسی‌های کاربران و تخصیص نقش‌های کارگروهی
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0 pb-0 sm:px-0">
           <RolesTable users={users} workgroups={workgroups} />
         </CardContent>
       </Card>
 
       {/* Evaluation permission matrix */}
-      <Card className="border-nude-200">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-nude-900 flex items-center gap-2">
-            <Network className="w-5 h-5" />
-            ماتریس دسترسی ارزیابی
-          </CardTitle>
-          <CardDescription>
-            هر نقش اجازه ارزیابی کدام نقش‌ها را دارد
-          </CardDescription>
+          <CardTitle>ماتریس دسترسی ارزیابی</CardTitle>
+          <CardDescription>هر نقش اجازه ارزیابی کدام نقش‌ها را دارد</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {TEAM_ROLES.map((role) => (
-            <div
-              key={role}
-              className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-b border-nude-100 pb-3 last:border-0 last:pb-0"
-            >
-              <div className="sm:w-44 flex-shrink-0">
-                <Badge className={`text-xs ${getRoleBadgeClass(role)}`}>
-                  {getRoleLabel(role)}
-                </Badge>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {EVALUATION_MATRIX[role].map((target) => (
-                  <Badge
-                    key={target}
-                    variant="outline"
-                    className="text-xs border-nude-300 text-nude-700"
-                  >
-                    {getRoleLabel(target)}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
+        <CardContent>
+          <ul className="divide-y divide-border-subtle">
+            {TEAM_ROLES.map((role) => (
+              <li
+                key={role}
+                className="flex flex-col gap-2 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:gap-5"
+              >
+                <div className="sm:w-44 sm:shrink-0">
+                  <RoleBadge role={role} size="sm" />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {EVALUATION_MATRIX[role].map((target) => (
+                    <Badge key={target} variant="outline" size="sm">
+                      {getRoleLabel(target)}
+                    </Badge>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
     </div>

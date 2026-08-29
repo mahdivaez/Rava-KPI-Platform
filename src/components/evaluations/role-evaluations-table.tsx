@@ -1,7 +1,11 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+import { ClipboardList } from "lucide-react"
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { EmptyState } from "@/components/ui/empty-state"
+import { RoleBadge } from "@/components/ui/role-badge"
+import { ScoreBadge } from "@/components/ui/score"
 import {
   Table,
   TableBody,
@@ -10,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { SCORE_MAX, getRoleBadgeClass, getRoleLabel } from "@/lib/roles"
+import { SCORE_MAX } from "@/lib/roles"
+import { faNumber } from "@/lib/design-tokens"
 
 const PERSIAN_MONTHS = [
   "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
@@ -29,15 +34,12 @@ export interface RoleEvaluationRow {
   workgroup: { name: string }
 }
 
-function scoreBadgeClass(average: number) {
-  if (average >= 8) return "bg-success/10 text-success border border-success/30"
-  if (average >= 6) return "bg-info/10 text-info border border-info/30"
-  if (average >= 4) return "bg-amber-100 text-amber-700 border border-amber-300"
-  return "bg-destructive/10 text-destructive border border-destructive/30"
-}
-
 function monthLabel(month: number) {
   return PERSIAN_MONTHS[month - 1] ?? month
+}
+
+function initials(first: string, last: string) {
+  return `${first?.[0] ?? ""}${last?.[0] ?? ""}` || "؟"
 }
 
 export function RoleEvaluationsTable({
@@ -50,25 +52,27 @@ export function RoleEvaluationsTable({
 }) {
   if (evaluations.length === 0) {
     return (
-      <p className="text-nude-500 text-center py-8 text-sm">
-        هنوز ارزیابی ثبت نشده است
-      </p>
+      <EmptyState
+        icon={<ClipboardList />}
+        title="هنوز ارزیابی ثبت نشده است"
+        description="پس از ثبت اولین ارزیابی، سابقه آن در این جدول نمایش داده می‌شود."
+      />
     )
   }
+
+  const personColumn = showEvaluator ? "ارزیاب" : "فرد ارزیابی‌شده"
 
   return (
     <>
       {/* Desktop */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">
-                {showEvaluator ? "ارزیاب" : "فرد ارزیابی‌شده"}
-              </TableHead>
-              <TableHead className="text-right">نقش</TableHead>
-              <TableHead className="text-right">کارگروه</TableHead>
-              <TableHead className="text-right">دوره</TableHead>
+              <TableHead>{personColumn}</TableHead>
+              <TableHead>نقش</TableHead>
+              <TableHead>کارگروه</TableHead>
+              <TableHead>دوره</TableHead>
               <TableHead className="text-center">میانگین</TableHead>
               <TableHead className="text-center">امتیاز کل</TableHead>
             </TableRow>
@@ -78,27 +82,35 @@ export function RoleEvaluationsTable({
               const person = showEvaluator ? evaluation.evaluator : evaluation.target
               return (
                 <TableRow key={evaluation.id}>
-                  <TableCell className="font-medium text-sm">
-                    {person.firstName} {person.lastName}
+                  <TableCell>
+                    <span className="flex items-center gap-2.5">
+                      <Avatar className="size-8">
+                        <AvatarFallback className="text-2xs">
+                          {initials(person.firstName, person.lastName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium text-foreground">
+                        {person.firstName} {person.lastName}
+                      </span>
+                    </span>
                   </TableCell>
                   <TableCell>
-                    <Badge className={`text-xs ${getRoleBadgeClass(evaluation.targetRole)}`}>
-                      {getRoleLabel(evaluation.targetRole)}
-                    </Badge>
+                    <RoleBadge role={evaluation.targetRole} size="sm" />
                   </TableCell>
-                  <TableCell className="text-nude-600 text-sm">
+                  <TableCell className="text-foreground-muted">
                     {evaluation.workgroup.name}
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {monthLabel(evaluation.month)} {evaluation.year}
+                  <TableCell className="whitespace-nowrap text-foreground-secondary">
+                    {monthLabel(evaluation.month)} {faNumber(evaluation.year)}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge className={`text-xs ${scoreBadgeClass(evaluation.averageScore)}`}>
-                      {evaluation.averageScore.toFixed(2)}/{SCORE_MAX}
-                    </Badge>
+                    <ScoreBadge score={evaluation.averageScore} />
                   </TableCell>
-                  <TableCell className="text-center text-sm text-nude-700 font-semibold">
-                    {evaluation.totalScore}
+                  <TableCell
+                    data-numeric
+                    className="text-center font-semibold text-foreground-secondary"
+                  >
+                    {faNumber(evaluation.totalScore)}
                   </TableCell>
                 </TableRow>
               )
@@ -108,36 +120,40 @@ export function RoleEvaluationsTable({
       </div>
 
       {/* Mobile */}
-      <div className="md:hidden space-y-3 p-4">
+      <ul className="space-y-3 p-4 md:hidden">
         {evaluations.map((evaluation) => {
           const person = showEvaluator ? evaluation.evaluator : evaluation.target
           return (
-            <Card key={evaluation.id} className="border border-nude-200">
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-nude-900 text-sm truncate">
-                      {person.firstName} {person.lastName}
-                    </p>
-                    <p className="text-nude-500 text-xs mt-0.5">{evaluation.workgroup.name}</p>
-                  </div>
-                  <Badge className={`text-xs flex-shrink-0 ${scoreBadgeClass(evaluation.averageScore)}`}>
-                    {evaluation.averageScore.toFixed(2)}/{SCORE_MAX}
-                  </Badge>
+            <li
+              key={evaluation.id}
+              className="rounded-xl border border-border bg-surface-sunken p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {person.firstName} {person.lastName}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-foreground-muted">
+                    {evaluation.workgroup.name}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className={`text-xs ${getRoleBadgeClass(evaluation.targetRole)}`}>
-                    {getRoleLabel(evaluation.targetRole)}
-                  </Badge>
-                  <span className="text-xs text-nude-600">
-                    {monthLabel(evaluation.month)} {evaluation.year}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+                <ScoreBadge score={evaluation.averageScore} className="shrink-0" />
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <RoleBadge role={evaluation.targetRole} size="sm" />
+                <span className="text-xs text-foreground-muted">
+                  {monthLabel(evaluation.month)} {faNumber(evaluation.year)}
+                </span>
+                <span className="text-xs text-foreground-subtle">
+                  امتیاز کل: {faNumber(evaluation.totalScore)} از{" "}
+                  {faNumber(SCORE_MAX * 6)}
+                </span>
+              </div>
+            </li>
           )
         })}
-      </div>
+      </ul>
     </>
   )
 }

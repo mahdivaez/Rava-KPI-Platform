@@ -1,4 +1,17 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
+import animate from "tailwindcss-animate"
+
+/**
+ * Rava Design System — Tailwind binding layer.
+ *
+ * Every colour resolves to a CSS custom property declared in globals.css, so
+ * the light/dark themes swap in one place and `bg-primary/10` still works.
+ * Type sizes match Tailwind's defaults on purpose; only leading and tracking
+ * are re-tuned, because Persian needs more leading than Latin at every size.
+ */
+
+/** rgb(var(--token) / <alpha-value>) — keeps the /opacity modifier working. */
+const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`
 
 const config: Config = {
   darkMode: ["class"],
@@ -6,76 +19,234 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Vazirmatn', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
       },
+
+      fontSize: {
+        "2xs": ["0.6875rem", { lineHeight: "1.5" }],
+        xs: ["0.75rem", { lineHeight: "1.6" }],
+        sm: ["0.875rem", { lineHeight: "1.7" }],
+        base: ["1rem", { lineHeight: "1.75" }],
+        lg: ["1.125rem", { lineHeight: "1.6" }],
+        xl: ["1.25rem", { lineHeight: "1.5" }],
+        "2xl": ["1.5rem", { lineHeight: "1.4", letterSpacing: "-0.01em" }],
+        "3xl": ["1.875rem", { lineHeight: "1.3", letterSpacing: "-0.015em" }],
+        "4xl": ["2.25rem", { lineHeight: "1.2", letterSpacing: "-0.02em" }],
+        "5xl": ["3rem", { lineHeight: "1.1", letterSpacing: "-0.025em" }],
+      },
+
       colors: {
-        nude: {
-          50: 'rgb(var(--nude-50) / <alpha-value>)',
-          100: 'rgb(var(--nude-100) / <alpha-value>)',
-          200: 'rgb(var(--nude-200) / <alpha-value>)',
-          300: 'rgb(var(--nude-300) / <alpha-value>)',
-          400: 'rgb(var(--nude-400) / <alpha-value>)',
-          500: 'rgb(var(--nude-500) / <alpha-value>)',
-          600: 'rgb(var(--nude-600) / <alpha-value>)',
-          700: 'rgb(var(--nude-700) / <alpha-value>)',
-          800: 'rgb(var(--nude-800) / <alpha-value>)',
-          900: 'rgb(var(--nude-900) / <alpha-value>)',
+        /* --- Planes --- */
+        background: token("background"),
+        surface: {
+          DEFAULT: token("surface"),
+          raised: token("surface-raised"),
+          sunken: token("surface-sunken"),
+          hover: token("surface-hover"),
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+
+        /* --- Ink --- */
+        foreground: {
+          DEFAULT: token("foreground"),
+          secondary: token("foreground-secondary"),
+          muted: token("foreground-muted"),
+          subtle: token("foreground-subtle"),
+        },
+
+        /* --- Rules --- */
+        border: {
+          DEFAULT: token("border"),
+          strong: token("border-strong"),
+          subtle: token("border-subtle"),
+        },
+        input: token("input"),
+        ring: token("ring"),
+
+        /* --- Brand --- */
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: token("primary"),
+          hover: token("primary-hover"),
+          foreground: token("primary-foreground"),
+          subtle: token("primary-subtle"),
+          "subtle-foreground": token("primary-subtle-foreground"),
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: token("secondary"),
+          foreground: token("secondary-foreground"),
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: token("muted"),
+          foreground: token("muted-foreground"),
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: token("accent"),
+          foreground: token("accent-foreground"),
         },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
+
+        /* --- Status --- */
         success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
+          DEFAULT: token("success"),
+          foreground: token("success-foreground"),
+          subtle: token("success-subtle"),
         },
         warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
+          DEFAULT: token("warning"),
+          foreground: token("warning-foreground"),
+          subtle: token("warning-subtle"),
+        },
+        danger: {
+          DEFAULT: token("danger"),
+          foreground: token("danger-foreground"),
+          subtle: token("danger-subtle"),
         },
         info: {
-          DEFAULT: "hsl(var(--info))",
-          foreground: "hsl(var(--info-foreground))",
+          DEFAULT: token("info"),
+          foreground: token("info-foreground"),
+          subtle: token("info-subtle"),
         },
+
+        /* --- shadcn aliases --- */
+        card: {
+          DEFAULT: token("card"),
+          foreground: token("card-foreground"),
+        },
+        popover: {
+          DEFAULT: token("popover"),
+          foreground: token("popover-foreground"),
+        },
+        destructive: {
+          DEFAULT: token("destructive"),
+          foreground: token("destructive-foreground"),
+        },
+
+        /* --- Shell --- */
+        sidebar: {
+          DEFAULT: token("sidebar"),
+          foreground: token("sidebar-foreground"),
+          active: token("sidebar-active"),
+          "active-foreground": token("sidebar-active-foreground"),
+          border: token("sidebar-border"),
+        },
+        navbar: token("navbar"),
+        overlay: token("overlay"),
+
+        /* --- Data visualisation: fixed slot order, never cycled --- */
+        chart: {
+          1: token("chart-1"),
+          2: token("chart-2"),
+          3: token("chart-3"),
+          4: token("chart-4"),
+          5: token("chart-5"),
+          6: token("chart-6"),
+          7: token("chart-7"),
+          8: token("chart-8"),
+          grid: token("chart-grid"),
+          axis: token("chart-axis"),
+          label: token("chart-label"),
+        },
+
+        /* --- Team-role identity: same slot order as the chart palette --- */
+        role: {
+          1: token("role-1"),
+          2: token("role-2"),
+          3: token("role-3"),
+          4: token("role-4"),
+          5: token("role-5"),
+          6: token("role-6"),
+          7: token("role-7"),
+          8: token("role-8"),
+          "1-ink": token("role-1-ink"),
+          "2-ink": token("role-2-ink"),
+          "3-ink": token("role-3-ink"),
+          "4-ink": token("role-4-ink"),
+          "5-ink": token("role-5-ink"),
+          "6-ink": token("role-6-ink"),
+          "7-ink": token("role-7-ink"),
+          "8-ink": token("role-8-ink"),
+        },
+
+        /* --- KPI score bands --- */
+        score: {
+          critical: token("score-critical"),
+          weak: token("score-weak"),
+          fair: token("score-fair"),
+          strong: token("score-strong"),
+        },
+
+        /* --- Primitive ramp, exposed for the rare direct reference --- */
+        sand: {
+          25: token("sand-25"),
+          50: token("sand-50"),
+          100: token("sand-100"),
+          200: token("sand-200"),
+          300: token("sand-300"),
+          400: token("sand-400"),
+          500: token("sand-500"),
+          600: token("sand-600"),
+          700: token("sand-700"),
+          800: token("sand-800"),
+          900: token("sand-900"),
+          950: token("sand-950"),
+        },
+
       },
+
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "var(--radius-sm)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
       },
+
+      boxShadow: {
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        none: "none",
+      },
+
+      /* 4pt rhythm, dashboard density. */
+      spacing: {
+        4.5: "1.125rem",
+        13: "3.25rem",
+        15: "3.75rem",
+        18: "4.5rem",
+        22: "5.5rem",
+      },
+
+      transitionTimingFunction: {
+        out: "var(--ease-out)",
+        "in-out": "var(--ease-in-out)",
+        spring: "var(--ease-spring)",
+      },
+      transitionDuration: {
+        fast: "var(--duration-fast)",
+        base: "var(--duration-base)",
+        slow: "var(--duration-slow)",
+      },
+
+      /* Layered z-index scale — no ad-hoc values anywhere else. */
+      zIndex: {
+        base: "0",
+        raised: "10",
+        sticky: "20",
+        drawer: "40",
+        overlay: "50",
+        modal: "60",
+        popover: "70",
+        toast: "80",
+      },
+
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -85,20 +256,17 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(-100%)" },
+        },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-      boxShadow: {
-        'nude-sm': '0 1px 2px rgba(61, 53, 48, 0.05)',
-        'nude-md': '0 4px 6px -1px rgba(61, 53, 48, 0.07), 0 2px 4px -1px rgba(61, 53, 48, 0.05)',
-        'nude-lg': '0 10px 15px -3px rgba(61, 53, 48, 0.1), 0 4px 6px -2px rgba(61, 53, 48, 0.05)',
-        'nude-xl': '0 20px 25px -5px rgba(61, 53, 48, 0.15), 0 10px 10px -5px rgba(61, 53, 48, 0.08)',
+        "accordion-down": "accordion-down 200ms var(--ease-out)",
+        "accordion-up": "accordion-up 200ms var(--ease-out)",
       },
     },
   },
-  plugins: [],
-};
+  plugins: [animate],
+}
 
-export default config;
+export default config

@@ -68,16 +68,16 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
   if (!isEditing) {
     return (
       <div className="text-center py-8">
-        <div className="mx-auto w-16 h-16 bg-nude-50 rounded-full flex items-center justify-center mb-4">
-          <Edit2 className="w-8 h-8 text-nude-600" />
+        <div className="mx-auto w-16 h-16 bg-surface-sunken rounded-full flex items-center justify-center mb-4">
+          <Edit2 className="w-8 h-8 text-foreground-muted" />
         </div>
-        <h3 className="text-lg font-semibold text-nude-900 mb-2">آماده برای ویرایش</h3>
-        <p className="text-nude-600 mb-6">برای تغییر اطلاعات شخصی خود، روی دکمه زیر کلیک کنید</p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">آماده برای ویرایش</h3>
+        <p className="text-foreground-muted mb-6">برای تغییر اطلاعات شخصی خود، روی دکمه زیر کلیک کنید</p>
         <Button
           onClick={() => setIsEditing(true)}
-          className="bg-nude-600 hover:bg-nude-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+          
         >
-          <Edit2 className="w-4 h-4 ml-2" />
+          <Edit2 className="size-4" />
           ویرایش اطلاعات
         </Button>
       </div>
@@ -87,20 +87,20 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
   return (
     <div className="space-y-6">
       {/* Form Header */}
-      <div className="text-center p-6 bg-gradient-to-r from-nude-50 to-nude-100 rounded-xl border border-nude-200">
-        <div className="w-12 h-12 bg-nude-100 rounded-full flex items-center justify-center mx-auto mb-3">
-          <Edit2 className="w-6 h-6 text-nude-600" />
+      <div className="text-center p-6 bg-surface-sunken rounded-xl border border-border">
+        <div className="w-12 h-12 bg-surface-sunken rounded-full flex items-center justify-center mx-auto mb-3">
+          <Edit2 className="w-6 h-6 text-foreground-muted" />
         </div>
-        <h3 className="text-lg font-semibold text-nude-900 mb-1">ویرایش اطلاعات</h3>
-        <p className="text-sm text-nude-600">اطلاعات جدید را وارد کنید و ذخیره کنید</p>
+        <h3 className="text-lg font-semibold text-foreground mb-1">ویرایش اطلاعات</h3>
+        <p className="text-sm text-foreground-muted">اطلاعات جدید را وارد کنید و ذخیره کنید</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name Fields */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-sm font-semibold text-nude-700 flex items-center gap-2">
-              <User className="w-4 h-4 text-nude-600" />
+            <Label htmlFor="firstName" className="text-sm font-semibold text-foreground-secondary flex items-center gap-2">
+              <User className="w-4 h-4 text-foreground-muted" />
               نام
             </Label>
             <div className="relative">
@@ -110,13 +110,13 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 placeholder="نام خود را وارد کنید"
                 required
-                className="h-12 border-nude-300 focus:border-nude-500 focus:ring-nude-200 rounded-xl transition-all duration-200 text-lg"
+                
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-sm font-semibold text-nude-700 flex items-center gap-2">
-              <User className="w-4 h-4 text-nude-600" />
+            <Label htmlFor="lastName" className="text-sm font-semibold text-foreground-secondary flex items-center gap-2">
+              <User className="w-4 h-4 text-foreground-muted" />
               نام خانوادگی
             </Label>
             <div className="relative">
@@ -126,7 +126,7 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 placeholder="نام خانوادگی خود را وارد کنید"
                 required
-                className="h-12 border-nude-300 focus:border-nude-500 focus:ring-nude-200 rounded-xl transition-all duration-200 text-lg"
+                
               />
             </div>
           </div>
@@ -134,8 +134,8 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
         
         {/* Email Field */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-semibold text-nude-700 flex items-center gap-2">
-            <Mail className="w-4 h-4 text-nude-600" />
+          <Label htmlFor="email" className="text-sm font-semibold text-foreground-secondary flex items-center gap-2">
+            <Mail className="w-4 h-4 text-foreground-muted" />
             ایمیل
           </Label>
           <div className="relative">
@@ -146,11 +146,11 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="email@example.com"
               required
-              className="h-12 border-nude-300 focus:border-nude-500 focus:ring-nude-200 rounded-xl transition-all duration-200 text-lg"
+              
               dir="ltr"
             />
           </div>
-          <p className="text-xs text-nude-500 mt-1">ایمیل شما برای ورود به سیستم استفاده می‌شود</p>
+          <p className="text-xs text-foreground-subtle mt-1">ایمیل شما برای ورود به سیستم استفاده می‌شود</p>
         </div>
 
         {/* Action Buttons */}
@@ -158,12 +158,12 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
           <Button
             type="submit"
             disabled={isLoading}
-            className="flex-1 h-12 bg-gradient-to-r from-nude-600 to-nude-700 hover:from-nude-700 hover:to-nude-800 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="flex-1"
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-5 h-5 ml-2 animate-spin" />
-                در حال ذخیره...
+                در حال ذخیره…
               </>
             ) : (
               <>
@@ -177,7 +177,7 @@ export function ProfileEditForm({ userId, firstName, lastName, email }: ProfileE
             variant="outline"
             onClick={handleCancel}
             disabled={isLoading}
-            className="h-12 px-8 border-nude-300 hover:bg-nude-50 text-nude-700 font-medium rounded-xl transition-all duration-200"
+            className="h-12 px-8 border-border-strong hover:bg-surface-hover text-foreground-secondary font-medium rounded-xl transition-all duration-200"
           >
             <X className="w-5 h-5 ml-2" />
             انصراف

@@ -1,330 +1,589 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   RAVA DESIGN SYSTEM v2.0
+   Enterprise KPI Platform · Persian / RTL · Light + Dark
+   --------------------------------------------------------------------------
+   Three-layer token architecture:
+     L1 primitives  → raw ramps. Never referenced by a component.
+     L2 semantic    → role-based tokens. What components consume.
+     L3 component   → per-component tokens, derived from L2.
+   Every colour is stored as space-separated RGB channels so Tailwind's
+   `/opacity` modifier works: rgb(var(--token) / <alpha-value>).
+   ========================================================================== */
+
 @layer base {
   :root {
-    /* Nude/Neutral Color Palette (RGB values) */
-    --nude-50: 250 248 245;
-    --nude-100: 245 241 235;
-    --nude-200: 232 225 216;
-    --nude-300: 212 197 185;
-    --nude-400: 181 165 154;
-    --nude-500: 155 139 126;
-    --nude-600: 138 122 111;
-    --nude-700: 107 93 84;
-    --nude-800: 74 63 56;
-    --nude-900: 61 53 48;
+    /* ------------------------------------------------------------------
+       L1 · PRIMITIVES — Sand (warm neutral, hue ≈ 35°, low chroma)
+       Carries the brand's warmth through every surface and rule.
+       ------------------------------------------------------------------ */
+    --sand-25: 253 252 251;
+    --sand-50: 250 248 245;
+    --sand-100: 244 241 236;
+    --sand-200: 232 227 219;
+    --sand-300: 214 207 195;
+    --sand-400: 180 170 155;
+    --sand-500: 142 131 117;
+    --sand-600: 111 101 90;
+    --sand-700: 87 78 69;
+    --sand-800: 61 54 47;
+    --sand-900: 38 34 32;
+    --sand-950: 23 21 20;
 
-    /* Semantic Colors (HSL values for shadcn compatibility) */
-    --background: 30 25% 97%;
-    --foreground: 25 11% 21%;
-    
-    --card: 0 0% 100%;
-    --card-foreground: 25 11% 21%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 11% 21%;
-    
-    --primary: 25 11% 55%;
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 30 25% 94%;
-    --secondary-foreground: 25 11% 36%;
-    
-    --muted: 30 25% 94%;
-    --muted-foreground: 25 11% 64%;
-    
-    --accent: 30 25% 94%;
-    --accent-foreground: 25 11% 36%;
-    
-    --success: 152 35% 60%;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 28 45% 64%;
-    --warning-foreground: 0 0% 100%;
-    
-    --destructive: 0 40% 63%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --info: 210 20% 63%;
-    --info-foreground: 0 0% 100%;
-    
-    --border: 30 25% 88%;
-    --input: 30 25% 88%;
-    --ring: 25 11% 55%;
-    
+    /* L1 · PRIMITIVES — Indigo (brand / interactive).
+       Cool by design: never collides with the red/amber/green status set. */
+    --indigo-50: 238 242 255;
+    --indigo-100: 224 231 255;
+    --indigo-200: 199 210 254;
+    --indigo-300: 165 180 252;
+    --indigo-400: 129 140 248;
+    --indigo-500: 99 102 241;
+    --indigo-600: 79 70 229;
+    --indigo-700: 67 56 202;
+    --indigo-800: 55 48 163;
+    --indigo-900: 49 46 129;
+    --indigo-950: 30 27 75;
+
+    /* L1 · PRIMITIVES — Status hues (fixed, never themed by brand) */
+    --green-100: 220 252 231;
+    --green-500: 34 197 94;
+    --green-600: 22 163 74;
+    --green-700: 21 128 61;
+    --green-400: 74 222 128;
+    --amber-100: 254 243 199;
+    --amber-400: 251 191 36;
+    --amber-500: 245 158 11;
+    --amber-700: 180 83 9;
+    --red-100: 254 226 226;
+    --red-400: 248 113 113;
+    --red-600: 220 38 38;
+    --red-700: 185 28 28;
+    --blue-100: 219 234 254;
+    --blue-400: 96 165 250;
+    --blue-600: 37 99 235;
+    --blue-700: 29 78 216;
+
+    /* ------------------------------------------------------------------
+       L2 · SEMANTIC — Light theme
+       ------------------------------------------------------------------ */
+
+    /* Planes: page sits behind, surface is the card, raised is above it. */
+    --background: var(--sand-50);
+    --surface: 255 255 255;
+    --surface-raised: 255 255 255;
+    --surface-sunken: var(--sand-100);
+    --surface-hover: var(--sand-50);
+
+    /* Ink: four deliberate steps, all ≥ 4.5:1 except `subtle`
+       which is reserved for icons and decoration (3.7:1, AA-large). */
+    --foreground: var(--sand-900);
+    --foreground-secondary: var(--sand-700);
+    --foreground-muted: var(--sand-600);
+    --foreground-subtle: var(--sand-500);
+
+    /* Rules */
+    --border: var(--sand-200);
+    --border-strong: var(--sand-300);
+    --border-subtle: var(--sand-100);
+
+    /* Brand / interactive */
+    --primary: var(--indigo-600);
+    --primary-hover: var(--indigo-700);
+    --primary-foreground: 255 255 255;
+    --primary-subtle: var(--indigo-50);
+    --primary-subtle-foreground: var(--indigo-700);
+
+    /* Secondary / neutral action */
+    --secondary: var(--sand-100);
+    --secondary-foreground: var(--sand-800);
+    --muted: var(--sand-100);
+    --muted-foreground: var(--sand-600);
+    --accent: var(--sand-100);
+    --accent-foreground: var(--sand-900);
+
+    /* Status — each ships with an icon + label; colour never carries alone. */
+    --success: var(--green-700);
+    --success-foreground: 255 255 255;
+    --success-subtle: var(--green-100);
+    --warning: var(--amber-700);
+    --warning-foreground: 255 255 255;
+    --warning-subtle: var(--amber-100);
+    --danger: var(--red-600);
+    --danger-foreground: 255 255 255;
+    --danger-subtle: var(--red-100);
+    --info: var(--blue-600);
+    --info-foreground: 255 255 255;
+    --info-subtle: var(--blue-100);
+
+    /* shadcn compatibility aliases */
+    --card: var(--surface);
+    --card-foreground: var(--foreground);
+    --popover: var(--surface-raised);
+    --popover-foreground: var(--foreground);
+    --destructive: var(--danger);
+    --destructive-foreground: var(--danger-foreground);
+    --input: var(--border);
+    --ring: var(--indigo-500);
+
+    /* ------------------------------------------------------------------
+       L2 · SEMANTIC — Data visualisation
+       Eight-slot categorical palette, assigned in FIXED order, never
+       cycled. Validated (adjacent-pair CVD ΔE 9.1, normal-vision 19.6)
+       against the white chart surface. Three slots sit below 3:1 on light,
+       so charts always ship a legend or direct labels — the relief rule.
+       ------------------------------------------------------------------ */
+    --chart-1: 42 120 214; /* blue    */
+    --chart-2: 235 104 52; /* orange  */
+    --chart-3: 27 175 122; /* aqua    */
+    --chart-4: 237 161 0; /* yellow  */
+    --chart-5: 232 123 164; /* magenta */
+    --chart-6: 0 131 0; /* green   */
+    --chart-7: 74 58 167; /* violet  */
+    --chart-8: 227 73 72; /* red     */
+
+    /* Chart chrome — recessive by design. */
+    --chart-grid: var(--sand-200);
+    --chart-axis: var(--sand-300);
+    --chart-label: var(--sand-600);
+
+    /* Team-role identity. One slot per role, same fixed order as the chart
+       palette, so a role wears the same hue in a badge and in a chart.
+       `-ink` is the text-safe step (≥ 4.6:1); the raw slot is for fills
+       and dots only. */
+    --role-1: var(--chart-1);
+    --role-2: var(--chart-2);
+    --role-3: var(--chart-3);
+    --role-4: var(--chart-4);
+    --role-5: var(--chart-5);
+    --role-6: var(--chart-6);
+    --role-7: var(--chart-7);
+    --role-8: var(--chart-8);
+    --role-1-ink: 41 117 208;
+    --role-2-ink: 191 85 43;
+    --role-3-ink: 23 132 93;
+    --role-4-ink: 156 107 3;
+    --role-5-ink: 171 92 121;
+    --role-6-ink: 0 131 0;
+    --role-7-ink: 74 58 167;
+    --role-8-ink: 206 67 66;
+
+    /* Score bands (KPI 1–10). Ordinal quality scale, always icon + label. */
+    --score-critical: var(--red-600);
+    --score-weak: var(--amber-700);
+    --score-fair: var(--blue-600);
+    --score-strong: var(--green-700);
+
+    /* ------------------------------------------------------------------
+       L3 · COMPONENT
+       ------------------------------------------------------------------ */
+    --sidebar: 255 255 255;
+    --sidebar-foreground: var(--sand-700);
+    --sidebar-active: var(--indigo-50);
+    --sidebar-active-foreground: var(--indigo-700);
+    --sidebar-border: var(--sand-200);
+    --navbar: 255 255 255;
+    --overlay: 38 34 32;
+
+    /* ------------------------------------------------------------------
+       Non-colour tokens (theme-invariant)
+       ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------
+       Type families. Each family stacks its Arabic subset ahead of its
+       Latin one; the browser falls back per glyph, so Persian text gets
+       the Persian cut and Latin words and digits get the matching Latin cut.
+       ------------------------------------------------------------------ */
+    --font-sans: var(--font-vazirmatn), var(--font-vazirmatn-latin), system-ui,
+      -apple-system, "Segoe UI", sans-serif;
+    --font-display: var(--font-estedad), var(--font-estedad-latin),
+      var(--font-sans);
+
     --radius: 0.75rem;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.25rem;
+
+    /* Warm-tinted elevation: shadows pick up the sand hue, never pure black. */
+    --shadow-color: 61 54 47;
+    --shadow-xs: 0 1px 2px rgb(var(--shadow-color) / 0.04);
+    --shadow-sm: 0 1px 3px rgb(var(--shadow-color) / 0.06), 0 1px 2px rgb(var(--shadow-color) / 0.04);
+    --shadow-md: 0 4px 12px -2px rgb(var(--shadow-color) / 0.08), 0 2px 4px -2px rgb(var(--shadow-color) / 0.04);
+    --shadow-lg: 0 12px 24px -6px rgb(var(--shadow-color) / 0.10), 0 4px 8px -4px rgb(var(--shadow-color) / 0.05);
+    --shadow-xl: 0 24px 48px -12px rgb(var(--shadow-color) / 0.16);
+
+    /* Motion — one rhythm across the whole product. */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --duration-slow: 320ms;
+
+    color-scheme: light;
   }
 
+  /* ====================================================================
+     L2 · SEMANTIC — Dark theme
+     Selected, not inverted: every step re-chosen for the dark surface.
+     ==================================================================== */
   .dark {
-    --background: 25 16% 13%;
-    --foreground: 30 25% 94%;
-    
-    --card: 25 11% 21%;
-    --card-foreground: 30 25% 94%;
-    
-    --popover: 25 11% 21%;
-    --popover-foreground: 30 25% 94%;
-    
-    --primary: 25 11% 55%;
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 25 11% 26%;
-    --secondary-foreground: 30 25% 94%;
-    
-    --muted: 25 11% 26%;
-    --muted-foreground: 25 11% 64%;
-    
-    --accent: 25 11% 26%;
-    --accent-foreground: 30 25% 94%;
-    
-    --border: 25 11% 26%;
-    --input: 25 11% 26%;
-    --ring: 25 11% 55%;
+    --background: 18 17 16;
+    --surface: 26 24 21;
+    --surface-raised: 35 32 25;
+    --surface-sunken: 18 17 16;
+    --surface-hover: 42 38 34;
+
+    --foreground: var(--sand-50);
+    --foreground-secondary: var(--sand-300);
+    --foreground-muted: var(--sand-400);
+    --foreground-subtle: var(--sand-500);
+
+    --border: 48 44 39;
+    --border-strong: 66 60 53;
+    --border-subtle: 35 32 25;
+
+    --primary: var(--indigo-500);
+    --primary-hover: var(--indigo-400);
+    --primary-foreground: 255 255 255;
+    --primary-subtle: 39 36 62;
+    --primary-subtle-foreground: var(--indigo-300);
+
+    --secondary: 42 38 34;
+    --secondary-foreground: var(--sand-100);
+    --muted: 42 38 34;
+    --muted-foreground: var(--sand-400);
+    --accent: 42 38 34;
+    --accent-foreground: var(--sand-50);
+
+    /* Status re-stepped for the dark plane — all ≥ 6:1 on --surface. */
+    --success: var(--green-400);
+    --success-foreground: 12 30 18;
+    --success-subtle: 20 45 30;
+    --warning: var(--amber-400);
+    --warning-foreground: 40 26 4;
+    --warning-subtle: 56 38 8;
+    --danger: var(--red-400);
+    --danger-foreground: 48 12 12;
+    --danger-subtle: 62 22 22;
+    --info: var(--blue-400);
+    --info-foreground: 8 24 48;
+    --info-subtle: 20 38 66;
+
+    --card: var(--surface);
+    --card-foreground: var(--foreground);
+    --popover: var(--surface-raised);
+    --popover-foreground: var(--foreground);
+    --destructive: var(--danger);
+    --destructive-foreground: var(--danger-foreground);
+    --input: var(--border);
+    --ring: var(--indigo-400);
+
+    /* Same eight hues, stepped for the dark surface. Validated: all ≥ 3:1,
+       adjacent-pair CVD ΔE 8.4, normal-vision 19.3. */
+    --chart-1: 57 135 229;
+    --chart-2: 217 89 38;
+    --chart-3: 25 158 112;
+    --chart-4: 201 133 0;
+    --chart-5: 213 81 129;
+    --chart-6: 0 131 0;
+    --chart-7: 144 133 233;
+    --chart-8: 230 103 103;
+
+    --chart-grid: 48 44 39;
+    --chart-axis: 66 60 53;
+    --chart-label: var(--sand-400);
+
+    --role-1: var(--chart-1);
+    --role-2: var(--chart-2);
+    --role-3: var(--chart-3);
+    --role-4: var(--chart-4);
+    --role-5: var(--chart-5);
+    --role-6: var(--chart-6);
+    --role-7: var(--chart-7);
+    --role-8: var(--chart-8);
+    --role-1-ink: 57 135 229;
+    --role-2-ink: 217 91 40;
+    --role-3-ink: 25 158 112;
+    --role-4-ink: 201 133 0;
+    --role-5-ink: 214 84 132;
+    --role-6-ink: 41 151 41;
+    --role-7-ink: 144 133 233;
+    --role-8-ink: 230 103 103;
+
+    --score-critical: var(--red-400);
+    --score-weak: var(--amber-400);
+    --score-fair: var(--blue-400);
+    --score-strong: var(--green-400);
+
+    --sidebar: 26 24 21;
+    --sidebar-foreground: var(--sand-300);
+    --sidebar-active: 39 36 62;
+    --sidebar-active-foreground: var(--indigo-300);
+    --sidebar-border: 48 44 39;
+    --navbar: 26 24 21;
+    --overlay: 8 7 7;
+
+    --shadow-color: 0 0 0;
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.30);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.40), 0 1px 2px rgb(0 0 0 / 0.30);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.30);
+    --shadow-lg: 0 12px 24px -6px rgb(0 0 0 / 0.55), 0 4px 8px -4px rgb(0 0 0 / 0.35);
+    --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.65);
+
+    color-scheme: dark;
   }
 }
+
+/* ==========================================================================
+   BASE ELEMENTS
+   ========================================================================== */
 
 @layer base {
   * {
     @apply border-border;
   }
-  
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    direction: rtl;
-    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-feature-settings: 'ss01' 1, 'ss02' 1, 'ss03' 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    /* Persian text needs more leading than Latin to stay readable. */
+    line-height: 1.75;
+    text-rendering: optimizeLegibility;
+    font-synthesis-weight: none;
   }
-  
-  /* Better text rendering for Persian */
-  h1, h2, h3, h4, h5, h6 {
+
+  /* Headings take the display face and tighter leading. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
     @apply font-bold text-foreground;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
   }
-  
-  button, input, textarea, select {
-    font-family: 'Vazirmatn', sans-serif;
-  }
-}
 
-/* Custom Animations */
-@keyframes blob {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
+  /* Digits align in columns everywhere data is tabular. */
+  th,
+  td,
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+  /* One focus treatment for the entire product. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--ring));
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
-  }
-}
 
-@keyframes bounce-slow {
-  0%, 100% {
-    transform: translateY(0);
+  ::selection {
+    background: rgb(var(--primary) / 0.2);
+    color: rgb(var(--foreground));
   }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
   }
-  100% {
-    background-position: 1000px 0;
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
-}
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-strong));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--foreground-subtle));
+    background-clip: content-box;
+  }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+  /* Number inputs: no spinners, they fight the score controls. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+/* ==========================================================================
+   COMPONENT PRIMITIVES
+   Only patterns repeated across many screens live here. Everything else
+   stays as utilities at the call site.
+   ========================================================================== */
+
+@layer components {
+  /* --- Surface ---------------------------------------------------------- */
+  .surface {
+    @apply bg-card border border-border rounded-xl;
+    box-shadow: var(--shadow-sm);
   }
-  to {
-    opacity: 1;
+
+  .surface-interactive {
+    @apply surface transition-all;
+    transition-duration: var(--duration-base);
+    transition-timing-function: var(--ease-out);
+  }
+  .surface-interactive:hover {
+    border-color: rgb(var(--border-strong));
+    box-shadow: var(--shadow-md);
+  }
+
+  /* --- Status pills. Always paired with an icon at the call site. -------- */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap;
+  }
+  .pill-success {
+    @apply pill;
+    background: rgb(var(--success-subtle));
+    color: rgb(var(--success));
+  }
+  .pill-warning {
+    @apply pill;
+    background: rgb(var(--warning-subtle));
+    color: rgb(var(--warning));
+  }
+  .pill-danger {
+    @apply pill;
+    background: rgb(var(--danger-subtle));
+    color: rgb(var(--danger));
+  }
+  .pill-info {
+    @apply pill;
+    background: rgb(var(--info-subtle));
+    color: rgb(var(--info));
+  }
+  .pill-neutral {
+    @apply pill;
+    background: rgb(var(--muted));
+    color: rgb(var(--foreground-secondary));
+  }
+
+  /* --- Section heading -------------------------------------------------- */
+  .section-label {
+    @apply text-[11px] font-bold uppercase tracking-[0.12em] text-foreground-subtle;
+  }
+
+  /* --- Skeleton --------------------------------------------------------- */
+  .skeleton {
+    @apply rounded-md bg-muted;
+    animation: pulse-soft 1.8s var(--ease-in-out) infinite;
   }
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
-}
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-bounce-slow {
-  animation: bounce-slow 3s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  animation: shimmer 1.5s infinite;
-  background: linear-gradient(
-    90deg,
-    rgb(var(--muted)) 0%,
-    rgb(var(--border)) 50%,
-    rgb(var(--muted)) 100%
-  );
-  background-size: 2000px 100%;
-}
-
-.animate-slide-in {
-  animation: slideInRight 0.3s ease-out;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animation-delay-1000 {
-  animation-delay: 1s;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* Utility Classes */
 @layer utilities {
-  .gradient-text {
-    @apply bg-gradient-to-r from-nude-500 to-nude-700 bg-clip-text text-transparent;
+  /* Logical-property helpers so RTL/LTR need no per-side overrides. */
+  .border-inline-start {
+    border-inline-start-width: 1px;
+  }
+  .border-inline-end {
+    border-inline-end-width: 1px;
   }
 
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* Purposeful blur — overlays only, never decoration. */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl border border-nude-200;
+    background: rgb(var(--surface) / 0.72);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
   }
 
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-nude-500/10 hover:-translate-y-1 hover:border-nude-300;
+  /* Sits under sticky headers so content never hides behind them. */
+  .scroll-gutter {
+    scroll-padding-block-start: 5rem;
   }
-  
-  .btn-primary {
-    @apply bg-gradient-to-r from-nude-500 to-nude-600 text-white font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl shadow-lg shadow-nude-500/25 hover:shadow-nude-500/40 transition-all duration-300 hover:-translate-y-0.5;
+
+  .animate-in-up {
+    animation: enter-up var(--duration-slow) var(--ease-out) both;
   }
-  
-  .btn-secondary {
-    @apply bg-white text-nude-700 border-1.5 border-nude-300 font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-nude-50 hover:border-nude-500 transition-all duration-300;
+  .animate-in-fade {
+    animation: enter-fade var(--duration-base) var(--ease-out) both;
   }
-  
-  .btn-ghost {
-    @apply bg-transparent text-nude-700 font-medium px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-nude-50 transition-all duration-300;
+
+  /* Staggered list entrance: 40ms per item, capped at 8 so long lists
+     never feel slow. */
+  .stagger > * {
+    animation: enter-up var(--duration-slow) var(--ease-out) both;
   }
-  
-  .input-nude {
-    @apply w-full bg-nude-50 border-1.5 border-nude-200 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-nude-900 placeholder:text-nude-400 focus:bg-white focus:border-nude-500 focus:ring-2 focus:ring-nude-500/20 transition-all;
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 40ms; }
+  .stagger > *:nth-child(3) { animation-delay: 80ms; }
+  .stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .stagger > *:nth-child(6) { animation-delay: 200ms; }
+  .stagger > *:nth-child(7) { animation-delay: 240ms; }
+  .stagger > *:nth-child(n + 8) { animation-delay: 280ms; }
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
   }
-  
-  .card-nude {
-    @apply bg-white border border-nude-200 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-nude-300 transition-all duration-300;
-  }
-  
-  .badge-success {
-    @apply bg-success/10 text-success border border-success/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
-  }
-  
-  .badge-warning {
-    @apply bg-warning/10 text-warning border border-warning/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
-  }
-  
-  .badge-error {
-    @apply bg-destructive/10 text-destructive border border-destructive/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
-  }
-  
-  .badge-neutral {
-    @apply bg-nude-100 text-nude-700 border border-nude-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-xs sm:text-sm font-medium;
-  }
-  
-  /* Responsive Table */
-  .table-responsive {
-    @apply w-full overflow-x-auto;
-  }
-  
-  .table-responsive table {
-    @apply min-w-full;
-  }
-  
-  /* Mobile Card for Tables */
-  .mobile-card {
-    @apply md:hidden bg-white border border-nude-200 rounded-lg p-4 space-y-2;
-  }
-  
-  /* Hide on Mobile */
-  .hide-mobile {
-    @apply hidden md:block;
-  }
-  
-  /* Show only on Mobile */
-  .show-mobile {
-    @apply block md:hidden;
-  }
-  
-  /* Responsive Container */
-  .container-responsive {
-    @apply w-full px-4 sm:px-6 lg:px-8 mx-auto;
-  }
-  
-  /* Responsive Grid Gaps */
-  .gap-responsive {
-    @apply gap-3 sm:gap-4 lg:gap-6;
-  }
-  
-  /* Responsive Text Truncate */
-  .truncate-mobile {
-    @apply truncate sm:whitespace-normal;
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: rgb(var(--nude-100));
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgb(var(--nude-400));
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--nude-500));
-}
-
-/* Selection */
-::selection {
-  background: rgb(var(--nude-500) / 0.2);
-  color: rgb(var(--nude-900));
+/* Respect the OS setting: motion is an enhancement, never load-bearing. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -14,10 +14,34 @@ export default async function DashboardLayout({
   const session = await auth()
   if (!session) redirect('/login')
 
-  const memberships = await prisma.workgroupMember.findMany({
-    where: { userId: session.user.id },
-  })
+  const [memberships, currentUser] = await Promise.all([
+    prisma.workgroupMember.findMany({
+      where: { userId: session.user.id },
+    }),
+    // Only the avatar — the rest of the profile is fetched by the pages that
+    // actually render it.
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { image: true },
+    }),
+  ])
 
-  return <DashboardLayoutClient session={session} memberships={memberships}>{children}</DashboardLayoutClient>
+  return (
+    <>
+      {/* Keyboard users reach the content without tabbing the whole sidebar. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-toast focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+      >
+        رفتن به محتوای اصلی
+      </a>
+      <DashboardLayoutClient
+        session={session}
+        memberships={memberships}
+        avatarUrl={currentUser?.image ?? null}
+      >
+        {children}
+      </DashboardLayoutClient>
+    </>
+  )
 }
-

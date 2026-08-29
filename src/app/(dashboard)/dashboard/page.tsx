@@ -1,42 +1,57 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import {
-  Users,
-  FolderKanban,
-  TrendingUp,
-  MessageSquareText,
-  User,
-  PieChart,
-  UserRoundCog,
+  ArrowLeft,
   BarChart3,
-  ArrowRight,
-  Sparkles,
-  Clock,
+  ClipboardCheck,
+  Database,
+  FolderKanban,
   Mail,
-  ClipboardCheck
+  MessageSquareText,
+  PieChart,
+  ShieldCheck,
+  TrendingUp,
+  UserRound,
+  UserRoundCog,
+  Users,
 } from "lucide-react"
-import { getRoleBadgeClass, getRoleLabel, isTeamRole, type TeamRole } from "@/lib/roles"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { EmptyState } from "@/components/ui/empty-state"
+import { RoleBadge } from "@/components/ui/role-badge"
+import { StatCard, StatGrid } from "@/components/ui/stat-card"
+import { isTeamRole, type TeamRole } from "@/lib/roles"
+import { faNumber } from "@/lib/design-tokens"
 
 export default async function DashboardPage() {
   const session = await auth()
   if (!session) return null
 
+  const firstName = session.user.name?.split(" ")[0] ?? ""
+
   // Check if database is available
   if (!prisma) {
     return (
-      <div className="space-y-4 sm:space-y-6">
-        <div className="bg-gradient-to-br from-nude-50 to-white border border-nude-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 mb-4">
-            خوش آمدید، {session.user.name?.split(' ')[0]} 👋
-          </h1>
-          <p className="text-nude-600">
-            دیتابیس در دسترس نیست. این یک محیط توسعه است و از کاربران تست استفاده می‌شود.
-          </p>
-        </div>
+      <div className="space-y-6">
+        <WelcomeBanner name={firstName} />
+        <Alert variant="warning">
+          <Database aria-hidden />
+          <AlertTitle>دیتابیس در دسترس نیست</AlertTitle>
+          <AlertDescription>
+            این یک محیط توسعه است و از کاربران تست استفاده می‌شود. پس از اتصال
+            دیتابیس، اطلاعات شما در این صفحه نمایش داده می‌شود.
+          </AlertDescription>
+        </Alert>
       </div>
     )
   }
@@ -49,7 +64,6 @@ export default async function DashboardPage() {
     where: { id: session.user.id },
     select: { image: true },
   })
-
 
   // Get unread messages
   const unreadMessages = await prismaClient.message.count({
@@ -84,9 +98,7 @@ export default async function DashboardPage() {
 
   // Every distinct workgroup role this user holds, for badges and quick actions.
   const myTeamRoles: TeamRole[] = Array.from(
-    new Set<TeamRole>(
-      memberships.map((m: any) => m.role).filter(isTeamRole)
-    )
+    new Set<TeamRole>(memberships.map((m: any) => m.role).filter(isTeamRole))
   )
 
   // Get stats for admin
@@ -98,231 +110,372 @@ export default async function DashboardPage() {
     }
   }
 
-  const getInitials = (name: string) => {
-    return name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
-  }
+  const getInitials = (name: string) =>
+    name?.split(" ").filter(Boolean).slice(0, 2).map((n) => n[0]).join("").toUpperCase() ||
+    "؟"
+
+  const canEvaluateTeam = myTeamRoles.length > 0 || session.user.isAdmin
+  const canEvaluateStrategists =
+    session.user.isTechnicalDeputy || session.user.isAdmin
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Welcome Header with Profile */}
-      <div className="bg-gradient-to-br from-nude-50 to-white border border-nude-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Avatar className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 border-2 sm:border-4 border-nude-200">
-              <AvatarImage src={currentUser?.image || undefined} />
-              <AvatarFallback className="bg-nude-200 text-nude-700 text-base sm:text-lg lg:text-xl font-bold">
-                {getInitials(session.user.name || '')}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-nude-900 mb-1">
-                خوش آمدید، {session.user.name?.split(' ')[0]} 👋
+    <div className="space-y-6">
+      {/* ---------------------------------------------------------------
+          Identity — who you are and what you can do here
+          --------------------------------------------------------------- */}
+      <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6">
+          <Avatar className="size-16 shrink-0 ring-2 ring-border sm:size-[72px]">
+            <AvatarImage src={currentUser?.image || undefined} alt="" />
+            <AvatarFallback className="text-lg">
+              {getInitials(session.user.name || "")}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="min-w-0 flex-1 space-y-2.5">
+            <div className="space-y-1">
+              <p className="text-sm text-foreground-muted">خوش آمدید</p>
+              <h1 className="truncate text-2xl font-bold text-foreground sm:text-3xl">
+                {session.user.name}
               </h1>
-              <p className="text-nude-600 flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                {session.user.isAdmin && <Badge className="badge-error text-xs">مدیر سیستم</Badge>}
-                {session.user.isTechnicalDeputy && <Badge className="badge-neutral text-xs">معاون فنی</Badge>}
-                {myTeamRoles.map(role => (
-                  <Badge key={role} className={`text-xs ${getRoleBadgeClass(role)}`}>
-                    {getRoleLabel(role)}
-                  </Badge>
-                ))}
-              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              {session.user.isAdmin && (
+                <Badge variant="info">
+                  <ShieldCheck aria-hidden />
+                  مدیر سیستم
+                </Badge>
+              )}
+              {session.user.isTechnicalDeputy && (
+                <Badge variant="secondary">معاون فنی</Badge>
+              )}
+              {myTeamRoles.map((role) => (
+                <RoleBadge key={role} role={role} />
+              ))}
+              {!session.user.isAdmin &&
+                !session.user.isTechnicalDeputy &&
+                myTeamRoles.length === 0 && (
+                  <Badge variant="neutral">بدون نقش کارگروهی</Badge>
+                )}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Personal Quick Stats */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Link href="/messages">
-          <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm text-nude-600 mb-1">پیام‌های جدید</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-info">{unreadMessages}</p>
-                </div>
-                <MessageSquareText className="w-8 h-8 sm:w-10 sm:h-10 text-info" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+      {/* ---------------------------------------------------------------
+          Headline figures
+          --------------------------------------------------------------- */}
+      <StatGrid className="xl:grid-cols-3">
+        <StatCard
+          label="پیام‌های خوانده‌نشده"
+          value={faNumber(unreadMessages)}
+          hint={
+            unreadMessages > 0
+              ? "برای مشاهده گفتگوها کلیک کنید"
+              : "همه پیام‌ها خوانده شده‌اند"
+          }
+          icon={<MessageSquareText />}
+          tone={unreadMessages > 0 ? "info" : "neutral"}
+          href="/messages"
+        />
+        <StatCard
+          label="کارگروه‌های من"
+          value={faNumber(myWorkgroups.length)}
+          hint={
+            myWorkgroups.length > 0
+              ? `${faNumber(myWorkgroups.filter((w) => w.isActive).length)} کارگروه فعال`
+              : "هنوز عضو کارگروهی نیستید"
+          }
+          icon={<FolderKanban />}
+          tone="primary"
+        />
+        <StatCard
+          label="نقش‌های من"
+          value={faNumber(myTeamRoles.length)}
+          hint={
+            myTeamRoles.length > 0
+              ? "بر اساس این نقش‌ها ارزیابی می‌کنید"
+              : "نقش‌ها را مدیر سیستم تعیین می‌کند"
+          }
+          icon={<UserRoundCog />}
+          tone="neutral"
+        />
+      </StatGrid>
 
-        <Link href="/profile" className="col-span-2 lg:col-span-1">
-          <Card className="card-nude card-hover border-nude-200 cursor-pointer">
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm text-nude-600 mb-1">پروفایل من</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-nude-500"><User className="w-7 h-7 sm:w-8 sm:h-8" /></p>
-                </div>
-                <User className="w-8 h-8 sm:w-10 sm:h-10 text-nude-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Admin Quick Access */}
+      {/* ---------------------------------------------------------------
+          Admin console
+          --------------------------------------------------------------- */}
       {session.user.isAdmin && adminStats && (
-        <Card className="border-nude-200 bg-gradient-to-br from-nude-50 to-white">
-          <CardHeader className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-nude-500" />
-                  پنل مدیریت
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm mt-1">دسترسی سریع به امکانات مدیریتی</CardDescription>
-              </div>
-            </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>پنل مدیریت</CardTitle>
+            <CardDescription>دسترسی سریع به امکانات مدیریتی سامانه</CardDescription>
           </CardHeader>
-          <CardContent className="p-4 sm:p-6">
-            <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-4">
-              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
-                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
-                <p className="text-xl sm:text-2xl font-bold text-nude-900">{adminStats.totalUsers}</p>
-                <p className="text-xs sm:text-sm text-nude-600">کاربران</p>
-              </div>
-              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
-                <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
-                <p className="text-xl sm:text-2xl font-bold text-nude-900">{adminStats.totalMessages}</p>
-                <p className="text-xs sm:text-sm text-nude-600">پیام‌ها</p>
-              </div>
-              <div className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200">
-                <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-nude-500 mb-2" />
-                <p className="text-xl sm:text-2xl font-bold text-nude-900">گزارشات</p>
-                <p className="text-xs sm:text-sm text-nude-600">آمار کامل</p>
-              </div>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <MiniStat
+                icon={<Users />}
+                value={faNumber(adminStats.totalUsers)}
+                label="کاربر ثبت‌شده"
+              />
+              <MiniStat
+                icon={<Mail />}
+                value={faNumber(adminStats.totalMessages)}
+                label="پیام ردوبدل‌شده"
+              />
+              <MiniStat
+                icon={<FolderKanban />}
+                value={faNumber(myWorkgroups.length)}
+                label="کارگروه شما"
+                className="col-span-2 sm:col-span-1"
+              />
             </div>
-            
-            <div className="grid gap-3 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
-              <Link href="/admin/dashboard" className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <PieChart className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">داشبورد تحلیلی</p>
-                <p className="text-xs text-nude-600 mt-1">آمار و نمودارها</p>
-              </Link>
 
-              <Link href="/admin/roles" className="p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-50 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <UserRoundCog className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-4 h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">ویرایش نقش‌ها</p>
-                <p className="text-xs text-nude-600 mt-1">مدیریت دسترسی‌ها</p>
-              </Link>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <QuickAction
+                href="/admin/dashboard"
+                icon={<PieChart />}
+                title="داشبورد تحلیلی"
+                description="آمار، روند عملکرد و رتبه‌بندی تیم"
+              />
+              <QuickAction
+                href="/admin/reports"
+                icon={<BarChart3 />}
+                title="گزارش‌های کامل"
+                description="همه ارزیابی‌ها با جزئیات"
+              />
+              <QuickAction
+                href="/admin/users"
+                icon={<Users />}
+                title="کاربران"
+                description="افزودن، ویرایش و فعال‌سازی حساب‌ها"
+              />
+              <QuickAction
+                href="/admin/roles"
+                icon={<UserRoundCog />}
+                title="نقش‌ها و دسترسی‌ها"
+                description="تخصیص نقش و ماتریس ارزیابی"
+              />
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* My Features - Universal Section */}
-      <Card className="border-nude-200">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-nude-500" />
-            امکانات من
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm mt-1">دسترسی سریع به ویژگی‌های شما</CardDescription>
+      {/* ---------------------------------------------------------------
+          Everything this account can do
+          --------------------------------------------------------------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>امکانات من</CardTitle>
+          <CardDescription>
+            بر اساس نقش‌هایی که در سامانه دارید
+          </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {/* Profile */}
-            <Link href="/profile" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-              <div className="flex items-center justify-between mb-2">
-                <User className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-sm sm:text-base text-nude-900">پروفایل</p>
-              <p className="text-xs text-nude-600 mt-1">مشاهده و ویرایش</p>
-            </Link>
-
-
-            {/* Messages */}
-            <Link href="/messages" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group relative">
-              <div className="flex items-center justify-between mb-2">
-                <MessageSquareText className="w-5 h-5 sm:w-6 sm:h-6 text-info" />
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <p className="font-semibold text-sm sm:text-base text-nude-900">پیام‌ها</p>
-              <p className="text-xs text-nude-600 mt-1">
-                {unreadMessages > 0 ? `${unreadMessages} پیام جدید` : 'پیام‌های من'}
-              </p>
-              {unreadMessages > 0 && (
-                <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-destructive rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  {unreadMessages}
-                </div>
-              )}
-            </Link>
-
-            {/* Evaluations - Only for Deputy/Admin */}
-            {(session.user.isTechnicalDeputy || session.user.isAdmin) && (
-              <Link href="/evaluations/strategist" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی استراتژیست</p>
-                <p className="text-xs text-nude-600 mt-1">ثبت ارزیابی</p>
-              </Link>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {canEvaluateTeam && (
+              <QuickAction
+                href="/evaluations/team"
+                icon={<ClipboardCheck />}
+                title="ارزیابی همکاران"
+                description="ارزیابی ماهانه اعضای تیم بر اساس نقش"
+                emphasis
+              />
             )}
 
-            {/* Role-based team evaluation - anyone holding a workgroup role */}
-            {(myTeamRoles.length > 0 || session.user.isAdmin) && (
-              <Link href="/evaluations/team" className="p-3 sm:p-4 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200 hover:bg-nude-100 hover:border-nude-300 transition-all group">
-                <div className="flex items-center justify-between mb-2">
-                  <ClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6 text-nude-500" />
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-nude-400 group-hover:translate-x-1 transition-transform" />
-                </div>
-                <p className="font-semibold text-sm sm:text-base text-nude-900">ارزیابی تیم</p>
-                <p className="text-xs text-nude-600 mt-1">ارزیابی همکاران بر اساس نقش</p>
-              </Link>
+            {canEvaluateStrategists && (
+              <QuickAction
+                href="/evaluations/strategist"
+                icon={<TrendingUp />}
+                title="ارزیابی استراتژیست‌ها"
+                description="ثبت ارزیابی ماهانه معاون فنی"
+              />
             )}
+
+            <QuickAction
+              href="/messages"
+              icon={<MessageSquareText />}
+              title="پیام‌ها"
+              description={
+                unreadMessages > 0
+                  ? `${faNumber(unreadMessages)} پیام خوانده‌نشده`
+                  : "گفتگو با همکاران"
+              }
+              badge={unreadMessages > 0 ? faNumber(unreadMessages) : undefined}
+            />
+
+            <QuickAction
+              href="/profile"
+              icon={<UserRound />}
+              title="پروفایل من"
+              description="ویرایش اطلاعات و تغییر رمز عبور"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* My Workgroups */}
-      {myWorkgroups.length > 0 && (
-        <Card className="border-nude-200">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-nude-900 flex items-center gap-2 text-base sm:text-lg">
-              <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-info" />
-              کارگروه‌های من
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              نقش‌های شما در هر کارگروه
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6">
-            <div className="grid gap-2 sm:gap-3 grid-cols-1 lg:grid-cols-2">
+      {/* ---------------------------------------------------------------
+          Workgroups
+          --------------------------------------------------------------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>کارگروه‌های من</CardTitle>
+          <CardDescription>نقش‌های شما در هر کارگروه</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {myWorkgroups.length === 0 ? (
+            <EmptyState
+              icon={<FolderKanban />}
+              title="هنوز عضو هیچ کارگروهی نیستید"
+              description="عضویت در کارگروه‌ها توسط مدیر سیستم انجام می‌شود. پس از افزوده‌شدن، کارگروه‌ها اینجا نمایش داده می‌شوند."
+              size="sm"
+            />
+          ) : (
+            <ul className="stagger grid gap-3 lg:grid-cols-2">
               {myWorkgroups.map((group) => (
-                <div key={group.id} className="flex items-start justify-between gap-3 p-3 bg-nude-50 rounded-lg sm:rounded-xl border border-nude-200">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm sm:text-base text-nude-900 truncate">{group.name}</p>
-                    {group.description && (
-                      <p className="text-xs sm:text-sm text-nude-600 mt-1 line-clamp-2">{group.description}</p>
-                    )}
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {group.roles.map((role) => (
-                        <Badge key={role} className={`text-xs ${getRoleBadgeClass(role)}`}>
-                          {getRoleLabel(role)}
-                        </Badge>
-                      ))}
-                    </div>
+                <li
+                  key={group.id}
+                  className="rounded-xl border border-border bg-surface-sunken p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="min-w-0 flex-1 truncate font-semibold text-foreground">
+                      {group.name}
+                    </p>
+                    <Badge
+                      variant={group.isActive ? "success" : "neutral"}
+                      size="sm"
+                      dot={group.isActive ? "bg-success" : "bg-foreground-subtle"}
+                    >
+                      {group.isActive ? "فعال" : "غیرفعال"}
+                    </Badge>
                   </div>
-                  <Badge className={`${group.isActive ? "badge-success" : "badge-neutral"} text-xs whitespace-nowrap flex-shrink-0`}>
-                    {group.isActive ? 'فعال' : 'غیرفعال'}
-                  </Badge>
-                </div>
+
+                  {group.description && (
+                    <p className="mt-1.5 line-clamp-2 text-sm text-foreground-muted">
+                      {group.description}
+                    </p>
+                  )}
+
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {group.roles.map((role) => (
+                      <RoleBadge key={role} role={role} size="sm" />
+                    ))}
+                  </div>
+                </li>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
+  )
+}
+
+/* ==========================================================================
+   Local pieces
+   ========================================================================== */
+
+function WelcomeBanner({ name }: { name: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+        خوش آمدید، {name}
+      </h1>
+    </div>
+  )
+}
+
+function MiniStat({
+  icon,
+  value,
+  label,
+  className,
+}: {
+  icon: React.ReactNode
+  value: string
+  label: string
+  className?: string
+}) {
+  return (
+    <div
+      className={`rounded-xl border border-border bg-surface-sunken p-4 ${className ?? ""}`}
+    >
+      <span
+        aria-hidden
+        className="mb-2.5 grid size-9 place-items-center rounded-lg bg-surface text-foreground-muted [&>svg]:size-[18px]"
+      >
+        {icon}
+      </span>
+      <p data-numeric className="font-display text-2xl font-bold text-foreground">
+        {value}
+      </p>
+      <p className="mt-0.5 text-xs text-foreground-muted">{label}</p>
+    </div>
+  )
+}
+
+function QuickAction({
+  href,
+  icon,
+  title,
+  description,
+  emphasis = false,
+  badge,
+}: {
+  href: string
+  icon: React.ReactNode
+  title: string
+  description: string
+  /** The one action this screen most wants you to take. */
+  emphasis?: boolean
+  badge?: string
+}) {
+  return (
+    <Link
+      href={href}
+      className={[
+        "group relative flex items-start gap-3.5 rounded-xl border p-4",
+        "transition-[border-color,background-color,box-shadow] duration-base ease-out",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        emphasis
+          ? "border-primary/30 bg-primary-subtle hover:border-primary/50"
+          : "border-border bg-surface-sunken hover:border-border-strong hover:bg-surface-hover",
+      ].join(" ")}
+    >
+      <span
+        aria-hidden
+        className={[
+          "grid size-10 shrink-0 place-items-center rounded-lg [&>svg]:size-5",
+          emphasis
+            ? "bg-primary text-primary-foreground"
+            : "bg-surface text-foreground-muted",
+        ].join(" ")}
+      >
+        {icon}
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2">
+          <span className="truncate font-semibold text-foreground">{title}</span>
+          {badge && (
+            <span
+              data-numeric
+              className="rounded-full bg-danger px-1.5 text-2xs font-bold text-danger-foreground"
+            >
+              {badge}
+            </span>
+          )}
+        </span>
+        <span className="mt-0.5 block text-sm leading-relaxed text-foreground-muted">
+          {description}
+        </span>
+      </span>
+
+      <ArrowLeft
+        aria-hidden
+        className="mt-2.5 size-4 shrink-0 text-foreground-subtle transition-transform duration-base ease-out group-hover:-translate-x-1"
+      />
+    </Link>
   )
 }

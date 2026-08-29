@@ -1,10 +1,11 @@
 "use client"
 
 import { Workgroup, WorkgroupMember, User } from "@prisma/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Pencil, Trash2, Users } from "lucide-react"
+import { FolderKanban, Pencil, Trash2, Users } from "lucide-react"
 import { EditWorkgroupDialog } from "./edit-workgroup-dialog"
 import { ManageMembersDialog } from "./manage-members-dialog"
 import { useState } from "react"
@@ -54,133 +55,117 @@ export function WorkgroupsTable({
     }
   }
 
+  const initialsOf = (u: User) =>
+    `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}` || "؟"
+
   return (
     <>
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-right">نام کارگروه</TableHead>
-              <TableHead className="text-right">توضیحات</TableHead>
-              <TableHead className="text-center">تعداد اعضا</TableHead>
-              <TableHead className="text-center">وضعیت</TableHead>
-              <TableHead className="text-left">عملیات</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {workgroups.map((workgroup) => (
-              <TableRow key={workgroup.id}>
-                <TableCell className="font-medium text-sm">{workgroup.name}</TableCell>
-                <TableCell className="text-slate-600 max-w-xs sm:max-w-md truncate text-sm">
-                  {workgroup.description || "-"}
-                </TableCell>
-                <TableCell className="text-center">
-                  <Badge variant="outline" className="text-xs">
-                    {workgroup._count.members} نفر
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center">
-                  {workgroup.isActive ? (
-                    <Badge variant="default" className="bg-green-500 text-xs">فعال</Badge>
-                  ) : (
-                    <Badge variant="destructive" className="text-xs">غیرفعال</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-left">
-                  <div className="flex gap-1 sm:gap-2 justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setManagingMembers(workgroup)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingWorkgroup(workgroup)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(workgroup.id)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {workgroups.length === 0 ? (
+        <EmptyState
+          icon={<FolderKanban />}
+          title="هنوز کارگروهی ایجاد نشده است"
+          description="با دکمه «کارگروه جدید» اولین کارگروه را بسازید و اعضا را به آن اضافه کنید."
+        />
+      ) : (
+        <>
+          {/* Desktop */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>نام کارگروه</TableHead>
+                  <TableHead>توضیحات</TableHead>
+                  <TableHead>اعضا</TableHead>
+                  <TableHead>وضعیت</TableHead>
+                  <TableHead className="text-end">عملیات</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {workgroups.map((workgroup) => (
+                  <TableRow key={workgroup.id}>
+                    <TableCell className="font-medium text-foreground">
+                      {workgroup.name}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate text-foreground-muted">
+                      {workgroup.description || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center gap-2">
+                        {/* Overlapping avatars read faster than a bare count. */}
+                        <span className="flex -space-x-2 space-x-reverse">
+                          {workgroup.members.slice(0, 3).map((m) => (
+                            <Avatar
+                              key={m.id}
+                              className="size-7 ring-2 ring-card"
+                              title={`${m.user.firstName} ${m.user.lastName}`}
+                            >
+                              <AvatarImage src={m.user.image || undefined} alt="" />
+                              <AvatarFallback className="text-[10px]">
+                                {initialsOf(m.user)}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </span>
+                        <span data-numeric className="text-sm text-foreground-muted">
+                          {workgroup._count.members.toLocaleString("fa-IR")} نفر
+                        </span>
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge active={workgroup.isActive} />
+                    </TableCell>
+                    <TableCell>
+                      <RowActions
+                        name={workgroup.name}
+                        onMembers={() => setManagingMembers(workgroup)}
+                        onEdit={() => setEditingWorkgroup(workgroup)}
+                        onDelete={() => handleDelete(workgroup.id)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
-        {workgroups.map((workgroup) => (
-          <Card key={workgroup.id} className="border border-slate-200 shadow-sm">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm text-slate-900 truncate">
-                    {workgroup.name}
-                  </h3>
-                  {workgroup.description && (
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-2">
-                      {workgroup.description}
+          {/* Mobile */}
+          <ul className="space-y-3 px-5 pb-5 md:hidden">
+            {workgroups.map((workgroup) => (
+              <li
+                key={workgroup.id}
+                className="rounded-xl border border-border bg-surface-sunken p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-foreground">
+                      {workgroup.name}
                     </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <Badge variant="outline" className="text-xs">
-                      {workgroup._count.members} نفر
-                    </Badge>
-                    {workgroup.isActive ? (
-                      <Badge variant="default" className="bg-green-500 text-xs">فعال</Badge>
-                    ) : (
-                      <Badge variant="destructive" className="text-xs">غیرفعال</Badge>
+                    {workgroup.description && (
+                      <p className="mt-1 line-clamp-2 text-xs text-foreground-muted">
+                        {workgroup.description}
+                      </p>
                     )}
                   </div>
+                  <RowActions
+                    name={workgroup.name}
+                    onMembers={() => setManagingMembers(workgroup)}
+                    onEdit={() => setEditingWorkgroup(workgroup)}
+                    onDelete={() => handleDelete(workgroup.id)}
+                  />
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setManagingMembers(workgroup)}
-                    className="h-8 w-8 p-0"
-                    title="مدیریت اعضا"
-                  >
-                    <Users className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditingWorkgroup(workgroup)}
-                    className="h-8 w-8 p-0"
-                    title="ویرایش"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(workgroup.id)}
-                    className="h-8 w-8 p-0"
-                    title="حذف"
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Badge variant="neutral">
+                    <Users aria-hidden />
+                    {workgroup._count.members.toLocaleString("fa-IR")} نفر
+                  </Badge>
+                  <StatusBadge active={workgroup.isActive} />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {editingWorkgroup && (
         <EditWorkgroupDialog
@@ -202,3 +187,59 @@ export function WorkgroupsTable({
   )
 }
 
+function StatusBadge({ active }: { active: boolean }) {
+  return active ? (
+    <Badge variant="success" dot="bg-success">
+      فعال
+    </Badge>
+  ) : (
+    <Badge variant="neutral" dot="bg-foreground-subtle">
+      غیرفعال
+    </Badge>
+  )
+}
+
+function RowActions({
+  name,
+  onMembers,
+  onEdit,
+  onDelete,
+}: {
+  name: string
+  onMembers: () => void
+  onEdit: () => void
+  onDelete: () => void
+}) {
+  return (
+    <div className="flex shrink-0 justify-end gap-1">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onMembers}
+        aria-label={`مدیریت اعضای ${name}`}
+        title="مدیریت اعضا"
+      >
+        <Users className="size-4" aria-hidden />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onEdit}
+        aria-label={`ویرایش ${name}`}
+        title="ویرایش"
+      >
+        <Pencil className="size-4" aria-hidden />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onDelete}
+        aria-label={`حذف ${name}`}
+        title="حذف"
+        className="text-danger hover:bg-danger-subtle hover:text-danger"
+      >
+        <Trash2 className="size-4" aria-hidden />
+      </Button>
+    </div>
+  )
+}

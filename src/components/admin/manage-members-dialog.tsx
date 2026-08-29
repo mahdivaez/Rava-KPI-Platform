@@ -147,7 +147,7 @@ export function ManageMembersDialog({
               </div>
             </div>
             <Button onClick={handleAddMember} disabled={loading} className="w-full">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="size-4" />
               افزودن عضو
             </Button>
           </div>
@@ -157,14 +157,14 @@ export function ManageMembersDialog({
             <h3 className="font-semibold">اعضای فعلی ({workgroup.members.length})</h3>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {workgroup.members.length === 0 ? (
-                <p className="text-slate-500 text-sm text-center py-4">
+                <p className="text-foreground-subtle text-sm text-center py-4">
                   هنوز عضوی اضافه نشده است
                 </p>
               ) : (
                 workgroup.members.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-surface-sunken rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-medium">
@@ -179,7 +179,7 @@ export function ManageMembersDialog({
                       size="sm"
                       onClick={() => handleRemoveMember(member.id)}
                     >
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                      <Trash2 className="h-4 w-4 text-danger" />
                     </Button>
                   </div>
                 ))

@@ -47,7 +47,7 @@ export function ImageModal({ isOpen, onClose, imageSrc, imageAlt }: ImageModalPr
       {/* Close button */}
       <Button
         onClick={onClose}
-        className="absolute top-4 right-4 z-60 bg-white/20 hover:bg-white/30 text-white border-white/30 rounded-full p-2"
+        className="absolute top-4 right-4 z-60 bg-surface/20 hover:bg-surface/30 text-white border-white/30 rounded-full p-2"
         size="sm"
       >
         <X className="w-6 h-6" />

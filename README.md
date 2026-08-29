@@ -16,13 +16,28 @@
 
 ## 🛠️ تکنولوژی‌های استفاده شده
 
-- **Framework**: Next.js 16 (App Router)
+- **Framework**: Next.js 14 (App Router)
 - **Database**: PostgreSQL با Prisma ORM
 - **Authentication**: NextAuth.js v5
-- **UI Components**: shadcn/ui
-- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui + Radix UI
+- **Styling**: Tailwind CSS v3 با سیستم توکن سه‌لایه
+- **Charts**: Recharts
+- **Fonts**: وزیرمتن و استعداد (variable، خودمیزبان)
 - **Language**: TypeScript
 - **Form Validation**: Zod + React Hook Form
+
+## 🎨 سیستم طراحی
+
+سیستم طراحی کامل در [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) مستند شده است:
+توکن‌های رنگ و تایپوگرافی، پالت داده اعتبارسنجی‌شده برای کوررنگی، باندهای امتیاز،
+قواعد نمودار و پایه دسترس‌پذیری.
+
+نسخه زنده آن روی مسیر **`/design-system`** اجرا می‌شود و از همان کامپوننت‌هایی
+استفاده می‌کند که در محصول به کار می‌روند، بنابراین هرگز از واقعیت فاصله نمی‌گیرد.
+
+```bash
+npm run dev   # سپس http://localhost:3000/design-system
+```
 
 ## 📋 پیش‌نیازها
 
