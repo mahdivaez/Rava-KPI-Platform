@@ -3,7 +3,6 @@
 import { motion, type Variants } from "framer-motion"
 
 import { LoginForm } from "@/components/auth/login-form"
-import { BrandLockup } from "@/components/dashboard/brand"
 
 /**
  * Login — elevated card with the brand image on one side and a
@@ -63,8 +62,13 @@ export function LoginExperience() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div variants={itemVariants} className="mb-8">
-              <BrandLockup />
+            <motion.div variants={itemVariants} className="mb-10 text-center">
+              <span className="block font-display text-4xl font-black leading-tight tracking-tight text-foreground">
+                Rava
+              </span>
+              <span className="mt-1.5 block text-sm text-foreground-muted">
+                سامانه مدیریت عملکرد
+              </span>
             </motion.div>
 
             <motion.h1

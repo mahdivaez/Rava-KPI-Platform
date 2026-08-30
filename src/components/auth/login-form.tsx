@@ -97,7 +97,12 @@ export function LoginForm() {
         </div>
       </div>
 
-      <Button type="submit" size="lg" loading={isLoading} className="w-full">
+      <Button
+        type="submit"
+        size="lg"
+        loading={isLoading}
+        className="w-full bg-sand-950 text-sand-50 hover:bg-sand-800 dark:bg-sand-50 dark:text-sand-950 dark:hover:bg-sand-200"
+      >
         {isLoading ? "در حال ورود…" : "ورود به سامانه"}
       </Button>
     </form>
