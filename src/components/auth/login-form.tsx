@@ -3,12 +3,20 @@
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+/**
+ * Login form — minimal and token-driven so it follows the app theme.
+ * Fields are quiet by default and only speak on focus: the border darkens,
+ * nothing glows, nothing moves.
+ */
+
+const fieldClass =
+  "h-11 w-full rounded-lg border border-border bg-surface px-3.5 text-sm text-foreground " +
+  "placeholder:text-foreground-subtle outline-none transition-colors duration-fast " +
+  "hover:border-border-strong focus:border-foreground " +
+  "disabled:cursor-not-allowed disabled:opacity-50"
 
 export function LoginForm() {
   const router = useRouter()
@@ -51,10 +59,15 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="email">ایمیل</Label>
-        <Input
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-foreground-secondary"
+        >
+          ایمیل
+        </label>
+        <input
           id="email"
           name="email"
           type="email"
@@ -63,49 +76,53 @@ export function LoginForm() {
           autoComplete="username"
           placeholder="name@company.com"
           dir="ltr"
-          className="text-start"
           required
           disabled={isLoading}
+          className={`${fieldClass} text-start`}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">رمز عبور</Label>
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-foreground-secondary"
+        >
+          رمز عبور
+        </label>
         <div className="relative">
-          <Input
+          <input
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="current-password"
-            placeholder="رمز عبور خود را وارد کنید"
             required
             disabled={isLoading}
-            className="pe-11"
+            className={`${fieldClass} pe-11`}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? "پنهان کردن رمز عبور" : "نمایش رمز عبور"}
             aria-pressed={showPassword}
-            className="absolute inset-y-0 end-0 grid w-11 place-items-center rounded-e-lg text-foreground-subtle transition-colors duration-fast hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="absolute inset-y-0 end-0 grid w-11 cursor-pointer place-items-center text-foreground-subtle transition-colors duration-fast hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {showPassword ? (
-              <EyeOff className="size-[18px]" aria-hidden />
+              <EyeOff className="size-4" aria-hidden />
             ) : (
-              <Eye className="size-[18px]" aria-hidden />
+              <Eye className="size-4" aria-hidden />
             )}
           </button>
         </div>
       </div>
 
-      <Button type="submit" size="lg" loading={isLoading} className="mt-2 w-full">
-        {isLoading ? "در حال ورود…" : "ورود به سامانه"}
-      </Button>
-
-      <p className="text-center text-xs leading-relaxed text-foreground-subtle">
-        حساب کاربری توسط مدیر سیستم ساخته می‌شود. اگر رمز عبور خود را فراموش
-        کرده‌اید، با مدیر سامانه تماس بگیرید.
-      </p>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-semibold text-background transition-opacity duration-fast hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:opacity-80 disabled:pointer-events-none disabled:opacity-50"
+      >
+        {isLoading && <Loader2 className="size-4 animate-spin" aria-hidden />}
+        {isLoading ? "در حال ورود…" : "ورود"}
+      </button>
     </form>
   )
 }
