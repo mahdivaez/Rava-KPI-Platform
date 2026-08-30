@@ -44,13 +44,14 @@ export function LoginExperience() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        {/* Brand image — object-contain on the image's own background colour
-            so the full illustration is always visible, never cropped. */}
-        <div className="hidden bg-[#FFF8E6] lg:block">
+        {/* Brand image — absolutely positioned and object-contain on the
+            image's own background colour, so the full illustration is always
+            visible and never grows or crops the panel. */}
+        <div className="relative hidden bg-[#FFF8E6] lg:block">
           <img
             src="/login-image.jpeg"
             alt=""
-            className="h-full w-full object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         </div>
 
