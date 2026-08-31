@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Building2,
   ClipboardCheck,
   FolderKanban,
   LayoutDashboard,
@@ -118,6 +119,12 @@ export function buildNavigation({
           label: "کارگروه‌ها",
           icon: FolderKanban,
           hint: "کارگروه‌ها و اعضای آن‌ها",
+        },
+        {
+          href: "/admin/clients",
+          label: "مشتریان",
+          icon: Building2,
+          hint: "حساب‌ها، متن داشبورد و ارزیابی مشتری",
         },
         {
           href: "/admin/roles",

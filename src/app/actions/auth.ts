@@ -7,3 +7,8 @@ export async function handleSignOut() {
 }
 
 
+
+/** Clients return to their own login page, not the team one. */
+export async function handleClientSignOut() {
+  await signOut({ redirectTo: "/client/login" })
+}
