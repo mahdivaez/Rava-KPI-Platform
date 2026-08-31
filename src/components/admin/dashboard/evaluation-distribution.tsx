@@ -1,145 +1,109 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts"
+
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   AXIS_PROPS,
   ChartFrame,
   ChartTooltip,
   GRID_PROPS,
 } from "@/components/ui/chart"
-import { chartColor } from "@/lib/design-tokens"
-import { Badge } from "@/components/ui/badge"
-
-interface EvaluationDistributionProps {
-  strategistEvaluations: any[]
-  writerEvaluations: any[]
-}
-
-export function EvaluationDistribution({ strategistEvaluations, writerEvaluations }: EvaluationDistributionProps) {
-  // Calculate detailed metrics for strategist evaluations
-  const strategistMetrics = {
-    ideation: 0,
-    avgViews: 0,
-    qualityControl: 0,
-    teamRelations: 0,
-    clientRelations: 0,
-    responsiveness: 0,
-    clientSatisfaction: 0,
-  }
-
-  strategistEvaluations.forEach(evaluation => {
-    strategistMetrics.ideation += evaluation.ideation
-    strategistMetrics.avgViews += evaluation.avgViews
-    strategistMetrics.qualityControl += evaluation.qualityControl
-    strategistMetrics.teamRelations += evaluation.teamRelations
-    strategistMetrics.clientRelations += evaluation.clientRelations
-    strategistMetrics.responsiveness += evaluation.responsiveness
-    strategistMetrics.clientSatisfaction += evaluation.clientSatisfaction
-  })
-
-  const count = strategistEvaluations.length || 1
-  const strategistData = [
-    { metric: 'ایده‌پردازی', score: (strategistMetrics.ideation / count).toFixed(2) },
-    { metric: 'میانگین بازدید', score: (strategistMetrics.avgViews / count).toFixed(2) },
-    { metric: 'کنترل کیفیت', score: (strategistMetrics.qualityControl / count).toFixed(2) },
-    { metric: 'روابط تیمی', score: (strategistMetrics.teamRelations / count).toFixed(2) },
-    { metric: 'روابط با مشتری', score: (strategistMetrics.clientRelations / count).toFixed(2) },
-    { metric: 'پاسخگویی', score: (strategistMetrics.responsiveness / count).toFixed(2) },
-    { metric: 'رضایت مشتری', score: (strategistMetrics.clientSatisfaction / count).toFixed(2) },
-  ]
-
-  // Calculate detailed metrics for writer evaluations
-  const writerMetrics = {
-    responsibility: 0,
-    strategistSatisfaction: 0,
-    meetingEngagement: 0,
-    scenarioPerformance: 0,
-    clientSatisfaction: 0,
-    brandAlignment: 0,
-  }
-
-  writerEvaluations.forEach(evaluation => {
-    writerMetrics.responsibility += evaluation.responsibility
-    writerMetrics.strategistSatisfaction += evaluation.strategistSatisfaction
-    writerMetrics.meetingEngagement += evaluation.meetingEngagement
-    writerMetrics.scenarioPerformance += evaluation.scenarioPerformance
-    writerMetrics.clientSatisfaction += evaluation.clientSatisfaction
-    writerMetrics.brandAlignment += evaluation.brandAlignment
-  })
-
-  const writerCount = writerEvaluations.length || 1
-  const writerData = [
-    { metric: 'مسئولیت‌پذیری', score: (writerMetrics.responsibility / writerCount).toFixed(2) },
-    { metric: 'رضایت استراتژیست', score: (writerMetrics.strategistSatisfaction / writerCount).toFixed(2) },
-    { metric: 'مشارکت در جلسات', score: (writerMetrics.meetingEngagement / writerCount).toFixed(2) },
-    { metric: 'عملکرد سناریو', score: (writerMetrics.scenarioPerformance / writerCount).toFixed(2) },
-    { metric: 'رضایت مشتری', score: (writerMetrics.clientSatisfaction / writerCount).toFixed(2) },
-    { metric: 'هماهنگی با برند', score: (writerMetrics.brandAlignment / writerCount).toFixed(2) },
-  ]
-
-  // Status distribution
-  const completedStrategist = strategistEvaluations.filter(evaluation => evaluation.status === 'COMPLETED').length
-  const pendingStrategist = strategistEvaluations.filter(evaluation => evaluation.status === 'PENDING').length
-  const completedWriter = writerEvaluations.filter(evaluation => evaluation.status === 'COMPLETED').length
-  const pendingWriter = writerEvaluations.filter(evaluation => evaluation.status === 'PENDING').length
-
-  return (
-    <>
-      <MetricsCard
-        title="تحلیل معیارهای استراتژیست‌ها"
-        data={strategistData}
-        slot={1}
-        completed={completedStrategist}
-        pending={pendingStrategist}
-      />
-      <MetricsCard
-        title="تحلیل معیارهای نویسندگان"
-        data={writerData}
-        slot={3}
-        completed={completedWriter}
-        pending={pendingWriter}
-      />
-    </>
-  )
-}
+import { EmptyState } from "@/components/ui/empty-state"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { ScoreBadge } from "@/components/ui/score"
+import { ROLE_SLOT, chartColor, faNumber } from "@/lib/design-tokens"
+import { ClipboardList } from "lucide-react"
+import type { RoleAggregate } from "@/lib/admin-analytics"
 
 /**
- * One card per role: the average of each metric, as horizontal bars.
+ * Metric averages for one role at a time.
  *
- * Horizontal because the metric names are long Persian phrases — rotating
- * them under a vertical axis makes them unreadable on a phone.
+ * A role picker rather than one card per role: the eight roles have different
+ * metrics, so stacking eight charts would push everything below the fold and
+ * invite comparisons between axes that do not mean the same thing.
  */
-function MetricsCard({
-  title,
-  data,
-  slot,
-  completed,
-  pending,
+export function EvaluationDistribution({
+  roleAggregates,
 }: {
-  title: string
-  data: Array<{ metric: string; score: string }>
-  slot: 1 | 3
-  completed: number
-  pending: number
+  roleAggregates: RoleAggregate[]
 }) {
-  const rows = data.map((d) => ({ metric: d.metric, score: parseFloat(d.score) }))
+  const withData = roleAggregates.filter((r) => r.count > 0)
+  const [role, setRole] = useState(withData[0]?.role ?? "")
+
+  const selected = withData.find((r) => r.role === role) ?? withData[0]
+
+  if (!selected) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>تحلیل شاخص‌ها</CardTitle>
+          <CardDescription>میانگین امتیاز هر شاخص، از ۱۰</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <EmptyState
+            icon={<ClipboardList />}
+            title="هنوز ارزیابی‌ای ثبت نشده است"
+            description="پس از ثبت اولین ارزیابی، میانگین هر شاخص اینجا نمایش داده می‌شود."
+            size="sm"
+          />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const rows = selected.metrics.map((m) => ({
+    metric: m.title,
+    score: Number(m.average.toFixed(2)),
+  }))
   const isEmpty = rows.every((r) => !r.score)
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>میانگین امتیاز هر معیار، از ۱۰</CardDescription>
+        <CardTitle>تحلیل شاخص‌های {selected.label}</CardTitle>
+        <CardDescription>
+          میانگین هر شاخص از {faNumber(selected.count)} ارزیابی برای{" "}
+          {faNumber(selected.peopleCount)} نفر
+        </CardDescription>
+        <CardAction>
+          <Select value={selected.role} onValueChange={setRole}>
+            <SelectTrigger aria-label="انتخاب نقش" className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {withData.map((r) => (
+                <SelectItem key={r.role} value={r.role}>
+                  {r.label} ({faNumber(r.count)})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardAction>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Single series: the title names it, so no legend box is needed. */}
+        {/* Horizontal bars: the metric names are long Persian phrases and are
+            unreadable rotated under a vertical axis. */}
         <ChartFrame
           height={300}
           isEmpty={isEmpty}
           emptyMessage="هنوز ارزیابی‌ای ثبت نشده است"
-          summary={`میانگین ${rows.length} معیار برای این نقش.`}
+          summary={`میانگین ${faNumber(rows.length)} شاخص برای ${selected.label}.`}
         >
           <BarChart
             data={rows}
@@ -152,7 +116,7 @@ function MetricsCard({
               type="category"
               dataKey="metric"
               orientation="right"
-              width={130}
+              width={140}
               {...AXIS_PROPS}
             />
             <Tooltip
@@ -162,21 +126,18 @@ function MetricsCard({
             <Bar
               dataKey="score"
               name="میانگین"
-              fill={chartColor(slot)}
+              fill={chartColor(ROLE_SLOT[selected.role])}
               radius={4}
               maxBarSize={22}
             />
           </BarChart>
         </ChartFrame>
 
-        <div className="flex flex-wrap items-center gap-2 border-t border-border-subtle pt-4">
-          <span className="text-sm text-foreground-muted">وضعیت ارزیابی‌ها:</span>
-          <Badge variant="success" dot="bg-success">
-            {completed.toLocaleString("fa-IR")} تکمیل‌شده
-          </Badge>
-          <Badge variant="warning" dot="bg-warning">
-            {pending.toLocaleString("fa-IR")} در انتظار
-          </Badge>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border-subtle pt-4">
+          <span className="text-sm text-foreground-muted">
+            میانگین کل این نقش
+          </span>
+          <ScoreBadge score={selected.average} showLabel />
         </div>
       </CardContent>
     </Card>

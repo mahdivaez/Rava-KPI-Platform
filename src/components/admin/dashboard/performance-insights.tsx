@@ -1,272 +1,234 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight } from "lucide-react"
-import moment from 'moment-jalaali'
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Minus,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react"
 
-interface PerformanceInsightsProps {
-  strategistEvaluations: any[]
-  writerEvaluations: any[]
-}
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { EmptyState } from "@/components/ui/empty-state"
+import { RoleBadge } from "@/components/ui/role-badge"
+import { ScoreBadge } from "@/components/ui/score"
+import { faNumber } from "@/lib/design-tokens"
+import { cn } from "@/lib/utils"
+import { PERSIAN_MONTHS, type PeriodAggregate, type RoleAggregate } from "@/lib/admin-analytics"
 
-export function PerformanceInsights({ strategistEvaluations, writerEvaluations }: PerformanceInsightsProps) {
-  // Get current month and previous month data
-  const currentPersian = moment()
-  const currentMonth = currentPersian.jMonth() + 1
-  const currentYear = currentPersian.jYear()
-  const previousMonth = currentMonth === 1 ? 11 : currentMonth - 1 // since we have 11 months, max 11
+type Trajectory = "improving" | "declining" | "stable"
+
+/**
+ * Month-over-month movement, per role.
+ *
+ * The previous version compared only استراتژیست and نویسنده, and rolled the
+ * month over at 11 — the Persian year has 12, so every اسفند comparison read
+ * the wrong month.
+ */
+export function PerformanceInsights({
+  periods,
+  roleAggregates,
+  currentMonth,
+  currentYear,
+}: {
+  periods: PeriodAggregate[]
+  roleAggregates: RoleAggregate[]
+  currentMonth: number
+  currentYear: number
+}) {
+  const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1
   const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear
 
-  // Filter evaluations by month
-  const currentMonthStrategist = strategistEvaluations.filter(
-    e => e.month === currentMonth && e.year === currentYear
+  const current = periods.find(
+    (p) => p.month === currentMonth && p.year === currentYear
   )
-  const previousMonthStrategist = strategistEvaluations.filter(
-    e => e.month === previousMonth && e.year === previousYear
-  )
-
-  const currentMonthWriter = writerEvaluations.filter(
-    e => e.month === currentMonth && e.year === currentYear
-  )
-  const previousMonthWriter = writerEvaluations.filter(
-    e => e.month === previousMonth && e.year === previousYear
+  const previous = periods.find(
+    (p) => p.month === previousMonth && p.year === previousYear
   )
 
-  // Calculate averages
-  const calculateAvgStrategist = (evals: any[]) => {
-    if (evals.length === 0) return 0
-    return evals.reduce((sum, e) => {
-      const avg = (e.ideation + e.avgViews + e.qualityControl + e.teamRelations + 
-                  e.clientRelations + e.responsiveness + e.clientSatisfaction) / 7
-      return sum + avg
-    }, 0) / evals.length
-  }
+  const rolesWithData = roleAggregates.filter((r) => r.count > 0)
 
-  const calculateAvgWriter = (evals: any[]) => {
-    if (evals.length === 0) return 0
-    return evals.reduce((sum, e) => {
-      const avg = (e.responsibility + e.strategistSatisfaction + e.meetingEngagement + 
-                  e.scenarioPerformance + e.clientSatisfaction + e.brandAlignment) / 6
-      return sum + avg
-    }, 0) / evals.length
-  }
-
-  const currentStrategistAvg = calculateAvgStrategist(currentMonthStrategist)
-  const previousStrategistAvg = calculateAvgStrategist(previousMonthStrategist)
-  const strategistGrowth = previousStrategistAvg > 0 
-    ? ((currentStrategistAvg - previousStrategistAvg) / previousStrategistAvg * 100).toFixed(1)
-    : '0.0'
-
-  const currentWriterAvg = calculateAvgWriter(currentMonthWriter)
-  const previousWriterAvg = calculateAvgWriter(previousMonthWriter)
-  const writerGrowth = previousWriterAvg > 0 
-    ? ((currentWriterAvg - previousWriterAvg) / previousWriterAvg * 100).toFixed(1)
-    : '0.0'
-
-  // Performance trajectory (last 3 months)
-  const getLastThreeMonths = () => {
-    const months = []
-    for (let i = 2; i >= 0; i--) {
-      let month = currentMonth - i
-      let year = currentYear
-      while (month <= 0) {
-        month += 11 // since we have 11 months
-        year -= 1
-      }
-      months.push({ month, year })
-    }
-    return months
-  }
-
-  const lastThreeMonths = getLastThreeMonths()
-  const strategistTrend = lastThreeMonths.map(({ month, year }) => {
-    const evals = strategistEvaluations.filter(e => e.month === month && e.year === year)
-    return calculateAvgStrategist(evals)
-  })
-
-  const writerTrend = lastThreeMonths.map(({ month, year }) => {
-    const evals = writerEvaluations.filter(e => e.month === month && e.year === year)
-    return calculateAvgWriter(evals)
-  })
-
-  const getTrajectory = (trend: number[]) => {
-    const validScores = trend.filter(s => s > 0)
-    if (validScores.length < 2) return 'stable'
-    const first = validScores[0]
-    const last = validScores[validScores.length - 1]
-    if (last > first + 0.5) return 'improving'
-    if (last < first - 0.5) return 'declining'
-    return 'stable'
-  }
-
-  const strategistTrajectory = getTrajectory(strategistTrend)
-  const writerTrajectory = getTrajectory(writerTrend)
-
-  const TrajectoryIcon = ({ trajectory }: { trajectory: string }) => {
-    if (trajectory === 'improving') return <TrendingUp className="w-5 h-5 text-success" />
-    if (trajectory === 'declining') return <TrendingDown className="w-5 h-5 text-danger" />
-    return <Minus className="w-5 h-5 text-warning" />
-  }
-
-  const TrajectoryBadge = ({ trajectory }: { trajectory: string }) => {
-    if (trajectory === 'improving') {
-      return (
-        <span className="px-3 py-1 rounded-full bg-success-subtle text-success text-sm font-semibold flex items-center gap-1">
-          <ArrowUpRight className="size-4" />
-          در حال بهبود
-        </span>
-      )
-    }
-    if (trajectory === 'declining') {
-      return (
-        <span className="px-3 py-1 rounded-full bg-danger-subtle text-danger text-sm font-semibold flex items-center gap-1">
-          <ArrowDownRight className="size-4" />
-          نیاز به توجه
-        </span>
-      )
-    }
+  if (rolesWithData.length === 0) {
     return (
-      <span className="px-3 py-1 rounded-full bg-warning-subtle text-warning text-sm font-semibold flex items-center gap-1">
-        <Minus className="size-4" />
-        ثابت
-      </span>
+      <Card>
+        <CardHeader>
+          <CardTitle>روند ماهانه</CardTitle>
+          <CardDescription>مقایسه این ماه با ماه قبل، به تفکیک نقش</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <EmptyState
+            icon={<TrendingUp />}
+            title="هنوز داده‌ای برای مقایسه نیست"
+            description="پس از ثبت ارزیابی در دو ماه متوالی، رشد یا افت هر نقش اینجا نمایش داده می‌شود."
+            size="sm"
+          />
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-    <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-      {/* Strategist Performance */}
-      <Card className="">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-foreground text-lg sm:text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
-            عملکرد استراتژیست‌ها
-          </CardTitle>
-          <CardDescription className="text-primary text-xs sm:text-sm">تحلیل روند و رشد ماهانه</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-          {/* Current vs Previous Month */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-surface rounded-xl border border-border">
-            <div className="text-center sm:text-start">
-              <p className="text-xs sm:text-sm text-foreground-muted mb-1">میانگین این ماه</p>
-              <p className="text-2xl sm:text-3xl font-bold text-foreground">{currentStrategistAvg.toFixed(2)}</p>
-            </div>
-            <div className="text-center">
-              {parseFloat(strategistGrowth) > 0 ? (
-                <div className="flex flex-col items-center gap-1">
-                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-success" />
-                  <span className="text-xl sm:text-2xl font-bold text-success">+{strategistGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">رشد</span>
-                </div>
-              ) : parseFloat(strategistGrowth) < 0 ? (
-                <div className="flex flex-col items-center gap-1">
-                  <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-danger" />
-                  <span className="text-xl sm:text-2xl font-bold text-danger">{strategistGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">کاهش</span>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <Minus className="w-6 h-6 sm:w-8 sm:h-8 text-warning" />
-                  <span className="text-xl sm:text-2xl font-bold text-warning">{strategistGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">ثابت</span>
-                </div>
-              )}
-            </div>
-            <div className="text-center sm:text-start">
-              <p className="text-xs sm:text-sm text-foreground-muted mb-1">میانگین ماه قبل</p>
-              <p className="text-xl sm:text-2xl font-bold text-foreground-secondary">{previousStrategistAvg.toFixed(2)}</p>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>روند ماهانه به تفکیک نقش</CardTitle>
+        <CardDescription>
+          {PERSIAN_MONTHS[currentMonth - 1]} {faNumber(currentYear)} در مقایسه با{" "}
+          {PERSIAN_MONTHS[previousMonth - 1]} {faNumber(previousYear)}
+        </CardDescription>
+      </CardHeader>
 
-          {/* Performance Trajectory */}
-          <div className="p-4 bg-surface rounded-xl border border-border">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-foreground-secondary">روند عملکرد (3 ماه اخیر)</p>
-              <TrajectoryIcon trajectory={strategistTrajectory} />
-            </div>
-            <TrajectoryBadge trajectory={strategistTrajectory} />
-          </div>
+      <CardContent className="space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <SummaryTile
+            label="میانگین این ماه"
+            value={current ? faNumber(current.average, 2) : "—"}
+            hint={
+              current
+                ? `${faNumber(current.count)} ارزیابی`
+                : "ارزیابی‌ای ثبت نشده"
+            }
+          />
+          <SummaryTile
+            label="میانگین ماه قبل"
+            value={previous ? faNumber(previous.average, 2) : "—"}
+            hint={
+              previous
+                ? `${faNumber(previous.count)} ارزیابی`
+                : "ارزیابی‌ای ثبت نشده"
+            }
+          />
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="p-2 sm:p-3 bg-primary-subtle rounded-lg border border-border">
-              <p className="text-xs text-primary mb-1">ارزیابی‌های این ماه</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground">{currentMonthStrategist.length}</p>
-            </div>
-            <div className="p-2 sm:p-3 bg-primary-subtle rounded-lg border border-border">
-              <p className="text-xs text-primary mb-1">ارزیابی‌های ماه قبل</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground">{previousMonthStrategist.length}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        <ul className="divide-y divide-border-subtle rounded-xl border border-border">
+          {rolesWithData.map((role) => {
+            const now = current?.byRole[role.role]
+            const before = previous?.byRole[role.role]
+            const growth =
+              typeof now === "number" && typeof before === "number" && before > 0
+                ? ((now - before) / before) * 100
+                : null
 
-      {/* Writer Performance */}
-      <Card className="">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-foreground text-base sm:text-lg lg:text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
-            عملکرد نویسندگان
-          </CardTitle>
-          <CardDescription className="text-primary text-xs sm:text-sm">تحلیل روند و رشد ماهانه</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-          {/* Current vs Previous Month */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-surface rounded-xl border border-border">
-            <div className="text-center sm:text-start">
-              <p className="text-xs sm:text-sm text-foreground-muted mb-1">میانگین این ماه</p>
-              <p className="text-2xl sm:text-3xl font-bold text-foreground">{currentWriterAvg.toFixed(2)}</p>
-            </div>
-            <div className="text-center">
-              {parseFloat(writerGrowth) > 0 ? (
-                <div className="flex flex-col items-center gap-1">
-                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-success" />
-                  <span className="text-xl sm:text-2xl font-bold text-success">+{writerGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">رشد</span>
+            const trajectory: Trajectory =
+              growth === null
+                ? "stable"
+                : growth > 2
+                  ? "improving"
+                  : growth < -2
+                    ? "declining"
+                    : "stable"
+
+            return (
+              <li
+                key={role.role}
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
+              >
+                <div className="flex min-w-0 items-center gap-2">
+                  <RoleBadge role={role.role} size="sm" />
+                  <span className="text-xs text-foreground-subtle">
+                    {faNumber(role.count)} ارزیابی
+                  </span>
                 </div>
-              ) : parseFloat(writerGrowth) < 0 ? (
-                <div className="flex flex-col items-center gap-1">
-                  <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-danger" />
-                  <span className="text-xl sm:text-2xl font-bold text-danger">{writerGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">کاهش</span>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <Minus className="w-6 h-6 sm:w-8 sm:h-8 text-warning" />
-                  <span className="text-xl sm:text-2xl font-bold text-warning">{writerGrowth}%</span>
-                  <span className="text-xs text-foreground-muted">ثابت</span>
-                </div>
-              )}
-            </div>
-            <div className="text-center sm:text-start">
-              <p className="text-xs sm:text-sm text-foreground-muted mb-1">میانگین ماه قبل</p>
-              <p className="text-xl sm:text-2xl font-bold text-foreground-secondary">{previousWriterAvg.toFixed(2)}</p>
-            </div>
-          </div>
 
-          {/* Performance Trajectory */}
-          <div className="p-4 bg-surface rounded-xl border border-border">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-foreground-secondary">روند عملکرد (3 ماه اخیر)</p>
-              <TrajectoryIcon trajectory={writerTrajectory} />
-            </div>
-            <TrajectoryBadge trajectory={writerTrajectory} />
-          </div>
+                <div className="flex items-center gap-3">
+                  {typeof now === "number" ? (
+                    <ScoreBadge score={now} size="sm" />
+                  ) : (
+                    <span className="text-xs text-foreground-subtle">
+                      این ماه ثبت نشده
+                    </span>
+                  )}
+                  <GrowthChip growth={growth} trajectory={trajectory} />
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      </CardContent>
+    </Card>
+  )
+}
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="p-2 sm:p-3 bg-primary-subtle rounded-lg border border-border">
-              <p className="text-xs text-primary mb-1">ارزیابی‌های این ماه</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground">{currentMonthWriter.length}</p>
-            </div>
-            <div className="p-2 sm:p-3 bg-primary-subtle rounded-lg border border-border">
-              <p className="text-xs text-primary mb-1">ارزیابی‌های ماه قبل</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground">{previousMonthWriter.length}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+function SummaryTile({
+  label,
+  value,
+  hint,
+}: {
+  label: string
+  value: string
+  hint: string
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-sunken p-4">
+      <p className="text-sm text-foreground-muted">{label}</p>
+      <p
+        data-numeric
+        className="mt-1.5 font-display text-3xl font-bold leading-none text-foreground"
+      >
+        {value}
+      </p>
+      <p className="mt-1.5 text-xs text-foreground-subtle">{hint}</p>
     </div>
   )
 }
 
+/** The direction is stated in words as well as colour and arrow. */
+function GrowthChip({
+  growth,
+  trajectory,
+}: {
+  growth: number | null
+  trajectory: Trajectory
+}) {
+  if (growth === null) {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground-muted">
+        <Minus className="size-3" aria-hidden />
+        بدون مقایسه
+      </span>
+    )
+  }
+
+  const tone =
+    trajectory === "improving"
+      ? "bg-success-subtle text-success"
+      : trajectory === "declining"
+        ? "bg-danger-subtle text-danger"
+        : "bg-warning-subtle text-warning"
+
+  const Icon =
+    trajectory === "improving"
+      ? ArrowUpRight
+      : trajectory === "declining"
+        ? ArrowDownRight
+        : Minus
+
+  const label =
+    trajectory === "improving"
+      ? "بهبود"
+      : trajectory === "declining"
+        ? "افت"
+        : "ثابت"
+
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        tone
+      )}
+    >
+      <Icon className="size-3" aria-hidden />
+      {label}
+      <span data-numeric className="font-normal opacity-80">
+        {faNumber(Math.abs(growth), 1)}٪
+      </span>
+    </span>
+  )
+}
+
+export type { Trajectory }

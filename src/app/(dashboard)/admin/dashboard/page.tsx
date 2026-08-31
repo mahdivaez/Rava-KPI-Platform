@@ -1,8 +1,4 @@
-import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { prisma } from "@/lib/prisma"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PageHeader } from "@/components/ui/page-header"
 import {
   Activity,
   LayoutGrid,
@@ -12,6 +8,11 @@ import {
   Trophy,
   Users,
 } from "lucide-react"
+
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PageHeader } from "@/components/ui/page-header"
 import { OverviewStats } from "@/components/admin/dashboard/overview-stats-redesigned"
 import { PerformanceTrends } from "@/components/admin/dashboard/performance-trends"
 import { WorkgroupAnalytics } from "@/components/admin/dashboard/workgroup-analytics"
@@ -20,128 +21,100 @@ import { RecentActivity } from "@/components/admin/dashboard/recent-activity"
 import { EvaluationDistribution } from "@/components/admin/dashboard/evaluation-distribution"
 import { PerformanceInsights } from "@/components/admin/dashboard/performance-insights"
 import { TeamLeaderboard } from "@/components/admin/dashboard/team-leaderboard"
-import { PerformanceAlerts } from "@/components/admin/dashboard/performance-alerts"
+import {
+  PerformanceAlerts,
+  type UnevaluatedPerson,
+} from "@/components/admin/dashboard/performance-alerts"
+import {
+  aggregateByPeriod,
+  aggregateByPerson,
+  aggregateByRole,
+  aggregateByWorkgroup,
+  getClientEvaluationRecords,
+  getCoverageStats,
+  getRoleEvaluationRecords,
+  overallAverage,
+} from "@/lib/admin-analytics"
+import { isTeamRole, type TeamRole } from "@/lib/roles"
+
+export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardPage() {
   const session = await auth()
-  if (!session?.user?.isAdmin) redirect('/dashboard')
+  if (!session?.user?.isAdmin) redirect("/dashboard")
 
-  // Get comprehensive statistics
   const [
+    records,
+    clientRecords,
+    coverage,
     totalUsers,
     activeUsers,
     totalWorkgroups,
     activeWorkgroups,
-    strategistMembers,
-    writerMembers,
-    strategistEvaluations,
-    writerEvaluations,
-    writerFeedbacks,
+    workgroupRows,
     recentUsers,
-    recentEvaluations,
   ] = await Promise.all([
+    getRoleEvaluationRecords(),
+    getClientEvaluationRecords(),
+    getCoverageStats(),
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.workgroup.count(),
     prisma.workgroup.count({ where: { isActive: true } }),
-    prisma.workgroupMember.findMany({ 
-      where: { role: 'STRATEGIST' },
-      distinct: ['userId'],
-      select: { userId: true }
+    prisma.workgroup.findMany({
+      include: { members: { include: { user: true } } },
+      orderBy: { name: "asc" },
     }),
-    prisma.workgroupMember.findMany({ 
-      where: { role: 'WRITER' },
-      distinct: ['userId'],
-      select: { userId: true }
-    }),
-    prisma.strategistEvaluation.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        strategist: true,
-        evaluator: true,
-      },
-    }),
-    prisma.writerEvaluation.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        writer: true,
-        strategist: true,
-        workgroup: true,
-      },
-    }),
-    prisma.writerFeedback.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        writer: true,
-        workgroup: true,
-      },
-    }),
-    prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-    }),
-    prisma.strategistEvaluation.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      include: {
-        strategist: true,
-        evaluator: true,
-      },
-    }),
+    prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
   ])
 
-  // Count unique strategists and writers
-  const totalStrategists = strategistMembers.length
-  const totalWriters = writerMembers.length
+  const people = aggregateByPerson(records)
+  const roleAggregates = aggregateByRole(records)
+  const periods = aggregateByPeriod(records)
 
-  // Calculate detailed statistics
-  const completedStrategistEvals = strategistEvaluations.filter(e => e.status === 'COMPLETED').length
-  const pendingStrategistEvals = strategistEvaluations.filter(e => e.status === 'PENDING').length
-  const completedWriterEvals = writerEvaluations.filter(e => e.status === 'COMPLETED').length
-  const pendingWriterEvals = writerEvaluations.filter(e => e.status === 'PENDING').length
+  const workgroupSummaries = workgroupRows.map((w) => ({
+    id: w.id,
+    name: w.name,
+    isActive: w.isActive,
+  }))
 
-  // Calculate average scores
-  const avgStrategistScore = strategistEvaluations.length > 0
-    ? strategistEvaluations.reduce((sum, e) => {
-        const avg = (e.ideation + e.avgViews + e.qualityControl + e.teamRelations + 
-                    e.clientRelations + e.responsiveness + e.clientSatisfaction) / 7
-        return sum + avg
-      }, 0) / strategistEvaluations.length
-    : 0
+  const members = workgroupRows.flatMap((w) =>
+    w.members
+      .filter((m) => isTeamRole(m.role))
+      .map((m) => ({
+        workgroupId: w.id,
+        userId: m.userId,
+        name: `${m.user.firstName} ${m.user.lastName}`,
+        role: m.role as TeamRole,
+      }))
+  )
 
-  const avgWriterScore = writerEvaluations.length > 0
-    ? writerEvaluations.reduce((sum, e) => {
-        const avg = (e.responsibility + e.strategistSatisfaction + e.meetingEngagement + 
-                    e.scenarioPerformance + e.clientSatisfaction + e.brandAlignment) / 6
-        return sum + avg
-      }, 0) / writerEvaluations.length
-    : 0
+  const workgroupAggregates = aggregateByWorkgroup(
+    records,
+    clientRecords,
+    workgroupRows.map((w) => ({
+      id: w.id,
+      name: w.name,
+      memberCount: w.members.length,
+    }))
+  )
 
-  const avgFeedbackScore = writerFeedbacks.length > 0
-    ? writerFeedbacks.reduce((sum, f) => {
-        const avg = (f.communication + f.supportLevel + f.clarityOfTasks + f.feedbackQuality) / 4
-        return sum + avg
-      }, 0) / writerFeedbacks.length
-    : 0
+  // Active members who hold a role somewhere but have never been evaluated in
+  // it — the honest denominator for "who is missing from the reports".
+  const evaluatedKeys = new Set(records.map((r) => `${r.targetId}:${r.targetRole}`))
+  const unevaluated: UnevaluatedPerson[] = workgroupRows.flatMap((w) =>
+    w.members
+      .filter((m) => isTeamRole(m.role) && m.user.isActive)
+      .filter((m) => !evaluatedKeys.has(`${m.userId}:${m.role}`))
+      .map((m) => ({
+        id: m.userId,
+        name: `${m.user.firstName} ${m.user.lastName}`,
+        role: m.role,
+        workgroupName: w.name,
+      }))
+  )
 
-  // Get workgroup performance data
-  const workgroups = await prisma.workgroup.findMany({
-    include: {
-      members: {
-        include: { user: true }
-      },
-      writerEvaluations: true,
-      writerFeedbacks: true,
-    },
-  })
-
-  // Get all users for alerts component
-  // We get all users and the alerts component will filter based on evaluations
-  const allUsers = await prisma.user.findMany({
-    where: {
-      isActive: true
-    }
-  })
+  const scoredClient = clientRecords.filter((r) => !r.skipped)
 
   const stats = {
     totalUsers,
@@ -149,25 +122,27 @@ export default async function AdminDashboardPage() {
     inactiveUsers: totalUsers - activeUsers,
     totalWorkgroups,
     activeWorkgroups,
-    inactiveWorkgroups: totalWorkgroups - activeWorkgroups,
-    totalStrategists,
-    totalWriters,
-    totalEvaluations: strategistEvaluations.length + writerEvaluations.length,
-    completedEvaluations: completedStrategistEvals + completedWriterEvals,
-    pendingEvaluations: pendingStrategistEvals + pendingWriterEvals,
-    totalFeedbacks: writerFeedbacks.length,
-    avgStrategistScore: avgStrategistScore.toFixed(2),
-    avgWriterScore: avgWriterScore.toFixed(2),
-    avgFeedbackScore: avgFeedbackScore.toFixed(2),
-    completionRate: ((completedStrategistEvals + completedWriterEvals) / 
-                    (strategistEvaluations.length + writerEvaluations.length) * 100).toFixed(1),
+    totalEvaluations: records.length,
+    peopleEvaluated: new Set(records.map((r) => r.targetId)).size,
+    selfEvaluations: records.filter((r) => r.isSelf).length,
+    overallAverage: overallAverage(records),
+    clientEvaluations: clientRecords.length,
+    clientAverage: scoredClient.length
+      ? scoredClient.reduce((sum, r) => sum + r.average, 0) / scoredClient.length
+      : 0,
+    clientSkipped: clientRecords.length - scoredClient.length,
+    month: coverage.month,
+    year: coverage.year,
+    expectedThisMonth: coverage.expected,
+    filedThisMonth: coverage.filed,
+    completionRate: coverage.completionRate,
   }
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="داشبورد تحلیلی"
-        description="تحلیل کامل عملکرد، آمار و گزارشات سامانه"
+        description="تحلیل عملکرد همه نقش‌ها، کارگروه‌ها و نظر مشتریان"
         icon={<PieChart />}
         breadcrumbs={[
           { label: "داشبورد", href: "/dashboard" },
@@ -175,12 +150,9 @@ export default async function AdminDashboardPage() {
         ]}
       />
 
-      {/* Main Overview Stats */}
-      <OverviewStats stats={stats} />
+      <OverviewStats stats={stats} roleAggregates={roleAggregates} />
 
-      {/* Tabs for different analytics sections */}
       <Tabs defaultValue="overview" className="w-full">
-        {/* The list scrolls on its own so the page never scrolls sideways. */}
         <TabsList className="w-full justify-start lg:w-fit">
           <TabsTrigger value="overview">
             <LayoutGrid aria-hidden />
@@ -210,55 +182,53 @@ export default async function AdminDashboardPage() {
 
         <TabsContent value="overview" className="space-y-5">
           <div className="grid gap-5 lg:grid-cols-2">
-            <EvaluationDistribution
-              strategistEvaluations={strategistEvaluations}
-              writerEvaluations={writerEvaluations}
-            />
-            <TopPerformers
-              strategistEvaluations={strategistEvaluations}
-              writerEvaluations={writerEvaluations}
-            />
+            <EvaluationDistribution roleAggregates={roleAggregates} />
+            <TopPerformers people={people} />
           </div>
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-5">
-          {/* Performance Insights - Month over Month Growth */}
           <PerformanceInsights
-            strategistEvaluations={strategistEvaluations}
-            writerEvaluations={writerEvaluations}
+            periods={periods}
+            roleAggregates={roleAggregates}
+            currentMonth={coverage.month}
+            currentYear={coverage.year}
           />
-
-          {/* Performance Trends Charts */}
           <PerformanceTrends
-            strategistEvaluations={strategistEvaluations}
-            writerEvaluations={writerEvaluations}
-            feedbacks={writerFeedbacks}
+            periods={periods}
+            roleAggregates={roleAggregates}
+            records={records}
           />
         </TabsContent>
 
         <TabsContent value="leaderboard" className="space-y-5">
           <TeamLeaderboard
-            strategistEvaluations={strategistEvaluations}
-            writerEvaluations={writerEvaluations}
-            workgroups={workgroups}
+            people={people}
+            roleAggregates={roleAggregates}
+            workgroups={workgroupAggregates}
           />
         </TabsContent>
 
         <TabsContent value="alerts" className="space-y-5">
           <PerformanceAlerts
-            strategistEvaluations={strategistEvaluations}
-            writerEvaluations={writerEvaluations}
-            users={allUsers}
+            people={people}
+            records={records}
+            unevaluated={unevaluated}
           />
         </TabsContent>
 
         <TabsContent value="workgroups" className="space-y-5">
-          <WorkgroupAnalytics workgroups={workgroups} />
+          <WorkgroupAnalytics
+            aggregates={workgroupAggregates}
+            workgroups={workgroupSummaries}
+            members={members}
+          />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-5">
           <RecentActivity
-            recentEvaluations={recentEvaluations}
+            recentEvaluations={records.slice(0, 10)}
+            recentClientEvaluations={clientRecords.slice(0, 8)}
             recentUsers={recentUsers}
           />
         </TabsContent>
