@@ -13,6 +13,9 @@ export default async function DashboardLayout({
 }) {
   const session = await auth()
   if (!session) redirect('/login')
+  // Client accounts live in their own table and have no team membership;
+  // sending them here would query `User` with a ClientAccount id.
+  if (session.user.isClient) redirect('/client')
 
   const [memberships, currentUser] = await Promise.all([
     prisma.workgroupMember.findMany({

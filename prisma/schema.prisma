@@ -67,6 +67,7 @@ model User {
   receivedMessages          Message[]              @relation("ReceivedMessages")
   roleEvaluationsGiven      RoleEvaluation[]       @relation("RoleEvaluationEvaluator")
   roleEvaluationsReceived   RoleEvaluation[]       @relation("RoleEvaluationTarget")
+  clientEvaluationsReceived ClientEvaluation[]     @relation("ClientEvaluationTarget")
 
   @@index([email])
   @@index([totalPoints])
@@ -84,6 +85,8 @@ model Workgroup {
   writerEvaluations  WriterEvaluation[]
   writerFeedbacks    WriterFeedback[]
   roleEvaluations    RoleEvaluation[]
+  clientAccounts     ClientAccount[]
+  clientEvaluations  ClientEvaluation[]
 
   @@index([name])
 }
@@ -300,4 +303,73 @@ model Message {
   @@index([receiverId])
   @@index([isRead])
   @@index([createdAt])
+}
+
+/// A brand-side contact who logs in through /client/login and rates the team
+/// members working on their workgroup. Kept out of `User` on purpose: clients
+/// never hold a WorkgroupRole, never appear in the team evaluation matrix and
+/// must not reach the internal dashboard.
+model ClientAccount {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String
+
+  /// The person who signs in — used by the greeting, e.g. «مهدی».
+  contactName String
+  /// The brand this account speaks for, shown next to the greeting.
+  brandName   String
+
+  workgroupId String
+  isActive    Boolean @default(true)
+
+  /// Admin-authored dashboard greeting. `{name}` and `{brand}` are substituted
+  /// at render time; both fall back to a default sentence when empty.
+  welcomeTitle    String?
+  welcomeMessage  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workgroup   Workgroup          @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
+  evaluations ClientEvaluation[]
+
+  @@index([workgroupId])
+  @@index([email])
+}
+
+/// One client's monthly verdict on one team member in one role.
+/// The whole form is submitted at once, so a period produces one row per
+/// evaluated member. `skipped` records «تعامل کافی نداشتم» without scores.
+model ClientEvaluation {
+  id          String        @id @default(cuid())
+  clientId    String
+  workgroupId String
+  targetId    String
+  targetRole  WorkgroupRole
+  month       Int
+  year        Int
+
+  /// True when the client declared they could not judge this person.
+  skipped Boolean @default(false)
+
+  /// { [metricKey]: 1..10 } — empty object when `skipped`.
+  scores       Json
+  totalScore   Int   @default(0)
+  averageScore Float @default(0)
+
+  /// { [questionKey]: string } — the role's open questions.
+  answers Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client    ClientAccount @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  workgroup Workgroup     @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
+  target    User          @relation("ClientEvaluationTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, targetId, targetRole, month, year], map: "ClientEvaluation_unique_per_period")
+  @@index([clientId])
+  @@index([targetId])
+  @@index([workgroupId])
+  @@index([month, year])
 }

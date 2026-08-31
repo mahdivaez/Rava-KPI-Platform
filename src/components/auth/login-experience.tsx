@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion, type Variants } from "framer-motion"
 
 import { LoginForm } from "@/components/auth/login-form"
@@ -94,6 +95,21 @@ export function LoginExperience() {
             >
               حساب کاربری توسط مدیر سیستم ساخته می‌شود. برای بازیابی رمز عبور
               با مدیر سامانه تماس بگیرید.
+            </motion.p>
+
+            {/* Clients authenticate against their own table, so they need the
+                other door — not this one with a different password. */}
+            <motion.p
+              variants={itemVariants}
+              className="mt-3 text-center text-xs text-foreground-subtle"
+            >
+              مشتری هستید؟{" "}
+              <Link
+                href="/client/login"
+                className="font-medium text-foreground underline underline-offset-4 hover:text-foreground-secondary"
+              >
+                ورود به بخش ارزیابی مشتریان
+              </Link>
             </motion.p>
           </motion.div>
         </div>
