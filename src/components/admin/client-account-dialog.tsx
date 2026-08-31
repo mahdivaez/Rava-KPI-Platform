@@ -23,12 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  DEFAULT_WELCOME_MESSAGE,
-  DEFAULT_WELCOME_TITLE,
-  renderGreetingTemplate,
-} from "@/lib/client-greeting"
 
 export interface ClientAccountFormValues {
   id: string
@@ -37,8 +31,6 @@ export interface ClientAccountFormValues {
   brandName: string
   workgroupId: string
   isActive: boolean
-  welcomeTitle: string | null
-  welcomeMessage: string | null
 }
 
 export interface WorkgroupOption {
@@ -72,21 +64,6 @@ export function ClientAccountDialog({
   const [contactName, setContactName] = useState(client?.contactName ?? "")
   const [brandName, setBrandName] = useState(client?.brandName ?? "")
   const [workgroupId, setWorkgroupId] = useState(client?.workgroupId ?? "")
-  const [welcomeTitle, setWelcomeTitle] = useState(client?.welcomeTitle ?? "")
-  const [welcomeMessage, setWelcomeMessage] = useState(client?.welcomeMessage ?? "")
-
-  const previewSource = {
-    contactName: contactName.trim() || "نام مخاطب",
-    brandName: brandName.trim() || "نام برند",
-  }
-  const previewTitle = renderGreetingTemplate(
-    welcomeTitle.trim() || DEFAULT_WELCOME_TITLE,
-    previewSource
-  )
-  const previewMessage = renderGreetingTemplate(
-    welcomeMessage.trim() || DEFAULT_WELCOME_MESSAGE,
-    previewSource
-  )
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -116,8 +93,6 @@ export function ClientAccountDialog({
       brandName: brandName.trim(),
       workgroupId,
       isActive: formData.get("isActive") === "on",
-      welcomeTitle,
-      welcomeMessage,
     }
 
     if (mode === "edit") payload.id = client?.id
@@ -156,7 +131,8 @@ export function ClientAccountDialog({
           </DialogTitle>
           <DialogDescription>
             مشتری با این حساب وارد /client/login می‌شود و فقط اعضای کارگروه
-            انتخاب‌شده را ارزیابی می‌کند.
+            انتخاب‌شده را ارزیابی می‌کند. نام مخاطب، همان نامی است که در
+            داشبورد به او خوش‌آمد گفته می‌شود.
           </DialogDescription>
         </DialogHeader>
 
@@ -237,53 +213,6 @@ export function ClientAccountDialog({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          {/* The customisable greeting. */}
-          <div className="space-y-4 rounded-xl border border-border bg-surface-sunken p-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                متن داشبورد مشتری
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-foreground-muted">
-                هرچه بنویسید همان را می‌بیند. <code dir="ltr">{"{name}"}</code> با
-                نام مخاطب و <code dir="ltr">{"{brand}"}</code> با نام برند جایگزین
-                می‌شود. خالی بگذارید تا متن پیش‌فرض نمایش داده شود.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="ca-welcomeTitle">عنوان خوش‌آمدگویی</Label>
-              <Input
-                id="ca-welcomeTitle"
-                value={welcomeTitle}
-                onChange={(e) => setWelcomeTitle(e.target.value)}
-                placeholder={DEFAULT_WELCOME_TITLE}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="ca-welcomeMessage">متن توضیح</Label>
-              <Textarea
-                id="ca-welcomeMessage"
-                rows={3}
-                value={welcomeMessage}
-                onChange={(e) => setWelcomeMessage(e.target.value)}
-                placeholder={DEFAULT_WELCOME_MESSAGE}
-              />
-            </div>
-
-            <div className="rounded-lg border border-border bg-surface p-4">
-              <p className="text-2xs font-semibold uppercase tracking-wide text-foreground-subtle">
-                پیش‌نمایش
-              </p>
-              <p className="mt-2 font-display text-xl font-bold leading-tight text-foreground">
-                {previewTitle}
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-foreground-secondary">
-                {previewMessage}
-              </p>
             </div>
           </div>
 

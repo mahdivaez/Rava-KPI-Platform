@@ -50,7 +50,7 @@ export default async function ClientDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* The greeting an admin authored for this specific client. */}
+      {/* Name + one shared prompt, the same for every client. */}
       <section className="rounded-2xl border border-border bg-surface-sunken px-6 py-8 sm:px-8 sm:py-10">
         <p className="text-sm font-medium text-foreground-muted">{periodLabel}</p>
         <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">

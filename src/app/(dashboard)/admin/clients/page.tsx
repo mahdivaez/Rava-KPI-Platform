@@ -60,8 +60,6 @@ export default async function AdminClientsPage() {
     brandName: account.brandName,
     workgroupId: account.workgroupId,
     isActive: account.isActive,
-    welcomeTitle: account.welcomeTitle,
-    welcomeMessage: account.welcomeMessage,
     workgroupName: account.workgroup.name,
     evaluationCount: account._count.evaluations,
   }))

@@ -1,43 +1,25 @@
 /**
- * The admin-authored greeting shown on a client's dashboard.
+ * The client dashboard greeting.
  *
- * Admins write free text per client and may drop `{name}` / `{brand}` into it,
- * so one saved sentence stays correct if the contact person is renamed later.
- * Empty fields fall back to a neutral default rather than rendering a blank
- * header.
+ * Deliberately not customisable per client any more: the admin sets the
+ * contact's name and the portal greets them by it, under one shared sentence
+ * asking for the monthly evaluation. One sentence to change, everywhere.
  */
 
 export interface GreetingSource {
   contactName: string
   brandName: string
-  welcomeTitle?: string | null
-  welcomeMessage?: string | null
 }
 
-export const GREETING_TOKENS = ["{name}", "{brand}"] as const
-
-export const DEFAULT_WELCOME_TITLE = "{name} جان، خوش آمدی به بخش ارزیابی"
-export const DEFAULT_WELCOME_MESSAGE =
-  "نظر شما درباره تیمی که روی «{brand}» کار می‌کند، مستقیماً به بهتر شدن کار آن‌ها کمک می‌کند."
-
-/** Substitute `{name}` and `{brand}` in an admin-authored template. */
-export function renderGreetingTemplate(
-  template: string,
-  source: Pick<GreetingSource, "contactName" | "brandName">
-): string {
-  return template
-    .replaceAll("{name}", source.contactName)
-    .replaceAll("{brand}", source.brandName)
-}
+/** Shown to every client, under their name. */
+export const CLIENT_PROMPT =
+  "لطفاً ارزیابی این ماه تیم را تکمیل کنید. نظر شما مستقیماً به بهتر شدن کار آن‌ها کمک می‌کند."
 
 export function resolveClientGreeting(source: GreetingSource) {
-  const title = source.welcomeTitle?.trim() || DEFAULT_WELCOME_TITLE
-  const message = source.welcomeMessage?.trim() || DEFAULT_WELCOME_MESSAGE
+  const name = source.contactName.trim()
 
   return {
-    title: renderGreetingTemplate(title, source),
-    message: renderGreetingTemplate(message, source),
-    /** True when the admin has not customised this client's greeting yet. */
-    isDefault: !source.welcomeTitle?.trim() && !source.welcomeMessage?.trim(),
+    title: name ? `${name} جان، خوش آمدی` : "خوش آمدید",
+    message: CLIENT_PROMPT,
   }
 }
