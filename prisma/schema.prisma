@@ -314,16 +314,23 @@ model ClientAccount {
   email    String  @unique
   password String
 
-  /// The person who signs in — used by the greeting, e.g. «مهدی».
+  /// The person who signs in, written out in full — the small line under the
+  /// brand in the portal header, e.g. «دکتر بیتا مجیدزاده».
   contactName String
-  /// The brand this account speaks for, shown next to the greeting.
+  /// The brand this account speaks for — the headline of the portal header,
+  /// e.g. «کلینیک گیتا».
   brandName   String
+  /// What the greeting calls them, when a shorter, warmer form reads better
+  /// than the full contact name, e.g. «بیتا» for «بیتا جان، خوش آمدی».
+  /// Falls back to `contactName` when empty.
+  greetingName String?
 
   workgroupId String
   isActive    Boolean @default(true)
 
-  /// Admin-authored dashboard greeting. `{name}` and `{brand}` are substituted
-  /// at render time; both fall back to a default sentence when empty.
+  /// Admin-authored dashboard greeting. `{name}`, `{contact}` and `{brand}`
+  /// are substituted at render time; both fall back to a default sentence
+  /// when empty.
   welcomeTitle    String?
   welcomeMessage  String?
 

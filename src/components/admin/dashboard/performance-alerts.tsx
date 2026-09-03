@@ -19,7 +19,7 @@ import {
 import { EmptyState } from "@/components/ui/empty-state"
 import { RoleBadge } from "@/components/ui/role-badge"
 import { ScoreBadge } from "@/components/ui/score"
-import { faNumber } from "@/lib/design-tokens"
+import { faNumber, faYear } from "@/lib/design-tokens"
 import { PERSIAN_MONTHS, type EvalRecord, type PersonAggregate } from "@/lib/admin-analytics"
 
 /** Below this peer average, a person is surfaced for attention. */
@@ -98,7 +98,7 @@ export function PerformanceAlerts({
 
       const labelOf = (key: string) => {
         const [year, month] = key.split("-").map(Number)
-        return `${PERSIAN_MONTHS[month - 1]} ${faNumber(year)}`
+        return `${PERSIAN_MONTHS[month - 1]} ${faYear(year)}`
       }
 
       return {

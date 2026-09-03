@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Building2, Pencil, Trash2 } from "lucide-react"
+import { Building2, MessageSquareQuote, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,7 @@ import {
   type ClientAccountFormValues,
   type WorkgroupOption,
 } from "@/components/admin/client-account-dialog"
+import { resolveClientGreeting } from "@/lib/client-greeting"
 import { faNumber } from "@/lib/design-tokens"
 
 export interface ClientAccountRow extends ClientAccountFormValues {
@@ -80,6 +81,7 @@ export function ClientAccountsTable({
             <TableRow>
               <TableHead>مخاطب</TableHead>
               <TableHead>کارگروه</TableHead>
+              <TableHead>متن داشبورد</TableHead>
               <TableHead>ارزیابی‌ها</TableHead>
               <TableHead>وضعیت</TableHead>
               <TableHead className="text-end">عملیات</TableHead>
@@ -87,6 +89,7 @@ export function ClientAccountsTable({
           </TableHeader>
           <TableBody>
             {clients.map((client) => {
+              const greeting = resolveClientGreeting(client)
               return (
                 <TableRow key={client.id}>
                   <TableCell>
@@ -112,6 +115,21 @@ export function ClientAccountsTable({
                         برند: {client.brandName}
                       </p>
                     </div>
+                  </TableCell>
+
+                  <TableCell className="max-w-[22rem]">
+                    <p className="flex items-start gap-1.5 text-sm text-foreground-secondary">
+                      <MessageSquareQuote
+                        className="mt-0.5 size-3.5 shrink-0 text-foreground-subtle"
+                        aria-hidden
+                      />
+                      <span className="line-clamp-2">{greeting.title}</span>
+                    </p>
+                    {greeting.isDefault && (
+                      <Badge variant="outline" size="sm" className="mt-1.5">
+                        پیش‌فرض
+                      </Badge>
+                    )}
                   </TableCell>
 
                   <TableCell>

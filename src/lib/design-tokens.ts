@@ -179,3 +179,13 @@ export const faNumber = (value: number, fractionDigits = 0) =>
 /** Percentage with a Persian sign, e.g. «۱۲٪». */
 export const faPercent = (value: number, fractionDigits = 0) =>
   `${faNumber(value, fractionDigits)}٪`
+
+/**
+ * A Persian year, e.g. «۱۴۰۵».
+ * A year is a label, not a quantity, so it keeps no thousands separator —
+ * `faNumber` would render «۱٬۴۰۵».
+ */
+export const faYear = (value: number) =>
+  new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(
+    Number.isFinite(value) ? value : 0
+  )

@@ -13,7 +13,7 @@ import {
 import { EmptyState } from "@/components/ui/empty-state"
 import { Progress } from "@/components/ui/progress"
 import { RoleBadge } from "@/components/ui/role-badge"
-import { faNumber, faPercent } from "@/lib/design-tokens"
+import { faNumber, faPercent, faYear } from "@/lib/design-tokens"
 import { resolveClientGreeting } from "@/lib/client-greeting"
 import { requireClient } from "@/lib/client-session"
 import {
@@ -46,11 +46,11 @@ export default async function ClientDashboardPage() {
   const doneCount = targets.filter((t) => submitted.has(t.key)).length
   const remaining = targets.length - doneCount
   const completionPct = targets.length ? (doneCount / targets.length) * 100 : 0
-  const periodLabel = `${PERSIAN_MONTHS[month - 1]} ${faNumber(year)}`
+  const periodLabel = `${PERSIAN_MONTHS[month - 1]} ${faYear(year)}`
 
   return (
     <div className="space-y-6">
-      {/* Name + one shared prompt, the same for every client. */}
+      {/* The greeting an admin authored for this specific client. */}
       <section className="rounded-2xl border border-border bg-surface-sunken px-6 py-8 sm:px-8 sm:py-10">
         <p className="text-sm font-medium text-foreground-muted">{periodLabel}</p>
         <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">

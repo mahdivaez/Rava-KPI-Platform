@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { EmptyState } from "@/components/ui/empty-state"
 import { ClientEvaluationForm } from "@/components/client/client-evaluation-form"
 import { requireClient } from "@/lib/client-session"
-import { faNumber } from "@/lib/design-tokens"
+import { faYear } from "@/lib/design-tokens"
 import {
   currentPersianPeriod,
   getClientEvaluationTargets,
@@ -39,7 +39,7 @@ export default async function ClientEvaluatePage() {
 
   // Only what is still outstanding: a filed evaluation is final.
   const targets = allTargets.filter((t) => !submitted.has(t.key))
-  const periodLabel = `${PERSIAN_MONTHS[month - 1]} ${faNumber(year)}`
+  const periodLabel = `${PERSIAN_MONTHS[month - 1]} ${faYear(year)}`
 
   if (targets.length === 0) {
     return (

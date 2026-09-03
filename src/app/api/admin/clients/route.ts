@@ -12,6 +12,7 @@ const createSchema = z.object({
   password: z.string().min(6),
   contactName: z.string().min(1),
   brandName: z.string().min(1),
+  greetingName: z.string().optional(),
   workgroupId: z.string().min(1),
   isActive: z.boolean().default(true),
   welcomeTitle: z.string().optional(),
@@ -27,7 +28,7 @@ const updateSchema = createSchema
     password: z.string().min(6).optional().or(z.literal("")),
   })
 
-/** Blank strings clear the field back to the default greeting. */
+/** Blank strings clear the field back to its default. */
 function optionalText(value: string | undefined) {
   if (value === undefined) return undefined
   const trimmed = value.trim()
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
         password: await bcrypt.hash(data.password, 10),
         contactName: data.contactName,
         brandName: data.brandName,
+        greetingName: optionalText(data.greetingName),
         workgroupId: data.workgroupId,
         isActive: data.isActive,
         welcomeTitle: optionalText(data.welcomeTitle),
@@ -85,7 +87,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "غیرمجاز" }, { status: 403 })
     }
 
-    const { id, password, welcomeTitle, welcomeMessage, ...rest } =
+    const { id, password, greetingName, welcomeTitle, welcomeMessage, ...rest } =
       updateSchema.parse(await req.json())
 
     const client = await prisma.clientAccount.update({
@@ -93,6 +95,7 @@ export async function PUT(req: NextRequest) {
       data: {
         ...rest,
         ...(password ? { password: await bcrypt.hash(password, 10) } : {}),
+        greetingName: optionalText(greetingName),
         welcomeTitle: optionalText(welcomeTitle),
         welcomeMessage: optionalText(welcomeMessage),
       },
