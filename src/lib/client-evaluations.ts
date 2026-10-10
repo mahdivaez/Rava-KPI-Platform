@@ -1,8 +1,7 @@
-import moment from "moment-jalaali"
-
 import { prisma } from "@/lib/prisma"
 import { isTeamRole, type TeamRole } from "@/lib/roles"
 import { isClientEvaluableRole } from "@/lib/client-kpis"
+import { getOpenPeriod } from "@/lib/evaluation-period"
 
 export interface ClientEvaluationTarget {
   /** Stable key for a person-in-a-role; the form and the API agree on it. */
@@ -14,10 +13,10 @@ export interface ClientEvaluationTarget {
   role: TeamRole
 }
 
-/** The current Persian month — the only period a client can file for. */
-export function currentPersianPeriod() {
-  const now = moment()
-  return { month: now.jMonth() + 1, year: now.jYear() }
+/** The open KPI month (admin-pinned or the calendar month) — the only one a client can file for. */
+export async function currentPersianPeriod() {
+  const { month, year } = await getOpenPeriod()
+  return { month, year }
 }
 
 export function targetKey(userId: string, role: string) {

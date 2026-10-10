@@ -28,7 +28,7 @@ const PERSIAN_MONTHS = [
 
 export default async function ClientEvaluatePage() {
   const client = await requireClient()
-  const { month, year } = currentPersianPeriod()
+  const { month, year } = await currentPersianPeriod()
 
   const [allTargets, submitted] = await Promise.all([
     getClientEvaluationTargets(client.workgroupId),

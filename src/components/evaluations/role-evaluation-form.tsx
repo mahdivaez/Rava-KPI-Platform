@@ -90,7 +90,7 @@ export function RoleEvaluationForm({
   } = usePersianDate()
   const router = useRouter()
 
-  // usePersianDate resolves in an effect; until then the year is Gregorian.
+  // usePersianDate fetches the open period in an effect; until then it is a placeholder.
   const dateReady = currentDate !== ""
 
   const [loading, setLoading] = useState(false)
@@ -481,7 +481,7 @@ export function RoleEvaluationForm({
 
               <div className="space-y-2">
                 <Label>دوره ارزیابی</Label>
-                {/* Read-only: the period is always the current Persian month. */}
+                {/* Read-only: the month an admin has opened (defaults to the current Persian month). */}
                 <div className="flex h-11 items-center gap-2 rounded-lg border border-border bg-surface-sunken px-3.5 text-sm font-medium text-foreground-secondary sm:h-10">
                   <CalendarDays className="size-4 shrink-0 text-foreground-subtle" aria-hidden />
                   {dateReady ? (

@@ -36,7 +36,7 @@ const PERSIAN_MONTHS = [
 export default async function ClientDashboardPage() {
   const client = await requireClient()
   const greeting = resolveClientGreeting(client)
-  const { month, year } = currentPersianPeriod()
+  const { month, year } = await currentPersianPeriod()
 
   const [targets, submitted] = await Promise.all([
     getClientEvaluationTargets(client.workgroupId),

@@ -380,3 +380,12 @@ model ClientEvaluation {
   @@index([workgroupId])
   @@index([month, year])
 }
+
+/// Runtime settings an admin can change without a deploy, keyed by name.
+/// `evaluationPeriod` → { month, year } pins the open KPI month; absent means
+/// the current Persian calendar month.
+model AppSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

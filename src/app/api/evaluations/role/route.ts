@@ -12,6 +12,11 @@ import {
   validateScores,
   type TeamRole,
 } from "@/lib/roles"
+import {
+  closedPeriodMessage,
+  getOpenPeriod,
+  isSamePeriod,
+} from "@/lib/evaluation-period"
 
 const roleEnum = z.enum(TEAM_ROLES)
 
@@ -42,6 +47,15 @@ export async function POST(req: NextRequest) {
     }
 
     const parsed = evaluationSchema.parse(await req.json())
+
+    // Only the open month accepts entries; a stale tab cannot file elsewhere.
+    const openPeriod = await getOpenPeriod()
+    if (!isSamePeriod(parsed, openPeriod)) {
+      return NextResponse.json(
+        { error: closedPeriodMessage(openPeriod) },
+        { status: 400 }
+      )
+    }
 
     if (!ALLOW_SELF_EVALUATION && parsed.targetId === session.user.id) {
       return NextResponse.json(

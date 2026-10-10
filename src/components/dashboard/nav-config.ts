@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Building2,
+  CalendarDays,
   ClipboardCheck,
   FolderKanban,
   LayoutDashboard,
@@ -125,6 +126,12 @@ export function buildNavigation({
           label: "مشتریان",
           icon: Building2,
           hint: "حساب‌ها، متن داشبورد و ارزیابی مشتری",
+        },
+        {
+          href: "/admin/evaluation-period",
+          label: "دوره ارزیابی",
+          icon: CalendarDays,
+          hint: "ماهی که ثبت KPI برایش باز است",
         },
         {
           href: "/admin/roles",

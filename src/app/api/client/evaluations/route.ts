@@ -55,9 +55,9 @@ export async function POST(req: NextRequest) {
 
     const parsed = payloadSchema.parse(await req.json())
 
-    // The period is fixed server-side: a client files for the current month
-    // only, so a stale tab cannot backfill an earlier one.
-    const period = currentPersianPeriod()
+    // The period is fixed server-side: a client files for the open month
+    // only, so a stale tab cannot backfill a different one.
+    const period = await currentPersianPeriod()
     if (parsed.month !== period.month || parsed.year !== period.year) {
       return NextResponse.json(
         { error: "دوره ارزیابی تغییر کرده است. صفحه را تازه کنید." },

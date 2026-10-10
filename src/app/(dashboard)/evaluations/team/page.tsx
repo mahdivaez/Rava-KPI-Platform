@@ -20,7 +20,7 @@ import { StatCard, StatGrid } from "@/components/ui/stat-card"
 import { RoleEvaluationsTable } from "@/components/evaluations/role-evaluations-table"
 import { getEvaluableWorkgroups } from "@/lib/team-evaluations"
 import { faNumber, faPercent } from "@/lib/design-tokens"
-import moment from "moment-jalaali"
+import { getOpenPeriod } from "@/lib/evaluation-period"
 
 const PERSIAN_MONTHS = [
   "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
@@ -43,9 +43,8 @@ export default async function TeamEvaluationsPage() {
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
   })
 
-  const now = moment()
-  const currentMonth = now.jMonth() + 1
-  const currentYear = now.jYear()
+  // The month open for entry — normally the calendar month, unless an admin pinned another.
+  const { month: currentMonth, year: currentYear } = await getOpenPeriod()
 
   const doneThisMonth = new Set(
     evaluations
