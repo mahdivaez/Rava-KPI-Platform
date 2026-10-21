@@ -8,8 +8,6 @@ declare module "next-auth" {
       isTechnicalDeputy: boolean
       /** True for brand-side contacts signed in through /client/login. */
       isClient: boolean
-      /** The workgroup a client account belongs to; unset for team members. */
-      workgroupId?: string
     } & DefaultSession["user"]
   }
 
@@ -18,7 +16,6 @@ declare module "next-auth" {
     isAdmin: boolean
     isTechnicalDeputy: boolean
     isClient?: boolean
-    workgroupId?: string
   }
 }
 
@@ -28,6 +25,5 @@ declare module "next-auth/jwt" {
     isAdmin: boolean
     isTechnicalDeputy: boolean
     isClient?: boolean
-    workgroupId?: string
   }
 }

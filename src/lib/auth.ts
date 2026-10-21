@@ -58,7 +58,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     // Brand-side contacts. A separate provider (rather than a flag on `User`)
     // keeps client credentials in their own table, so a client can never be
-    // granted a team role or an admin flag by mistake.
+    // granted a team role or an admin flag by mistake. The session carries no
+    // workgroup: one login may cover several brands, and which brands those
+    // are is read live from the database on every request.
     Credentials({
       id: "client-credentials",
       name: "Client",
@@ -101,7 +103,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             isAdmin: false,
             isTechnicalDeputy: false,
             isClient: true,
-            workgroupId: client.workgroupId,
           }
         } catch (error) {
           console.error("Client auth error:", error)
@@ -117,7 +118,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.isAdmin = user.isAdmin
         token.isTechnicalDeputy = user.isTechnicalDeputy
         token.isClient = user.isClient ?? false
-        token.workgroupId = user.workgroupId
       }
       return token
     },
@@ -128,7 +128,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.isTechnicalDeputy = token.isTechnicalDeputy as boolean
         // Older sessions issued before client accounts existed carry no flag.
         session.user.isClient = (token.isClient as boolean | undefined) ?? false
-        session.user.workgroupId = token.workgroupId as string | undefined
       }
       return session
     },

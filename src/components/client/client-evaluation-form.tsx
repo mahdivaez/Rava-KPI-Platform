@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { Fragment, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -37,6 +37,8 @@ import type { TeamRole } from "@/lib/roles"
 
 export interface ClientFormTarget {
   key: string
+  brandId: string
+  brandName: string
   userId: string
   firstName: string
   lastName: string
@@ -57,14 +59,20 @@ const emptyEntry = (): EntryState => ({ skipped: false, scores: {}, answers: {} 
  * A single submit is deliberate — the client answers once a month, and a
  * per-person save would turn one sitting into a dozen round trips. Sections
  * already filed for this period never reach this component.
+ *
+ * A client who owns several brands gets them all in this one form, split by
+ * brand heading: the same strategist may appear under two brands, and the two
+ * sections are two independent verdicts.
  */
 export function ClientEvaluationForm({
   targets,
+  showBrandHeadings = false,
   periodLabel,
   month,
   year,
 }: {
   targets: ClientFormTarget[]
+  showBrandHeadings?: boolean
   periodLabel: string
   month: number
   year: number
@@ -118,6 +126,17 @@ export function ClientEvaluationForm({
     ? (completion.done / completion.total) * 100
     : 0
 
+  /** How many people each brand contributes, and where each one sits in it. */
+  const { brandCounts, brandPositions } = useMemo(() => {
+    const counts: Record<string, number> = {}
+    const positions: Record<string, number> = {}
+    for (const target of targets) {
+      counts[target.brandId] = (counts[target.brandId] ?? 0) + 1
+      positions[target.key] = counts[target.brandId]
+    }
+    return { brandCounts: counts, brandPositions: positions }
+  }, [targets])
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
@@ -128,8 +147,11 @@ export function ClientEvaluationForm({
       const kpi = getClientRoleKpi(target.role)
       const missing = kpi?.metrics.find((m) => !entry.scores[m.key])
       if (missing) {
+        const who = `${target.firstName} ${target.lastName}`
         toast.error(
-          `امتیاز «${missing.title}» برای ${target.firstName} ${target.lastName} وارد نشده است`
+          showBrandHeadings
+            ? `امتیاز «${missing.title}» برای ${who} (${target.brandName}) وارد نشده است`
+            : `امتیاز «${missing.title}» برای ${who} وارد نشده است`
         )
         document
           .getElementById(`section-${target.key}`)
@@ -150,6 +172,7 @@ export function ClientEvaluationForm({
           entries: targets.map((target) => {
             const entry = entryOf(target.key)
             return {
+              brandId: target.brandId,
               targetId: target.userId,
               targetRole: target.role,
               skipped: entry.skipped,
@@ -208,115 +231,131 @@ export function ClientEvaluationForm({
 
         const entry = entryOf(target.key)
         const fullName = `${target.firstName} ${target.lastName}`
+        const firstOfBrand =
+          index === 0 || targets[index - 1].brandId !== target.brandId
 
         return (
-          <Card key={target.key} id={`section-${target.key}`} className="scroll-mt-32">
-            <CardHeader>
-              <CardTitle className="flex flex-wrap items-center gap-2.5">
-                <span
-                  data-numeric
-                  aria-hidden
-                  className="grid size-6 shrink-0 place-items-center rounded-md bg-surface-sunken text-xs font-bold text-foreground-muted"
-                >
-                  {faNumber(index + 1)}
+          <Fragment key={target.key}>
+            {/* Which brand these sections are about. */}
+            {showBrandHeadings && firstOfBrand && (
+              <div className="flex items-center gap-3 pt-2">
+                <h2 className="font-display text-lg font-bold text-foreground">
+                  {target.brandName}
+                </h2>
+                <span aria-hidden className="h-px flex-1 bg-border" />
+                <span data-numeric className="shrink-0 text-xs text-foreground-muted">
+                  {faNumber(brandCounts[target.brandId] ?? 0)} نفر
                 </span>
-                {fullName}
-                <RoleBadge role={target.role} size="sm" />
-              </CardTitle>
-              <CardDescription>
-                امتیاز {faNumber(SCORE_MIN)} تا {faNumber(SCORE_MAX)} — اگر در این
-                ماه تعامل کافی نداشته‌اید، گزینه زیر را انتخاب کنید.
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-5">
-              <div className="rounded-xl border border-border bg-surface-sunken p-1.5">
-                <CheckboxField
-                  id={`skip-${target.key}`}
-                  label={SKIP_LABEL}
-                  hint={SKIP_HINT}
-                  checked={entry.skipped}
-                  onChange={(e) => toggleSkip(target.key, e.target.checked)}
-                />
               </div>
+            )}
+            <Card id={`section-${target.key}`} className="scroll-mt-32">
+              <CardHeader>
+                <CardTitle className="flex flex-wrap items-center gap-2.5">
+                  <span
+                    data-numeric
+                    aria-hidden
+                    className="grid size-6 shrink-0 place-items-center rounded-md bg-surface-sunken text-xs font-bold text-foreground-muted"
+                  >
+                    {faNumber(brandPositions[target.key] ?? index + 1)}
+                  </span>
+                  {fullName}
+                  <RoleBadge role={target.role} size="sm" />
+                </CardTitle>
+                <CardDescription>
+                  امتیاز {faNumber(SCORE_MIN)} تا {faNumber(SCORE_MAX)} — اگر در این
+                  ماه تعامل کافی نداشته‌اید، گزینه زیر را انتخاب کنید.
+                </CardDescription>
+              </CardHeader>
 
-              {entry.skipped ? (
-                <p className="flex items-center gap-2 rounded-xl bg-muted px-4 py-3 text-sm text-foreground-secondary">
-                  <CheckCircle2 className="size-4 shrink-0" aria-hidden />
-                  برای {fullName} امتیازی ثبت نمی‌شود.
-                </p>
-              ) : (
-                <>
-                  {/* The four rated questions. */}
-                  <div className="space-y-4">
-                    {kpi.metrics.map((metric, metricIndex) => (
-                      <fieldset
-                        key={metric.key}
-                        className="rounded-xl border border-border bg-surface-sunken p-4 sm:p-5"
-                      >
-                        <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
-                          <legend className="contents">
-                            <div className="min-w-0 lg:w-[40%]">
-                              <p className="flex items-start gap-2 font-semibold text-foreground">
-                                <span
-                                  data-numeric
-                                  aria-hidden
-                                  className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-md bg-surface text-2xs font-bold text-foreground-muted"
-                                >
-                                  {faNumber(metricIndex + 1)}
-                                </span>
-                                {metric.title}
-                              </p>
-                              <p className="mt-1.5 text-sm leading-relaxed text-foreground-muted">
-                                {metric.question}
-                              </p>
+              <CardContent className="space-y-5">
+                <div className="rounded-xl border border-border bg-surface-sunken p-1.5">
+                  <CheckboxField
+                    id={`skip-${target.key}`}
+                    label={SKIP_LABEL}
+                    hint={SKIP_HINT}
+                    checked={entry.skipped}
+                    onChange={(e) => toggleSkip(target.key, e.target.checked)}
+                  />
+                </div>
+
+                {entry.skipped ? (
+                  <p className="flex items-center gap-2 rounded-xl bg-muted px-4 py-3 text-sm text-foreground-secondary">
+                    <CheckCircle2 className="size-4 shrink-0" aria-hidden />
+                    برای {fullName} امتیازی ثبت نمی‌شود.
+                  </p>
+                ) : (
+                  <>
+                    {/* The four rated questions. */}
+                    <div className="space-y-4">
+                      {kpi.metrics.map((metric, metricIndex) => (
+                        <fieldset
+                          key={metric.key}
+                          className="rounded-xl border border-border bg-surface-sunken p-4 sm:p-5"
+                        >
+                          <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+                            <legend className="contents">
+                              <div className="min-w-0 lg:w-[40%]">
+                                <p className="flex items-start gap-2 font-semibold text-foreground">
+                                  <span
+                                    data-numeric
+                                    aria-hidden
+                                    className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-md bg-surface text-2xs font-bold text-foreground-muted"
+                                  >
+                                    {faNumber(metricIndex + 1)}
+                                  </span>
+                                  {metric.title}
+                                </p>
+                                <p className="mt-1.5 text-sm leading-relaxed text-foreground-muted">
+                                  {metric.question}
+                                </p>
+                              </div>
+                            </legend>
+
+                            <div className="min-w-0 flex-1">
+                              <ScoreScale
+                                name={`${target.key}-${metric.key}`}
+                                label={`${metric.title} — ${fullName}`}
+                                value={entry.scores[metric.key]}
+                                onChange={(value) =>
+                                  setScore(target.key, metric.key, value)
+                                }
+                              />
                             </div>
-                          </legend>
-
-                          <div className="min-w-0 flex-1">
-                            <ScoreScale
-                              name={`${target.key}-${metric.key}`}
-                              label={`${metric.title} — ${fullName}`}
-                              value={entry.scores[metric.key]}
-                              onChange={(value) =>
-                                setScore(target.key, metric.key, value)
-                              }
-                            />
                           </div>
-                        </div>
-                      </fieldset>
-                    ))}
-                  </div>
+                        </fieldset>
+                      ))}
+                    </div>
 
-                  {/* Open questions. */}
-                  <div className="space-y-4 border-t border-border pt-5">
-                    <p className="text-sm font-semibold text-foreground">
-                      نظر تشریحی{" "}
-                      <span className="font-normal text-foreground-subtle">
-                        (اختیاری)
-                      </span>
-                    </p>
-                    {kpi.questions.map((question) => (
-                      <div key={question.key} className="space-y-2">
-                        <Label htmlFor={`${target.key}-${question.key}`}>
-                          {question.question}
-                        </Label>
-                        <Textarea
-                          id={`${target.key}-${question.key}`}
-                          rows={3}
-                          value={entry.answers[question.key] ?? ""}
-                          onChange={(e) =>
-                            setAnswer(target.key, question.key, e.target.value)
-                          }
-                          placeholder="اگر نکته‌ای هست بنویسید…"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                    {/* Open questions. */}
+                    <div className="space-y-4 border-t border-border pt-5">
+                      <p className="text-sm font-semibold text-foreground">
+                        نظر تشریحی{" "}
+                        <span className="font-normal text-foreground-subtle">
+                          (اختیاری)
+                        </span>
+                      </p>
+                      {kpi.questions.map((question) => (
+                        <div key={question.key} className="space-y-2">
+                          <Label htmlFor={`${target.key}-${question.key}`}>
+                            {question.question}
+                          </Label>
+                          <Textarea
+                            id={`${target.key}-${question.key}`}
+                            rows={3}
+                            value={entry.answers[question.key] ?? ""}
+                            onChange={(e) =>
+                              setAnswer(target.key, question.key, e.target.value)
+                            }
+                            placeholder="اگر نکته‌ای هست بنویسید…"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Fragment>
         )
       })}
 

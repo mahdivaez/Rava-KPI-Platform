@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -28,19 +29,30 @@ import {
   DEFAULT_WELCOME_MESSAGE,
   DEFAULT_WELCOME_TITLE,
   GREETING_TOKENS,
+  brandLabelOf,
   renderGreetingTemplate,
 } from "@/lib/client-greeting"
+import { faNumber } from "@/lib/design-tokens"
+
+/** One brand already on the account. */
+export interface ClientBrandFormValues {
+  id: string
+  brandName: string
+  workgroupId: string
+  workgroupName: string
+  /** Verdicts filed under this brand — removing it takes them along. */
+  evaluationCount: number
+}
 
 export interface ClientAccountFormValues {
   id: string
   email: string
   contactName: string
-  brandName: string
   greetingName: string | null
-  workgroupId: string
   isActive: boolean
   welcomeTitle: string | null
   welcomeMessage: string | null
+  brands: ClientBrandFormValues[]
 }
 
 export interface WorkgroupOption {
@@ -48,14 +60,38 @@ export interface WorkgroupOption {
   name: string
 }
 
+/** A brand row being edited; `id` is absent until it has been saved once. */
+interface BrandDraft {
+  /** Local, stable across re-renders — new rows have no database id yet. */
+  rowKey: string
+  id?: string
+  brandName: string
+  workgroupId: string
+  evaluationCount: number
+}
+
+let draftCounter = 0
+function newDraft(): BrandDraft {
+  draftCounter += 1
+  return {
+    rowKey: `new-${draftCounter}`,
+    brandName: "",
+    workgroupId: "",
+    evaluationCount: 0,
+  }
+}
+
 /**
  * Create or edit a client account.
  *
  * Everything the client portal says to this client — except the Rava wordmark —
- * is set here: the brand headline, the contact line beneath it, the name the
+ * is set here: the brands they own, the contact line beneath them, the name the
  * greeting uses, and the two greeting sentences themselves. The preview renders
  * the header and the greeting exactly as the client will see them, so nobody
  * has to sign in as the client to check their own wording.
+ *
+ * One person may own several brands. They get one email and one password; each
+ * brand adds its own card to their dashboard and its own section to the form.
  */
 export function ClientAccountDialog({
   mode,
@@ -74,16 +110,43 @@ export function ClientAccountDialog({
   const [loading, setLoading] = useState(false)
 
   const [contactName, setContactName] = useState(client?.contactName ?? "")
-  const [brandName, setBrandName] = useState(client?.brandName ?? "")
   const [greetingName, setGreetingName] = useState(client?.greetingName ?? "")
-  const [workgroupId, setWorkgroupId] = useState(client?.workgroupId ?? "")
   const [welcomeTitle, setWelcomeTitle] = useState(client?.welcomeTitle ?? "")
   const [welcomeMessage, setWelcomeMessage] = useState(client?.welcomeMessage ?? "")
+  const [brands, setBrands] = useState<BrandDraft[]>(() =>
+    client?.brands.length
+      ? client.brands.map((brand) => ({
+          rowKey: brand.id,
+          id: brand.id,
+          brandName: brand.brandName,
+          workgroupId: brand.workgroupId,
+          evaluationCount: brand.evaluationCount,
+        }))
+      : [newDraft()]
+  )
+
+  function updateBrand(rowKey: string, patch: Partial<BrandDraft>) {
+    setBrands((prev) =>
+      prev.map((brand) => (brand.rowKey === rowKey ? { ...brand, ...patch } : brand))
+    )
+  }
+
+  function removeBrand(brand: BrandDraft) {
+    // Deleting a brand deletes its history with it; say so before it happens.
+    if (brand.evaluationCount > 0) {
+      const warning = `حذف «${brand.brandName}» ${faNumber(
+        brand.evaluationCount
+      )} ارزیابی ثبت‌شده این برند را هم پاک می‌کند. ادامه می‌دهید؟`
+      if (!confirm(warning)) return
+    }
+    setBrands((prev) => prev.filter((b) => b.rowKey !== brand.rowKey))
+  }
 
   // Placeholders stand in for empty fields so the preview never collapses.
+  const brandNames = brands.map((brand) => brand.brandName.trim()).filter(Boolean)
   const previewSource = {
     contactName: contactName.trim() || "نام مخاطب",
-    brandName: brandName.trim() || "نام برند",
+    brandNames: brandNames.length ? brandNames : ["نام برند"],
     greetingName: greetingName.trim(),
   }
   const previewTitle = renderGreetingTemplate(
@@ -95,12 +158,30 @@ export function ClientAccountDialog({
     previewSource
   )
 
+  /** Workgroups still free to pick, plus whatever this row already holds. */
+  function availableWorkgroups(rowKey: string) {
+    const taken = new Set(
+      brands.filter((b) => b.rowKey !== rowKey).map((b) => b.workgroupId)
+    )
+    return workgroups.filter((w) => !taken.has(w.id))
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if (!workgroupId) {
-      toast.error("لطفاً کارگروه را انتخاب کنید")
+    if (brands.length === 0) {
+      toast.error("حداقل یک برند لازم است")
       return
+    }
+    for (const brand of brands) {
+      if (!brand.brandName.trim()) {
+        toast.error("نام هر برند را بنویسید")
+        return
+      }
+      if (!brand.workgroupId) {
+        toast.error(`کارگروه «${brand.brandName.trim()}» را انتخاب کنید`)
+        return
+      }
     }
 
     const formData = new FormData(e.currentTarget)
@@ -120,9 +201,12 @@ export function ClientAccountDialog({
     const payload: Record<string, unknown> = {
       email: String(formData.get("email") ?? "").trim(),
       contactName: contactName.trim(),
-      brandName: brandName.trim(),
       greetingName,
-      workgroupId,
+      brands: brands.map((brand) => ({
+        ...(brand.id ? { id: brand.id } : {}),
+        brandName: brand.brandName.trim(),
+        workgroupId: brand.workgroupId,
+      })),
       isActive: formData.get("isActive") === "on",
       welcomeTitle,
       welcomeMessage,
@@ -163,42 +247,27 @@ export function ClientAccountDialog({
             {mode === "create" ? "حساب مشتری جدید" : "ویرایش حساب مشتری"}
           </DialogTitle>
           <DialogDescription>
-            مشتری با این حساب وارد /client/login می‌شود و فقط اعضای کارگروه
-            انتخاب‌شده را ارزیابی می‌کند. هر متنی که در داشبورد او دیده می‌شود،
-            از همین‌جا تعیین می‌شود.
+            مشتری با این حساب وارد /client/login می‌شود و اعضای کارگروه هر برند
+            خود را ارزیابی می‌کند. هر متنی که در داشبورد او دیده می‌شود، از
+            همین‌جا تعیین می‌شود.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* The three names, each with its own home in the portal. */}
+          {/* The names, each with its own home in the portal. */}
           <div className="space-y-4 rounded-xl border border-border bg-surface-sunken p-4">
             <div>
               <p className="text-sm font-semibold text-foreground">
                 نام‌هایی که مشتری می‌بیند
               </p>
               <p className="mt-1 text-xs leading-relaxed text-foreground-muted">
-                سه جای مختلف، سه نام مجزا — هرکدام را همان‌طور که باید خوانده
-                شود بنویسید.
+                هرکدام را همان‌طور که باید خوانده شود بنویسید — نام برند بالای
+                صفحه می‌آید، نام مخاطب ریز زیر آن، و نام خودمانی فقط در جمله
+                خوش‌آمد.
               </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="ca-brandName">
-                  نام برند <RequiredMark />
-                </Label>
-                <Input
-                  id="ca-brandName"
-                  value={brandName}
-                  onChange={(e) => setBrandName(e.target.value)}
-                  placeholder="کلینیک گیتا"
-                  required
-                />
-                <p className="text-xs text-foreground-muted">
-                  خط اول بالای صفحه، کنار لوگو
-                </p>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="ca-contactName">
                   نام مخاطب <RequiredMark />
@@ -215,7 +284,7 @@ export function ClientAccountDialog({
                 </p>
               </div>
 
-              <div className="space-y-2 sm:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="ca-greetingName">نام در خوش‌آمدگویی</Label>
                 <Input
                   id="ca-greetingName"
@@ -224,11 +293,99 @@ export function ClientAccountDialog({
                   placeholder="بیتا"
                 />
                 <p className="text-xs text-foreground-muted">
-                  فقط برای جمله خوش‌آمد، جایی که «جان» صمیمی‌ترش می‌کند. خالی
-                  بگذارید تا همان نام مخاطب استفاده شود.
+                  جایی که «جان» صمیمی‌ترش می‌کند. خالی بگذارید تا همان نام مخاطب
+                  استفاده شود.
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* The brands this one login covers. */}
+          <div className="space-y-4 rounded-xl border border-border bg-surface-sunken p-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                برندهای این حساب
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-foreground-muted">
+                یک نفر می‌تواند چند برند داشته باشد؛ با همین یک ایمیل و رمز،
+                ارزیابی همه را در یک نشست ثبت می‌کند. هر برند به یک کارگروه وصل
+                می‌شود و هر کارگروه فقط یک بار.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {brands.map((brand, index) => (
+                <div
+                  key={brand.rowKey}
+                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3 sm:flex-row sm:items-start"
+                >
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor={`ca-brandName-${brand.rowKey}`}>
+                      نام برند <RequiredMark />
+                    </Label>
+                    <Input
+                      id={`ca-brandName-${brand.rowKey}`}
+                      value={brand.brandName}
+                      onChange={(e) =>
+                        updateBrand(brand.rowKey, { brandName: e.target.value })
+                      }
+                      placeholder={index === 0 ? "کلینیک گیتا" : "برند دوم"}
+                    />
+                  </div>
+
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor={`ca-workgroup-${brand.rowKey}`}>
+                      کارگروه <RequiredMark />
+                    </Label>
+                    <Select
+                      value={brand.workgroupId}
+                      onValueChange={(value) =>
+                        updateBrand(brand.rowKey, { workgroupId: value })
+                      }
+                    >
+                      <SelectTrigger id={`ca-workgroup-${brand.rowKey}`}>
+                        <SelectValue placeholder="انتخاب کنید" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableWorkgroups(brand.rowKey).map((w) => (
+                          <SelectItem key={w.id} value={w.id}>
+                            {w.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {brand.evaluationCount > 0 && (
+                      <p data-numeric className="text-xs text-foreground-muted">
+                        {faNumber(brand.evaluationCount)} ارزیابی ثبت‌شده
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="self-end sm:mt-7"
+                    aria-label={`حذف برند ${brand.brandName || index + 1}`}
+                    disabled={brands.length === 1}
+                    onClick={() => removeBrand(brand)}
+                  >
+                    <Trash2 aria-hidden />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={brands.length >= workgroups.length}
+              onClick={() => setBrands((prev) => [...prev, newDraft()])}
+            >
+              <Plus aria-hidden />
+              افزودن برند
+            </Button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -263,24 +420,6 @@ export function ClientAccountDialog({
                 }
                 required={mode === "create"}
               />
-            </div>
-
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="ca-workgroup">
-                کارگروه <RequiredMark />
-              </Label>
-              <Select value={workgroupId} onValueChange={setWorkgroupId}>
-                <SelectTrigger id="ca-workgroup">
-                  <SelectValue placeholder="انتخاب کنید" />
-                </SelectTrigger>
-                <SelectContent>
-                  {workgroups.map((w) => (
-                    <SelectItem key={w.id} value={w.id}>
-                      {w.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
@@ -340,7 +479,7 @@ export function ClientAccountDialog({
                 <span aria-hidden className="h-5 w-px shrink-0 bg-border" />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold leading-tight text-foreground">
-                    {previewSource.brandName}
+                    {brandLabelOf(previewSource)}
                   </span>
                   <span className="block truncate text-xs leading-tight text-foreground-muted">
                     {previewSource.contactName}

@@ -5,6 +5,7 @@ import { LogOut } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ThemeToggleCompact } from "@/components/theme/theme-toggle"
+import { brandLabelOf } from "@/lib/client-greeting"
 
 /**
  * Chrome for the client portal.
@@ -12,18 +13,23 @@ import { ThemeToggleCompact } from "@/components/theme/theme-toggle"
  * Deliberately thinner than the internal dashboard: a client has exactly one
  * job here, so there is no sidebar, no navigation tree and no counters —
  * just who they are signed in as and a way out.
+ *
+ * An owner of two brands sees both named in the header, because the one thing
+ * they must never wonder is which brand this login is for.
  */
 export function ClientShell({
   contactName,
-  brandName,
+  brandNames,
   signOutAction,
   children,
 }: {
   contactName: string
-  brandName: string
+  brandNames: string[]
   signOutAction: () => Promise<void>
   children: React.ReactNode
 }) {
+  const brandLabel = brandLabelOf({ brandNames })
+
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="sticky top-0 z-sticky border-b border-border bg-surface/85 backdrop-blur">
@@ -38,7 +44,7 @@ export function ClientShell({
             />
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold leading-tight text-foreground">
-                {brandName}
+                {brandLabel}
               </span>
               <span className="block truncate text-xs leading-tight text-foreground-muted">
                 {contactName}

@@ -22,7 +22,7 @@ export default async function ClientPortalLayout({
       </a>
       <ClientShell
         contactName={client.contactName}
-        brandName={client.brandName}
+        brandNames={client.brands.map((brand) => brand.brandName)}
         signOutAction={handleClientSignOut}
       >
         {children}

@@ -182,7 +182,7 @@ export async function getClientEvaluationRecords(): Promise<ClientEvalRecord[]> 
   if (!prisma) return []
 
   const rows = await prisma.clientEvaluation.findMany({
-    include: { target: true, client: true, workgroup: true },
+    include: { target: true, client: true, brand: true, workgroup: true },
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
   })
 
@@ -209,7 +209,7 @@ export async function getClientEvaluationRecords(): Promise<ClientEvalRecord[]> 
         targetRole,
         clientId: row.clientId,
         clientName: row.client.contactName,
-        brandName: row.client.brandName,
+        brandName: row.brand.brandName,
         workgroupId: row.workgroupId,
         workgroupName: row.workgroup.name,
         month: row.month,

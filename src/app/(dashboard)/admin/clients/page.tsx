@@ -33,7 +33,13 @@ export default async function AdminClientsPage() {
   const [accounts, workgroups, evaluations] = await Promise.all([
     prisma.clientAccount.findMany({
       include: {
-        workgroup: { select: { name: true } },
+        brands: {
+          include: {
+            workgroup: { select: { name: true } },
+            _count: { select: { evaluations: true } },
+          },
+          orderBy: { createdAt: "asc" },
+        },
         _count: { select: { evaluations: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -46,7 +52,8 @@ export default async function AdminClientsPage() {
     prisma.clientEvaluation.findMany({
       include: {
         target: { select: { firstName: true, lastName: true } },
-        client: { select: { contactName: true, brandName: true } },
+        client: { select: { contactName: true } },
+        brand: { select: { brandName: true } },
         workgroup: { select: { name: true } },
       },
       orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
@@ -57,13 +64,17 @@ export default async function AdminClientsPage() {
     id: account.id,
     email: account.email,
     contactName: account.contactName,
-    brandName: account.brandName,
     greetingName: account.greetingName,
-    workgroupId: account.workgroupId,
     isActive: account.isActive,
     welcomeTitle: account.welcomeTitle,
     welcomeMessage: account.welcomeMessage,
-    workgroupName: account.workgroup.name,
+    brands: account.brands.map((brand) => ({
+      id: brand.id,
+      brandName: brand.brandName,
+      workgroupId: brand.workgroupId,
+      workgroupName: brand.workgroup.name,
+      evaluationCount: brand._count.evaluations,
+    })),
     evaluationCount: account._count.evaluations,
   }))
 
@@ -79,7 +90,7 @@ export default async function AdminClientsPage() {
     targetName: `${row.target.firstName} ${row.target.lastName}`,
     targetRole: row.targetRole as TeamRole,
     clientName: row.client.contactName,
-    brandName: row.client.brandName,
+    brandName: row.brand.brandName,
     workgroupName: row.workgroup.name,
   }))
 
@@ -112,7 +123,7 @@ export default async function AdminClientsPage() {
               <CardTitle>حساب‌های مشتری</CardTitle>
               <CardDescription>
                 مشتری از طریق <span dir="ltr">/client/login</span> وارد می‌شود و
-                فقط اعضای کارگروه خودش را ارزیابی می‌کند.
+                با همین یک حساب، تیم همه برندهای خودش را ارزیابی می‌کند.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-0 pb-0 sm:px-0">

@@ -25,7 +25,7 @@ import { resolveClientGreeting } from "@/lib/client-greeting"
 import { faNumber } from "@/lib/design-tokens"
 
 export interface ClientAccountRow extends ClientAccountFormValues {
-  workgroupName: string
+  /** Across every brand on the account. */
   evaluationCount: number
 }
 
@@ -41,7 +41,7 @@ export function ClientAccountsTable({
 
   async function handleDelete(client: ClientAccountRow) {
     const warning = client.evaluationCount
-      ? `حذف «${client.contactName}» ${faNumber(client.evaluationCount)} ارزیابی ثبت‌شده او را هم پاک می‌کند. ادامه می‌دهید؟`
+      ? `حذف «${client.contactName}» ${faNumber(client.evaluationCount)} ارزیابی ثبت‌شده او را در همه برندهایش پاک می‌کند. ادامه می‌دهید؟`
       : `آیا از حذف حساب «${client.contactName}» اطمینان دارید؟`
 
     if (!confirm(warning)) return
@@ -80,7 +80,7 @@ export function ClientAccountsTable({
           <TableHeader>
             <TableRow>
               <TableHead>مخاطب</TableHead>
-              <TableHead>کارگروه</TableHead>
+              <TableHead>برندها</TableHead>
               <TableHead>متن داشبورد</TableHead>
               <TableHead>ارزیابی‌ها</TableHead>
               <TableHead>وضعیت</TableHead>
@@ -89,7 +89,10 @@ export function ClientAccountsTable({
           </TableHeader>
           <TableBody>
             {clients.map((client) => {
-              const greeting = resolveClientGreeting(client)
+              const greeting = resolveClientGreeting({
+                ...client,
+                brandNames: client.brands.map((brand) => brand.brandName),
+              })
               return (
                 <TableRow key={client.id}>
                   <TableCell>
@@ -107,14 +110,19 @@ export function ClientAccountsTable({
                   </TableCell>
 
                   <TableCell>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm text-foreground">
-                        {client.workgroupName}
-                      </p>
-                      <p className="truncate text-xs text-foreground-muted">
-                        برند: {client.brandName}
-                      </p>
-                    </div>
+                    {/* One row per brand: the brand, and the team behind it. */}
+                    <ul className="min-w-0 space-y-1">
+                      {client.brands.map((brand) => (
+                        <li key={brand.id} className="min-w-0">
+                          <p className="truncate text-sm text-foreground">
+                            {brand.brandName}
+                          </p>
+                          <p className="truncate text-xs text-foreground-muted">
+                            {brand.workgroupName}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
                   </TableCell>
 
                   <TableCell className="max-w-[22rem]">

@@ -6,6 +6,9 @@
  * contact line under it («دکتر بیتا مجیدزاده»), and the greeting, where a
  * short first name plus «جان» is the whole point («بیتا جان، خوش آمدی»).
  *
+ * The greeting belongs to the person, not to a brand — one owner of two
+ * clinics is greeted once — so `{brand}` lists every brand they hold.
+ *
  * Title and message are admin-authored templates. Whatever the admin writes is
  * what the client reads; leaving a field empty falls back to the default
  * sentence, so an account nobody has customised still greets properly.
@@ -13,7 +16,8 @@
 
 export interface GreetingSource {
   contactName: string
-  brandName: string
+  /** Every brand this account speaks for, in portal order. */
+  brandNames: string[]
   greetingName?: string | null
   welcomeTitle?: string | null
   welcomeMessage?: string | null
@@ -30,7 +34,7 @@ export const DEFAULT_WELCOME_MESSAGE =
 export const GREETING_TOKENS = [
   { token: "{name}", label: "نام خودمانی (یا نام مخاطب)" },
   { token: "{contact}", label: "نام کامل مخاطب" },
-  { token: "{brand}", label: "نام برند" },
+  { token: "{brand}", label: "نام برند (چند برند با «و» کنار هم)" },
 ] as const
 
 /** The name the greeting uses: the warm form when set, else the full one. */
@@ -38,12 +42,17 @@ export function greetingNameOf(source: GreetingSource) {
   return (source.greetingName ?? "").trim() || source.contactName.trim()
 }
 
+/** What `{brand}` becomes: «کلینیک گیتا» alone, or «کلینیک گیتا و رستوران نار». */
+export function brandLabelOf(source: Pick<GreetingSource, "brandNames">) {
+  return source.brandNames.map((name) => name.trim()).filter(Boolean).join(" و ")
+}
+
 /** Substitute `{name}`, `{contact}` and `{brand}` into an authored sentence. */
 export function renderGreetingTemplate(template: string, source: GreetingSource) {
   const replacements: Record<string, string> = {
     "{name}": greetingNameOf(source),
     "{contact}": source.contactName.trim(),
-    "{brand}": source.brandName.trim(),
+    "{brand}": brandLabelOf(source),
   }
 
   return template
