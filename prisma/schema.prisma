@@ -85,7 +85,7 @@ model Workgroup {
   writerEvaluations  WriterEvaluation[]
   writerFeedbacks    WriterFeedback[]
   roleEvaluations    RoleEvaluation[]
-  clientAccounts     ClientAccount[]
+  clientBrands       ClientBrand[]
   clientEvaluations  ClientEvaluation[]
 
   @@index([name])
@@ -306,9 +306,13 @@ model Message {
 }
 
 /// A brand-side contact who logs in through /client/login and rates the team
-/// members working on their workgroup. Kept out of `User` on purpose: clients
+/// members working on their brands. Kept out of `User` on purpose: clients
 /// never hold a WorkgroupRole, never appear in the team evaluation matrix and
 /// must not reach the internal dashboard.
+///
+/// One person, one password — however many brands they own. The brands
+/// themselves live in `ClientBrand`, so an owner of two clinics files both
+/// months from a single login instead of juggling two accounts.
 model ClientAccount {
   id       String  @id @default(cuid())
   email    String  @unique
@@ -317,31 +321,53 @@ model ClientAccount {
   /// The person who signs in, written out in full — the small line under the
   /// brand in the portal header, e.g. «دکتر بیتا مجیدزاده».
   contactName String
-  /// The brand this account speaks for — the headline of the portal header,
-  /// e.g. «کلینیک گیتا».
-  brandName   String
   /// What the greeting calls them, when a shorter, warmer form reads better
   /// than the full contact name, e.g. «بیتا» for «بیتا جان، خوش آمدی».
   /// Falls back to `contactName` when empty.
   greetingName String?
 
-  workgroupId String
-  isActive    Boolean @default(true)
+  isActive Boolean @default(true)
 
   /// Admin-authored dashboard greeting. `{name}`, `{contact}` and `{brand}`
   /// are substituted at render time; both fall back to a default sentence
-  /// when empty.
+  /// when empty. The greeting speaks to the person, not to one brand, so it
+  /// stays here and `{brand}` lists whatever brands they hold.
   welcomeTitle    String?
   welcomeMessage  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  brands      ClientBrand[]
+  evaluations ClientEvaluation[]
+
+  @@index([email])
+}
+
+/// One brand a client account speaks for, bound to the workgroup that serves
+/// it. A client with two brands answers the same questions twice — once per
+/// brand — because the team's work differs per brand even when the people
+/// overlap.
+model ClientBrand {
+  id       String @id @default(cuid())
+  clientId String
+
+  /// The headline of the portal header for this brand, e.g. «کلینیک گیتا».
+  brandName   String
+  workgroupId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client      ClientAccount      @relation(fields: [clientId], references: [id], onDelete: Cascade)
   workgroup   Workgroup          @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
   evaluations ClientEvaluation[]
 
+  /// One brand per workgroup per account: two brands served by the same
+  /// workgroup would ask the client the same questions twice over.
+  @@unique([clientId, workgroupId])
+  @@index([clientId])
   @@index([workgroupId])
-  @@index([email])
 }
 
 /// One client's monthly verdict on one team member in one role.
@@ -350,6 +376,8 @@ model ClientAccount {
 model ClientEvaluation {
   id          String        @id @default(cuid())
   clientId    String
+  /// Which of the client's brands this verdict is about.
+  brandId     String
   workgroupId String
   targetId    String
   targetRole  WorkgroupRole
@@ -371,11 +399,13 @@ model ClientEvaluation {
   updatedAt DateTime @updatedAt
 
   client    ClientAccount @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  brand     ClientBrand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
   workgroup Workgroup     @relation(fields: [workgroupId], references: [id], onDelete: Cascade)
   target    User          @relation("ClientEvaluationTarget", fields: [targetId], references: [id], onDelete: Cascade)
 
-  @@unique([clientId, targetId, targetRole, month, year], map: "ClientEvaluation_unique_per_period")
+  @@unique([clientId, brandId, targetId, targetRole, month, year], map: "ClientEvaluation_unique_per_period")
   @@index([clientId])
+  @@index([brandId])
   @@index([targetId])
   @@index([workgroupId])
   @@index([month, year])

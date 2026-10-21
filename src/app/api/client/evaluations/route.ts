@@ -3,16 +3,20 @@ import { z } from "zod"
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { TEAM_ROLES, isTeamRole, type TeamRole } from "@/lib/roles"
+import { TEAM_ROLES, type TeamRole } from "@/lib/roles"
 import {
-  isClientEvaluableRole,
   pickClientAnswers,
   summarizeClientScores,
   validateClientScores,
 } from "@/lib/client-kpis"
-import { currentPersianPeriod, targetKey } from "@/lib/client-evaluations"
+import {
+  currentPersianPeriod,
+  getClientBoards,
+  targetKey,
+} from "@/lib/client-evaluations"
 
 const entrySchema = z.object({
+  brandId: z.string().min(1),
   targetId: z.string().min(1),
   targetRole: z.enum(TEAM_ROLES),
   skipped: z.boolean().default(false),
@@ -33,6 +37,9 @@ const payloadSchema = z.object({
  * a client never ends up with half a month recorded. Rows already submitted
  * for the period are rejected rather than silently overwritten — a client
  * revises by asking the admin, not by resubmitting.
+ *
+ * One request may span several brands: an owner of two clinics files both in
+ * a single sitting, and every entry names the brand it belongs to.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -47,6 +54,12 @@ export async function POST(req: NextRequest) {
 
     const client = await prisma.clientAccount.findUnique({
       where: { id: session.user.id },
+      include: {
+        brands: {
+          include: { workgroup: { select: { id: true, name: true } } },
+          orderBy: { createdAt: "asc" },
+        },
+      },
     })
 
     if (!client || !client.isActive) {
@@ -65,26 +78,26 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Everyone in the payload must really hold that role in this workgroup.
-    const memberships = await prisma.workgroupMember.findMany({
-      where: { workgroupId: client.workgroupId },
-    })
-    const validTargets = new Set(
-      memberships
-        .filter((m) => isTeamRole(m.role) && isClientEvaluableRole(m.role))
-        .map((m) => targetKey(m.userId, m.role))
+    // Everyone in the payload must really work on the brand they are filed
+    // under: the boards are built from the brands this account owns, so a
+    // forged brand id or a stranger's user id has nowhere to land.
+    const boards = await getClientBoards(
+      client.id,
+      client.brands,
+      period.month,
+      period.year
     )
-
-    const existing = await prisma.clientEvaluation.findMany({
-      where: { clientId: client.id, month: period.month, year: period.year },
-      select: { targetId: true, targetRole: true },
-    })
-    const alreadySubmitted = new Set(
-      existing.map((e) => targetKey(e.targetId, e.targetRole))
+    const workgroupOfBrand = new Map(boards.map((b) => [b.brandId, b.workgroupId]))
+    const validTargets = new Set(
+      boards.flatMap((board) => board.targets.map((t) => t.key))
+    )
+    const stillOpen = new Set(
+      boards.flatMap((board) => board.pending.map((t) => t.key))
     )
 
     const rows: Array<{
       clientId: string
+      brandId: string
       workgroupId: string
       targetId: string
       targetRole: TeamRole
@@ -100,15 +113,16 @@ export async function POST(req: NextRequest) {
     const seen = new Set<string>()
 
     for (const entry of parsed.entries) {
-      const key = targetKey(entry.targetId, entry.targetRole)
+      const key = targetKey(entry.brandId, entry.targetId, entry.targetRole)
+      const workgroupId = workgroupOfBrand.get(entry.brandId)
 
-      if (!validTargets.has(key)) {
+      if (!workgroupId || !validTargets.has(key)) {
         return NextResponse.json(
           { error: "یکی از افراد انتخاب‌شده عضو کارگروه شما نیست" },
           { status: 400 }
         )
       }
-      if (alreadySubmitted.has(key)) {
+      if (!stillOpen.has(key)) {
         return NextResponse.json(
           { error: "ارزیابی این ماه قبلاً ثبت شده است. صفحه را تازه کنید." },
           { status: 400 }
@@ -127,7 +141,8 @@ export async function POST(req: NextRequest) {
       if (entry.skipped) {
         rows.push({
           clientId: client.id,
-          workgroupId: client.workgroupId,
+          brandId: entry.brandId,
+          workgroupId,
           targetId: entry.targetId,
           targetRole: entry.targetRole,
           month: period.month,
@@ -150,7 +165,8 @@ export async function POST(req: NextRequest) {
 
       rows.push({
         clientId: client.id,
-        workgroupId: client.workgroupId,
+        brandId: entry.brandId,
+        workgroupId,
         targetId: entry.targetId,
         targetRole: entry.targetRole,
         month: period.month,
