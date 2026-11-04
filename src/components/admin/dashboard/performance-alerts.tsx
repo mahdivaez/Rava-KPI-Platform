@@ -46,12 +46,22 @@ interface UnevaluatedPerson {
 export function PerformanceAlerts({
   people,
   records,
+  previousRecords,
+  period,
+  previousPeriod,
   unevaluated,
 }: {
   people: PersonAggregate[]
+  /** Peer evaluations filed in the month the dashboard is showing. */
   records: EvalRecord[]
+  /** The month before it — the only thing a decline can be measured against. */
+  previousRecords: EvalRecord[]
+  period: { month: number; year: number }
+  previousPeriod: { month: number; year: number }
   unevaluated: UnevaluatedPerson[]
 }) {
+  const labelOf = (p: { month: number; year: number }) =>
+    `${PERSIAN_MONTHS[p.month - 1]} ${faYear(p.year)}`
   const rated = people.filter((p) => p.peerCount > 0)
 
   const lowScorers = rated
@@ -62,52 +72,25 @@ export function PerformanceAlerts({
     .filter((p) => p.peerAverage >= HIGH_SCORE)
     .slice(0, 8)
 
-  // Decline is measured between a person's two most recent periods, using peer
-  // scores only, so a single harsh self-evaluation cannot raise an alarm.
+  // Decline is the selected month against the one before it, peer scores only,
+  // so a single harsh self-evaluation cannot raise an alarm. Someone missing
+  // from either month has nothing to compare and raises nothing.
+  const peerAverageIn = (rows: EvalRecord[], person: PersonAggregate) => {
+    const theirs = rows.filter(
+      (r) => r.targetId === person.id && r.targetRole === person.role && !r.isSelf
+    )
+    if (!theirs.length) return null
+    return theirs.reduce((sum, r) => sum + r.average, 0) / theirs.length
+  }
+
   const declining = rated
     .map((person) => {
-      const theirs = records
-        .filter(
-          (r) =>
-            r.targetId === person.id && r.targetRole === person.role && !r.isSelf
-        )
-        .sort((a, b) =>
-          a.year !== b.year ? a.year - b.year : a.month - b.month
-        )
-
-      const periods = new Map<string, number[]>()
-      for (const record of theirs) {
-        const key = `${record.year}-${String(record.month).padStart(2, "0")}`
-        periods.set(key, [...(periods.get(key) ?? []), record.average])
-      }
-
-      const ordered = Array.from(periods.entries()).sort(([a], [b]) =>
-        a.localeCompare(b)
-      )
-      if (ordered.length < 2) return null
-
-      const avg = (values: number[]) =>
-        values.reduce((sum, v) => sum + v, 0) / values.length
-
-      const [prevKey, prevValues] = ordered[ordered.length - 2]
-      const [lastKey, lastValues] = ordered[ordered.length - 1]
-      const previous = avg(prevValues)
-      const latest = avg(lastValues)
-
+      const previous = peerAverageIn(previousRecords, person)
+      const latest = peerAverageIn(records, person)
+      if (previous === null || latest === null) return null
       if (previous - latest < DECLINE_DELTA) return null
 
-      const labelOf = (key: string) => {
-        const [year, month] = key.split("-").map(Number)
-        return `${PERSIAN_MONTHS[month - 1]} ${faYear(year)}`
-      }
-
-      return {
-        person,
-        previous,
-        latest,
-        previousLabel: labelOf(prevKey),
-        latestLabel: labelOf(lastKey),
-      }
+      return { person, previous, latest }
     })
     .filter((item): item is NonNullable<typeof item> => item !== null)
     .sort((a, b) => b.previous - b.latest - (a.previous - a.latest))
@@ -117,13 +100,13 @@ export function PerformanceAlerts({
       <AlertCard
         icon={<TrendingDown />}
         title="افت عملکرد"
-        description={`کاهش حداقل ${faNumber(DECLINE_DELTA)} نمره نسبت به دوره قبل`}
+        description={`کاهش حداقل ${faNumber(DECLINE_DELTA)} نمره نسبت به ${labelOf(previousPeriod)}`}
         count={declining.length}
         tone="danger"
         emptyTitle="افت قابل توجهی ثبت نشده"
-        emptyDescription="هیچ‌کس نسبت به دوره قبل افت معناداری نداشته است."
+        emptyDescription={`هیچ‌کس نسبت به ${labelOf(previousPeriod)} افت معناداری نداشته است.`}
       >
-        {declining.map(({ person, previous, latest, previousLabel, latestLabel }) => (
+        {declining.map(({ person, previous, latest }) => (
           <li
             key={`${person.id}-${person.role}`}
             className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface-sunken p-3"
@@ -134,7 +117,8 @@ export function PerformanceAlerts({
                 <RoleBadge role={person.role} size="sm" showDot={false} />
               </p>
               <p className="mt-0.5 text-xs text-foreground-subtle">
-                {previousLabel}: {faNumber(previous, 1)} ← {latestLabel}:{" "}
+                {labelOf(previousPeriod)}: {faNumber(previous, 1)} ←{" "}
+                {labelOf(period)}:{" "}
                 {faNumber(latest, 1)}
               </p>
             </div>
@@ -176,12 +160,12 @@ export function PerformanceAlerts({
 
       <AlertCard
         icon={<Clock />}
-        title="بدون ارزیابی"
-        description="اعضای فعالی که هنوز هیچ ارزیابی‌ای دریافت نکرده‌اند"
+        title="بدون ارزیابی در این ماه"
+        description="اعضای فعالی که در ماه انتخاب‌شده هیچ ارزیابی‌ای دریافت نکرده‌اند"
         count={unevaluated.length}
         tone="neutral"
         emptyTitle="همه ارزیابی شده‌اند"
-        emptyDescription="هر عضو فعال کارگروه‌ها حداقل یک ارزیابی دارد."
+        emptyDescription="هر عضو فعال کارگروه‌ها در این ماه حداقل یک ارزیابی دارد."
       >
         {unevaluated.map((person) => (
           <li
@@ -198,7 +182,7 @@ export function PerformanceAlerts({
               </p>
             </div>
             <Badge variant="neutral" size="sm">
-              هنوز ارزیابی نشده
+              در این ماه ارزیابی نشده
             </Badge>
           </li>
         ))}

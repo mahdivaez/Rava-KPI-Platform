@@ -75,6 +75,11 @@ export default async function AdminDashboardPage({
 
   const openPeriod = await getOpenPeriod()
   const period = resolvePeriod(searchParams, openPeriod)
+  // Farvardin's predecessor is Esfand of the year before.
+  const previousPeriod: PeriodItem =
+    period.month === 1
+      ? { month: 12, year: period.year - 1 }
+      : { month: period.month - 1, year: period.year }
 
   // The open month belongs in the picker even before anyone files for it.
   const availablePeriods = await getAvailablePeriods()
@@ -107,6 +112,7 @@ export default async function AdminDashboardPage({
     workgroupRows,
     recentUsers,
     allRecords,
+    previousRecords,
   ] = await Promise.all([
     getRoleEvaluationRecords(period),
     getClientEvaluationRecords(period),
@@ -122,6 +128,7 @@ export default async function AdminDashboardPage({
     prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
     // The trend tab compares months, so it is the one view that never narrows.
     getRoleEvaluationRecords(),
+    getRoleEvaluationRecords(previousPeriod),
   ])
 
   const people = aggregateByPerson(records, clientRecords)
@@ -156,8 +163,8 @@ export default async function AdminDashboardPage({
     }))
   )
 
-  // Active members who hold a role somewhere but have never been evaluated in
-  // it — the honest denominator for "who is missing from the reports".
+  // Active members who hold a role somewhere and were not evaluated in it this
+  // month — the follow-up list for the month on screen.
   const evaluatedKeys = new Set(records.map((r) => `${r.targetId}:${r.targetRole}`))
   const unevaluated: UnevaluatedPerson[] = workgroupRows.flatMap((w) =>
     w.members
@@ -271,6 +278,9 @@ export default async function AdminDashboardPage({
           <PerformanceAlerts
             people={people}
             records={records}
+            previousRecords={previousRecords}
+            period={period}
+            previousPeriod={previousPeriod}
             unevaluated={unevaluated}
           />
         </TabsContent>
