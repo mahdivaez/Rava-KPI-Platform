@@ -32,8 +32,12 @@ import type {
 /**
  * Rankings across every role — overall, per role, and per workgroup.
  *
- * Peer averages only: a self-evaluation says something useful about a person,
- * but not something that belongs in a league table.
+ * The order is the final score: half the peer average, half the client
+ * average, for the month the dashboard is showing. Both halves stay on the
+ * row, so a rank can always be traced back to what produced it.
+ *
+ * Self-evaluations stay out of all of it: they say something useful about a
+ * person, but not something that belongs in a league table.
  */
 export function TeamLeaderboard({
   people,
@@ -44,7 +48,12 @@ export function TeamLeaderboard({
   roleAggregates: RoleAggregate[]
   workgroups: WorkgroupAggregate[]
 }) {
-  const ranked = people.filter((p) => p.peerCount > 0)
+  // Someone only a client scored has half a final score; ranking them beside
+  // a full one would flatter or punish them for the missing half.
+  const ranked = people
+    .filter((p) => p.peerCount > 0)
+    .slice()
+    .sort((a, b) => b.finalScore - a.finalScore || b.peerAverage - a.peerAverage)
   const rolesWithData = roleAggregates.filter((r) => r.count > 0)
   const groupsWithData = workgroups.filter((w) => w.count > 0)
 
@@ -65,15 +74,15 @@ export function TeamLeaderboard({
             جدول رتبه‌بندی کل
           </CardTitle>
           <CardDescription>
-            همه افراد ارزیابی‌شده در همه نقش‌ها، بر اساس میانگین ارزیابی همکاران
+            رتبه از نمرهٔ نهایی می‌آید: نیمی ارزیابی همکاران، نیمی نظر مشتری
           </CardDescription>
         </CardHeader>
         <CardContent className="px-0 pb-0 sm:px-0">
           {ranked.length === 0 ? (
             <EmptyState
               icon={<Trophy />}
-              title="هنوز رتبه‌بندی ممکن نیست"
-              description="پس از ثبت اولین ارزیابی همکاران، جدول رتبه‌بندی اینجا ساخته می‌شود."
+              title="برای این ماه رتبه‌بندی ممکن نیست"
+              description="تا وقتی برای ماه انتخاب‌شده ارزیابی همکاران ثبت نشود، جدولی ساخته نمی‌شود."
               size="sm"
             />
           ) : (
@@ -88,6 +97,8 @@ export function TeamLeaderboard({
                     <TableHead>تعداد</TableHead>
                     <TableHead>خودارزیابی</TableHead>
                     <TableHead>میانگین همکاران</TableHead>
+                    <TableHead>میانگین مشتری</TableHead>
+                    <TableHead>نمرهٔ نهایی</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -132,6 +143,16 @@ export function TeamLeaderboard({
                       </TableCell>
                       <TableCell>
                         <ScoreBadge score={person.peerAverage} size="sm" />
+                      </TableCell>
+                      <TableCell>
+                        {person.clientAverage === null ? (
+                          <span className="text-xs text-foreground-subtle">—</span>
+                        ) : (
+                          <ScoreBadge score={person.clientAverage} size="sm" />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <ScoreBadge score={person.finalScore} size="sm" />
                       </TableCell>
                     </TableRow>
                   ))}

@@ -25,26 +25,84 @@ import {
   PerformanceAlerts,
   type UnevaluatedPerson,
 } from "@/components/admin/dashboard/performance-alerts"
+import { PeriodPicker, type PeriodItem } from "@/components/admin/dashboard/period-picker"
 import {
   aggregateByPeriod,
   aggregateByPerson,
   aggregateByRole,
   aggregateByWorkgroup,
+  getAvailablePeriods,
   getClientEvaluationRecords,
   getCoverageStats,
   getRoleEvaluationRecords,
   overallAverage,
 } from "@/lib/admin-analytics"
 import { isTeamRole, type TeamRole } from "@/lib/roles"
+import { getOpenPeriod } from "@/lib/evaluation-period"
 
 export const dynamic = "force-dynamic"
 
-export default async function AdminDashboardPage() {
+/**
+ * The month the page is about: whatever the URL asks for, as long as it is a
+ * real Persian period. Anything else — a missing, malformed or out-of-range
+ * parameter — falls back to the open KPI month rather than erroring.
+ */
+function resolvePeriod(
+  searchParams: { month?: string; year?: string },
+  openPeriod: PeriodItem
+): PeriodItem {
+  const month = Number(searchParams.month)
+  const year = Number(searchParams.year)
+
+  const valid =
+    Number.isInteger(month) &&
+    month >= 1 &&
+    month <= 12 &&
+    Number.isInteger(year) &&
+    year >= 1400 &&
+    year <= 1500
+
+  return valid ? { month, year } : openPeriod
+}
+
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: { month?: string; year?: string }
+}) {
   const session = await auth()
   if (!session?.user?.isAdmin) redirect("/dashboard")
 
+  const openPeriod = await getOpenPeriod()
+  const period = resolvePeriod(searchParams, openPeriod)
+  // Farvardin's predecessor is Esfand of the year before.
+  const previousPeriod: PeriodItem =
+    period.month === 1
+      ? { month: 12, year: period.year - 1 }
+      : { month: period.month - 1, year: period.year }
+
+  // The open month belongs in the picker even before anyone files for it.
+  const availablePeriods = await getAvailablePeriods()
+  const periodOptions: PeriodItem[] = [
+    ...availablePeriods,
+    ...[openPeriod, period].filter(
+      (candidate) =>
+        !availablePeriods.some(
+          (p) => p.month === candidate.month && p.year === candidate.year
+        )
+    ),
+  ]
+    .filter(
+      (candidate, i, all) =>
+        all.findIndex(
+          (other) =>
+            other.month === candidate.month && other.year === candidate.year
+        ) === i
+    )
+    .sort((a, b) => (a.year !== b.year ? b.year - a.year : b.month - a.month))
+
   const [
-    records,
+    allRecords,
     clientRecords,
     coverage,
     totalUsers,
@@ -54,9 +112,11 @@ export default async function AdminDashboardPage() {
     workgroupRows,
     recentUsers,
   ] = await Promise.all([
+    // The trend tab compares months, so the whole history is read once and the
+    // month-scoped views are cut from it rather than queried again.
     getRoleEvaluationRecords(),
-    getClientEvaluationRecords(),
-    getCoverageStats(),
+    getClientEvaluationRecords(period),
+    getCoverageStats(period),
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.workgroup.count(),
@@ -68,9 +128,16 @@ export default async function AdminDashboardPage() {
     prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
   ])
 
-  const people = aggregateByPerson(records)
+  const inPeriod = (p: PeriodItem) => (r: { month: number; year: number }) =>
+    r.month === p.month && r.year === p.year
+
+  const records = allRecords.filter(inPeriod(period))
+  const previousRecords = allRecords.filter(inPeriod(previousPeriod))
+
+  const people = aggregateByPerson(records, clientRecords)
   const roleAggregates = aggregateByRole(records)
-  const periods = aggregateByPeriod(records)
+  const periods = aggregateByPeriod(allRecords)
+  const allRoleAggregates = aggregateByRole(allRecords)
 
   const workgroupSummaries = workgroupRows.map((w) => ({
     id: w.id,
@@ -99,8 +166,8 @@ export default async function AdminDashboardPage() {
     }))
   )
 
-  // Active members who hold a role somewhere but have never been evaluated in
-  // it — the honest denominator for "who is missing from the reports".
+  // Active members who hold a role somewhere and were not evaluated in it this
+  // month — the follow-up list for the month on screen.
   const evaluatedKeys = new Set(records.map((r) => `${r.targetId}:${r.targetRole}`))
   const unevaluated: UnevaluatedPerson[] = workgroupRows.flatMap((w) =>
     w.members
@@ -133,6 +200,8 @@ export default async function AdminDashboardPage() {
     clientSkipped: clientRecords.length - scoredClient.length,
     month: coverage.month,
     year: coverage.year,
+    isOpenPeriod:
+      period.month === openPeriod.month && period.year === openPeriod.year,
     expectedThisMonth: coverage.expected,
     filedThisMonth: coverage.filed,
     completionRate: coverage.completionRate,
@@ -148,6 +217,7 @@ export default async function AdminDashboardPage() {
           { label: "داشبورد", href: "/dashboard" },
           { label: "داشبورد تحلیلی" },
         ]}
+        actions={<PeriodPicker periods={periodOptions} selected={period} />}
       />
 
       <OverviewStats stats={stats} roleAggregates={roleAggregates} />
@@ -190,14 +260,14 @@ export default async function AdminDashboardPage() {
         <TabsContent value="performance" className="space-y-5">
           <PerformanceInsights
             periods={periods}
-            roleAggregates={roleAggregates}
-            currentMonth={coverage.month}
-            currentYear={coverage.year}
+            roleAggregates={allRoleAggregates}
+            currentMonth={period.month}
+            currentYear={period.year}
           />
           <PerformanceTrends
             periods={periods}
-            roleAggregates={roleAggregates}
-            records={records}
+            roleAggregates={allRoleAggregates}
+            records={allRecords}
           />
         </TabsContent>
 
@@ -213,6 +283,9 @@ export default async function AdminDashboardPage() {
           <PerformanceAlerts
             people={people}
             records={records}
+            previousRecords={previousRecords}
+            period={period}
+            previousPeriod={previousPeriod}
             unevaluated={unevaluated}
           />
         </TabsContent>

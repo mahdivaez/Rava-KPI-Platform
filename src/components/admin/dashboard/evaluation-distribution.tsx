@@ -57,7 +57,7 @@ export function EvaluationDistribution({
         <CardContent className="p-0">
           <EmptyState
             icon={<ClipboardList />}
-            title="هنوز ارزیابی‌ای ثبت نشده است"
+            title="در این ماه ارزیابی‌ای ثبت نشده است"
             description="پس از ثبت اولین ارزیابی، میانگین هر شاخص اینجا نمایش داده می‌شود."
             size="sm"
           />
@@ -102,7 +102,7 @@ export function EvaluationDistribution({
         <ChartFrame
           height={300}
           isEmpty={isEmpty}
-          emptyMessage="هنوز ارزیابی‌ای ثبت نشده است"
+          emptyMessage="در این ماه ارزیابی‌ای ثبت نشده است"
           summary={`میانگین ${faNumber(rows.length)} شاخص برای ${selected.label}.`}
         >
           <BarChart

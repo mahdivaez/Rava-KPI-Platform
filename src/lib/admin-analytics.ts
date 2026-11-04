@@ -11,11 +11,9 @@
  * `src/lib/roles.ts`, so flattening it once here means a new role or a new KPI
  * shows up across every chart with no further work.
  *
- * Internal (peer) and client scores are deliberately kept apart: they answer
- * different questions and are not averaged together.
+ * Internal (peer) and client scores are kept apart everywhere except the
+ * leaderboard's final score, which blends them half and half on purpose.
  */
-
-import moment from "moment-jalaali"
 
 import { prisma } from "@/lib/prisma"
 import {
@@ -103,16 +101,29 @@ function numberOf(value: unknown): number {
    ========================================================================== */
 
 /**
+ * One Persian month. The dashboard reads a single month at a time, so every
+ * loader takes one of these; the reports page passes none and still gets the
+ * whole history.
+ */
+export interface PeriodFilter {
+  month: number
+  year: number
+}
+
+/**
  * Every role evaluation ever filed, newest first.
  *
  * Metrics are resolved against the role definition so a metric that was
  * removed from `roles.ts` after the fact simply drops out of the charts rather
  * than rendering as a raw key.
  */
-export async function getRoleEvaluationRecords(): Promise<EvalRecord[]> {
+export async function getRoleEvaluationRecords(
+  period?: PeriodFilter
+): Promise<EvalRecord[]> {
   if (!prisma) return []
 
   const rows = await prisma.roleEvaluation.findMany({
+    where: period ? { month: period.month, year: period.year } : undefined,
     include: { target: true, evaluator: true, workgroup: true },
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
   })
@@ -178,10 +189,13 @@ export async function getRoleEvaluationRecords(): Promise<EvalRecord[]> {
   })
 }
 
-export async function getClientEvaluationRecords(): Promise<ClientEvalRecord[]> {
+export async function getClientEvaluationRecords(
+  period?: PeriodFilter
+): Promise<ClientEvalRecord[]> {
   if (!prisma) return []
 
   const rows = await prisma.clientEvaluation.findMany({
+    where: period ? { month: period.month, year: period.year } : undefined,
     include: { target: true, client: true, brand: true, workgroup: true },
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
   })
@@ -231,6 +245,30 @@ export async function getClientEvaluationRecords(): Promise<ClientEvalRecord[]> 
     })
 }
 
+/**
+ * Every month that has something to show, newest first.
+ *
+ * The dashboard's month picker is built from this, so a month only appears
+ * once either the team or a client has filed something for it.
+ */
+export async function getAvailablePeriods(): Promise<PeriodFilter[]> {
+  if (!prisma) return []
+
+  const [roleMonths, clientMonths] = await Promise.all([
+    prisma.roleEvaluation.groupBy({ by: ["year", "month"] }),
+    prisma.clientEvaluation.groupBy({ by: ["year", "month"] }),
+  ])
+
+  const seen = new Map<string, PeriodFilter>()
+  for (const row of [...roleMonths, ...clientMonths]) {
+    seen.set(`${row.year}-${row.month}`, { month: row.month, year: row.year })
+  }
+
+  return Array.from(seen.values()).sort((a, b) =>
+    a.year !== b.year ? b.year - a.year : b.month - a.month
+  )
+}
+
 /* ==========================================================================
    Coverage
    ========================================================================== */
@@ -246,17 +284,21 @@ export interface CoverageStats {
 }
 
 /**
- * Expected evaluations for the current Persian month.
+ * Expected evaluations for one Persian month.
  *
  * Derived from the same permission matrix the forms enforce: for every
  * workgroup member, the people their roles allow them to evaluate there. This
  * replaces the old completion rate, which divided the legacy tables by each
  * other and produced NaN once those tables were empty.
+ *
+ * `expected` is always read from the roster as it stands today: workgroup
+ * membership carries no history, so a past month is measured against the
+ * current team. The dashboard labels that approximation rather than hiding it.
  */
-export async function getCoverageStats(): Promise<CoverageStats> {
-  const now = moment()
-  const month = now.jMonth() + 1
-  const year = now.jYear()
+export async function getCoverageStats(
+  period: PeriodFilter
+): Promise<CoverageStats> {
+  const { month, year } = period
 
   if (!prisma) return { month, year, expected: 0, filed: 0, completionRate: 0 }
 
@@ -316,11 +358,25 @@ export interface PersonAggregate {
   peerCount: number
   peerAverage: number
   selfAverage: number | null
+  /** Scored client verdicts about this person in this role; `skipped` rows do not count. */
+  clientCount: number
+  /** Null when no client scored them — not zero, which would halve the final score. */
+  clientAverage: number | null
+  /** Half peers, half clients. With no client score it is the peer average alone. */
+  finalScore: number
   workgroupNames: string[]
 }
 
-/** Average per person-and-role. Someone holding two roles ranks in each. */
-export function aggregateByPerson(records: EvalRecord[]): PersonAggregate[] {
+/**
+ * Average per person-and-role. Someone holding two roles ranks in each.
+ *
+ * Client verdicts join on the same person-and-role key, so a strategist scored
+ * by two brands carries one client average across both.
+ */
+export function aggregateByPerson(
+  records: EvalRecord[],
+  clientRecords: ClientEvalRecord[] = []
+): PersonAggregate[] {
   const map = new Map<
     string,
     {
@@ -369,19 +425,43 @@ export function aggregateByPerson(records: EvalRecord[]): PersonAggregate[] {
     }
   }
 
-  return Array.from(map.values())
-    .map((entry) => ({
-      id: entry.id,
-      name: entry.name,
-      role: entry.role,
-      roleLabel: getRoleLabel(entry.role),
-      count: entry.count,
-      average: entry.count ? entry.total / entry.count : 0,
-      peerCount: entry.peerCount,
-      peerAverage: entry.peerCount ? entry.peerTotal / entry.peerCount : 0,
-      selfAverage: entry.selfCount ? entry.selfTotal / entry.selfCount : null,
-      workgroupNames: Array.from(entry.workgroups),
-    }))
+  const clientByKey = new Map<string, { total: number; count: number }>()
+  for (const record of clientRecords) {
+    if (record.skipped) continue
+    const key = `${record.targetId}:${record.targetRole}`
+    const entry = clientByKey.get(key) ?? { total: 0, count: 0 }
+    entry.total += record.average
+    entry.count += 1
+    clientByKey.set(key, entry)
+  }
+
+  return Array.from(map.entries())
+    .map(([key, entry]) => {
+      const client = clientByKey.get(key)
+      const clientCount = client?.count ?? 0
+      const clientAverage = clientCount ? client!.total / clientCount : null
+      const peerAverage = entry.peerCount ? entry.peerTotal / entry.peerCount : 0
+
+      return {
+        id: entry.id,
+        name: entry.name,
+        role: entry.role,
+        roleLabel: getRoleLabel(entry.role),
+        count: entry.count,
+        average: entry.count ? entry.total / entry.count : 0,
+        peerCount: entry.peerCount,
+        peerAverage,
+        selfAverage: entry.selfCount ? entry.selfTotal / entry.selfCount : null,
+        clientCount,
+        clientAverage,
+        finalScore:
+          clientAverage === null ? peerAverage : (peerAverage + clientAverage) / 2,
+        workgroupNames: Array.from(entry.workgroups),
+      }
+    })
+    // Peer average, as before: «برترین‌ها» and the standout alert both read
+    // this order and both badge the peer score. The leaderboard, which ranks
+    // by the final score, sorts for itself.
     .sort((a, b) => b.peerAverage - a.peerAverage || b.average - a.average)
 }
 

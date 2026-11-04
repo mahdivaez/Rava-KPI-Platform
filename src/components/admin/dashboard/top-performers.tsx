@@ -84,8 +84,8 @@ export function TopPerformers({ people }: { people: PersonAggregate[] }) {
         {ranked.length === 0 ? (
           <EmptyState
             icon={<Award />}
-            title="هنوز رتبه‌بندی ممکن نیست"
-            description="برای رتبه‌بندی، حداقل یک ارزیابی از سوی همکاران لازم است."
+            title="برای این ماه رتبه‌بندی ممکن نیست"
+            description="در ماه انتخاب‌شده ارزیابی همکاران ثبت نشده است."
             size="sm"
           />
         ) : (
