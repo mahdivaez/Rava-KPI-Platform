@@ -358,11 +358,25 @@ export interface PersonAggregate {
   peerCount: number
   peerAverage: number
   selfAverage: number | null
+  /** Scored client verdicts about this person in this role; `skipped` rows do not count. */
+  clientCount: number
+  /** Null when no client scored them — not zero, which would halve the final score. */
+  clientAverage: number | null
+  /** Half peers, half clients. With no client score it is the peer average alone. */
+  finalScore: number
   workgroupNames: string[]
 }
 
-/** Average per person-and-role. Someone holding two roles ranks in each. */
-export function aggregateByPerson(records: EvalRecord[]): PersonAggregate[] {
+/**
+ * Average per person-and-role. Someone holding two roles ranks in each.
+ *
+ * Client verdicts join on the same person-and-role key, so a strategist scored
+ * by two brands carries one client average across both.
+ */
+export function aggregateByPerson(
+  records: EvalRecord[],
+  clientRecords: ClientEvalRecord[] = []
+): PersonAggregate[] {
   const map = new Map<
     string,
     {
@@ -411,20 +425,41 @@ export function aggregateByPerson(records: EvalRecord[]): PersonAggregate[] {
     }
   }
 
-  return Array.from(map.values())
-    .map((entry) => ({
-      id: entry.id,
-      name: entry.name,
-      role: entry.role,
-      roleLabel: getRoleLabel(entry.role),
-      count: entry.count,
-      average: entry.count ? entry.total / entry.count : 0,
-      peerCount: entry.peerCount,
-      peerAverage: entry.peerCount ? entry.peerTotal / entry.peerCount : 0,
-      selfAverage: entry.selfCount ? entry.selfTotal / entry.selfCount : null,
-      workgroupNames: Array.from(entry.workgroups),
-    }))
-    .sort((a, b) => b.peerAverage - a.peerAverage || b.average - a.average)
+  const clientByKey = new Map<string, { total: number; count: number }>()
+  for (const record of clientRecords) {
+    if (record.skipped) continue
+    const key = `${record.targetId}:${record.targetRole}`
+    const entry = clientByKey.get(key) ?? { total: 0, count: 0 }
+    entry.total += record.average
+    entry.count += 1
+    clientByKey.set(key, entry)
+  }
+
+  return Array.from(map.entries())
+    .map(([key, entry]) => {
+      const client = clientByKey.get(key)
+      const clientCount = client?.count ?? 0
+      const clientAverage = clientCount ? client!.total / clientCount : null
+      const peerAverage = entry.peerCount ? entry.peerTotal / entry.peerCount : 0
+
+      return {
+        id: entry.id,
+        name: entry.name,
+        role: entry.role,
+        roleLabel: getRoleLabel(entry.role),
+        count: entry.count,
+        average: entry.count ? entry.total / entry.count : 0,
+        peerCount: entry.peerCount,
+        peerAverage,
+        selfAverage: entry.selfCount ? entry.selfTotal / entry.selfCount : null,
+        clientCount,
+        clientAverage,
+        finalScore:
+          clientAverage === null ? peerAverage : (peerAverage + clientAverage) / 2,
+        workgroupNames: Array.from(entry.workgroups),
+      }
+    })
+    .sort((a, b) => b.finalScore - a.finalScore || b.peerAverage - a.peerAverage)
 }
 
 export interface RoleAggregate {
