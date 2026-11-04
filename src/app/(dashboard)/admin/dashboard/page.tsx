@@ -36,12 +36,17 @@ import {
   overallAverage,
 } from "@/lib/admin-analytics"
 import { isTeamRole, type TeamRole } from "@/lib/roles"
+import { getOpenPeriod } from "@/lib/evaluation-period"
 
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardPage() {
   const session = await auth()
   if (!session?.user?.isAdmin) redirect("/dashboard")
+
+  // Task 3 replaces this with the month the admin picked; until then the
+  // dashboard keeps reading the open KPI month.
+  const period = await getOpenPeriod()
 
   const [
     records,
@@ -56,7 +61,7 @@ export default async function AdminDashboardPage() {
   ] = await Promise.all([
     getRoleEvaluationRecords(),
     getClientEvaluationRecords(),
-    getCoverageStats(),
+    getCoverageStats(period),
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.workgroup.count(),
