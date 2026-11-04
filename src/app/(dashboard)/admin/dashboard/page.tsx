@@ -25,11 +25,13 @@ import {
   PerformanceAlerts,
   type UnevaluatedPerson,
 } from "@/components/admin/dashboard/performance-alerts"
+import { PeriodPicker, type PeriodItem } from "@/components/admin/dashboard/period-picker"
 import {
   aggregateByPeriod,
   aggregateByPerson,
   aggregateByRole,
   aggregateByWorkgroup,
+  getAvailablePeriods,
   getClientEvaluationRecords,
   getCoverageStats,
   getRoleEvaluationRecords,
@@ -40,13 +42,59 @@ import { getOpenPeriod } from "@/lib/evaluation-period"
 
 export const dynamic = "force-dynamic"
 
-export default async function AdminDashboardPage() {
+/**
+ * The month the page is about: whatever the URL asks for, as long as it is a
+ * real Persian period. Anything else — a missing, malformed or out-of-range
+ * parameter — falls back to the open KPI month rather than erroring.
+ */
+function resolvePeriod(
+  searchParams: { month?: string; year?: string },
+  openPeriod: PeriodItem
+): PeriodItem {
+  const month = Number(searchParams.month)
+  const year = Number(searchParams.year)
+
+  const valid =
+    Number.isInteger(month) &&
+    month >= 1 &&
+    month <= 12 &&
+    Number.isInteger(year) &&
+    year >= 1400 &&
+    year <= 1500
+
+  return valid ? { month, year } : openPeriod
+}
+
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: { month?: string; year?: string }
+}) {
   const session = await auth()
   if (!session?.user?.isAdmin) redirect("/dashboard")
 
-  // Task 3 replaces this with the month the admin picked; until then the
-  // dashboard keeps reading the open KPI month.
-  const period = await getOpenPeriod()
+  const openPeriod = await getOpenPeriod()
+  const period = resolvePeriod(searchParams, openPeriod)
+
+  // The open month belongs in the picker even before anyone files for it.
+  const availablePeriods = await getAvailablePeriods()
+  const periodOptions: PeriodItem[] = [
+    ...availablePeriods,
+    ...[openPeriod, period].filter(
+      (candidate) =>
+        !availablePeriods.some(
+          (p) => p.month === candidate.month && p.year === candidate.year
+        )
+    ),
+  ]
+    .filter(
+      (candidate, i, all) =>
+        all.findIndex(
+          (other) =>
+            other.month === candidate.month && other.year === candidate.year
+        ) === i
+    )
+    .sort((a, b) => (a.year !== b.year ? b.year - a.year : b.month - a.month))
 
   const [
     records,
@@ -58,9 +106,10 @@ export default async function AdminDashboardPage() {
     activeWorkgroups,
     workgroupRows,
     recentUsers,
+    allRecords,
   ] = await Promise.all([
-    getRoleEvaluationRecords(),
-    getClientEvaluationRecords(),
+    getRoleEvaluationRecords(period),
+    getClientEvaluationRecords(period),
     getCoverageStats(period),
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
@@ -71,11 +120,14 @@ export default async function AdminDashboardPage() {
       orderBy: { name: "asc" },
     }),
     prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
+    // The trend tab compares months, so it is the one view that never narrows.
+    getRoleEvaluationRecords(),
   ])
 
-  const people = aggregateByPerson(records)
+  const people = aggregateByPerson(records, clientRecords)
   const roleAggregates = aggregateByRole(records)
-  const periods = aggregateByPeriod(records)
+  const periods = aggregateByPeriod(allRecords)
+  const allRoleAggregates = aggregateByRole(allRecords)
 
   const workgroupSummaries = workgroupRows.map((w) => ({
     id: w.id,
@@ -153,6 +205,7 @@ export default async function AdminDashboardPage() {
           { label: "داشبورد", href: "/dashboard" },
           { label: "داشبورد تحلیلی" },
         ]}
+        actions={<PeriodPicker periods={periodOptions} selected={period} />}
       />
 
       <OverviewStats stats={stats} roleAggregates={roleAggregates} />
@@ -195,14 +248,14 @@ export default async function AdminDashboardPage() {
         <TabsContent value="performance" className="space-y-5">
           <PerformanceInsights
             periods={periods}
-            roleAggregates={roleAggregates}
-            currentMonth={coverage.month}
-            currentYear={coverage.year}
+            roleAggregates={allRoleAggregates}
+            currentMonth={period.month}
+            currentYear={period.year}
           />
           <PerformanceTrends
             periods={periods}
-            roleAggregates={roleAggregates}
-            records={records}
+            roleAggregates={allRoleAggregates}
+            records={allRecords}
           />
         </TabsContent>
 
