@@ -90,7 +90,7 @@ export function WorkgroupAnalytics({
           <ChartFrame
             height={Math.max(220, chartRows.length * 42)}
             isEmpty={chartRows.length === 0}
-            emptyMessage="هنوز ارزیابی‌ای برای هیچ کارگروهی ثبت نشده است"
+            emptyMessage="در این ماه برای هیچ کارگروهی ارزیابی ثبت نشده است"
             summary={`میانگین امتیاز ${faNumber(chartRows.length)} کارگروه.`}
           >
             <BarChart
@@ -160,7 +160,7 @@ export function WorkgroupAnalytics({
                   <ScoreBadge score={row.average} showLabel />
                 ) : (
                   <span className="text-xs text-foreground-subtle">
-                    هنوز ارزیابی نشده
+                    در این ماه ارزیابی نشده
                   </span>
                 )}
               </div>

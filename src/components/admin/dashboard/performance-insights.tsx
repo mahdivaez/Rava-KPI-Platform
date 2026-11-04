@@ -18,7 +18,7 @@ import {
 import { EmptyState } from "@/components/ui/empty-state"
 import { RoleBadge } from "@/components/ui/role-badge"
 import { ScoreBadge } from "@/components/ui/score"
-import { faNumber } from "@/lib/design-tokens"
+import { faNumber, faYear } from "@/lib/design-tokens"
 import { cn } from "@/lib/utils"
 import { PERSIAN_MONTHS, type PeriodAggregate, type RoleAggregate } from "@/lib/admin-analytics"
 
@@ -78,8 +78,8 @@ export function PerformanceInsights({
       <CardHeader>
         <CardTitle>روند ماهانه به تفکیک نقش</CardTitle>
         <CardDescription>
-          {PERSIAN_MONTHS[currentMonth - 1]} {faNumber(currentYear)} در مقایسه با{" "}
-          {PERSIAN_MONTHS[previousMonth - 1]} {faNumber(previousYear)}
+          {PERSIAN_MONTHS[currentMonth - 1]} {faYear(currentYear)} در مقایسه با{" "}
+          {PERSIAN_MONTHS[previousMonth - 1]} {faYear(previousYear)}
         </CardDescription>
       </CardHeader>
 

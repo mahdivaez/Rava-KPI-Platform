@@ -58,7 +58,7 @@ export function RecentActivity({
           {recentEvaluations.length === 0 ? (
             <EmptyState
               icon={<ClipboardCheck />}
-              title="هنوز ارزیابی‌ای ثبت نشده است"
+              title="در این ماه ارزیابی‌ای ثبت نشده است"
               size="sm"
             />
           ) : (
@@ -117,7 +117,7 @@ export function RecentActivity({
           {recentClientEvaluations.length === 0 ? (
             <EmptyState
               icon={<Building2 />}
-              title="هنوز نظری از مشتریان ثبت نشده است"
+              title="در این ماه نظری از مشتریان ثبت نشده است"
               size="sm"
             />
           ) : (

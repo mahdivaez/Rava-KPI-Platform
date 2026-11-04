@@ -11,7 +11,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { faYear } from "@/lib/design-tokens"
-import { PERSIAN_MONTHS } from "@/lib/evaluation-period"
+
+/**
+ * A local copy, as every other client component in this project keeps: the
+ * server module that owns these names also constructs the Prisma client, and
+ * that graph has no business in a browser bundle.
+ */
+const PERSIAN_MONTHS = [
+  "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+  "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند",
+] as const
 
 export interface PeriodItem {
   month: number

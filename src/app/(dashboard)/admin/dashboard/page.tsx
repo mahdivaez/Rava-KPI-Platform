@@ -102,7 +102,7 @@ export default async function AdminDashboardPage({
     .sort((a, b) => (a.year !== b.year ? b.year - a.year : b.month - a.month))
 
   const [
-    records,
+    allRecords,
     clientRecords,
     coverage,
     totalUsers,
@@ -111,10 +111,10 @@ export default async function AdminDashboardPage({
     activeWorkgroups,
     workgroupRows,
     recentUsers,
-    allRecords,
-    previousRecords,
   ] = await Promise.all([
-    getRoleEvaluationRecords(period),
+    // The trend tab compares months, so the whole history is read once and the
+    // month-scoped views are cut from it rather than queried again.
+    getRoleEvaluationRecords(),
     getClientEvaluationRecords(period),
     getCoverageStats(period),
     prisma.user.count(),
@@ -126,10 +126,13 @@ export default async function AdminDashboardPage({
       orderBy: { name: "asc" },
     }),
     prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
-    // The trend tab compares months, so it is the one view that never narrows.
-    getRoleEvaluationRecords(),
-    getRoleEvaluationRecords(previousPeriod),
   ])
+
+  const inPeriod = (p: PeriodItem) => (r: { month: number; year: number }) =>
+    r.month === p.month && r.year === p.year
+
+  const records = allRecords.filter(inPeriod(period))
+  const previousRecords = allRecords.filter(inPeriod(previousPeriod))
 
   const people = aggregateByPerson(records, clientRecords)
   const roleAggregates = aggregateByRole(records)

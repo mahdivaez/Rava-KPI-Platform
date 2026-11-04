@@ -161,11 +161,11 @@ export function PerformanceAlerts({
       <AlertCard
         icon={<Clock />}
         title="بدون ارزیابی در این ماه"
-        description="اعضای فعالی که در ماه انتخاب‌شده هیچ ارزیابی‌ای دریافت نکرده‌اند"
+        description={`اعضای فعالی که در ${labelOf(period)} هیچ ارزیابی‌ای دریافت نکرده‌اند`}
         count={unevaluated.length}
         tone="neutral"
         emptyTitle="همه ارزیابی شده‌اند"
-        emptyDescription="هر عضو فعال کارگروه‌ها در این ماه حداقل یک ارزیابی دارد."
+        emptyDescription={`هر عضو فعال کارگروه‌ها در ${labelOf(period)} حداقل یک ارزیابی دارد.`}
       >
         {unevaluated.map((person) => (
           <li
@@ -182,7 +182,7 @@ export function PerformanceAlerts({
               </p>
             </div>
             <Badge variant="neutral" size="sm">
-              در این ماه ارزیابی نشده
+              {labelOf(period)}: ارزیابی نشده
             </Badge>
           </li>
         ))}

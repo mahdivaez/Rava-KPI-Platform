@@ -459,7 +459,10 @@ export function aggregateByPerson(
         workgroupNames: Array.from(entry.workgroups),
       }
     })
-    .sort((a, b) => b.finalScore - a.finalScore || b.peerAverage - a.peerAverage)
+    // Peer average, as before: «برترین‌ها» and the standout alert both read
+    // this order and both badge the peer score. The leaderboard, which ranks
+    // by the final score, sorts for itself.
+    .sort((a, b) => b.peerAverage - a.peerAverage || b.average - a.average)
 }
 
 export interface RoleAggregate {

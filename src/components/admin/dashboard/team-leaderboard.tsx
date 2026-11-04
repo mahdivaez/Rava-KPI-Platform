@@ -81,8 +81,8 @@ export function TeamLeaderboard({
           {ranked.length === 0 ? (
             <EmptyState
               icon={<Trophy />}
-              title="هنوز رتبه‌بندی ممکن نیست"
-              description="پس از ثبت اولین ارزیابی همکاران، جدول رتبه‌بندی اینجا ساخته می‌شود."
+              title="برای این ماه رتبه‌بندی ممکن نیست"
+              description="تا وقتی برای ماه انتخاب‌شده ارزیابی همکاران ثبت نشود، جدولی ساخته نمی‌شود."
               size="sm"
             />
           ) : (
