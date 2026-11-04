@@ -51,7 +51,7 @@ export function RecentActivity({
         <CardHeader>
           <CardTitle>ارزیابی‌های اخیر تیم</CardTitle>
           <CardDescription>
-            آخرین ارزیابی‌های ثبت‌شده در همه نقش‌ها
+            آخرین ارزیابی‌های ثبت‌شده در ماه انتخاب‌شده، در همه نقش‌ها
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -109,7 +109,9 @@ export function RecentActivity({
       <Card>
         <CardHeader>
           <CardTitle>ارزیابی‌های اخیر مشتریان</CardTitle>
-          <CardDescription>آخرین نظرات ثبت‌شده از سمت برندها</CardDescription>
+          <CardDescription>
+            آخرین نظرات برندها در ماه انتخاب‌شده
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {recentClientEvaluations.length === 0 ? (
@@ -158,7 +160,9 @@ export function RecentActivity({
       <Card>
         <CardHeader>
           <CardTitle>کاربران جدید</CardTitle>
-          <CardDescription>آخرین حساب‌های ساخته‌شده</CardDescription>
+          <CardDescription>
+            آخرین حساب‌های ساخته‌شده — مستقل از ماه انتخاب‌شده
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {recentUsers.length === 0 ? (

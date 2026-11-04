@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress"
 import { RoleBadge } from "@/components/ui/role-badge"
 import { ScoreMeter } from "@/components/ui/score"
 import { StatCard, StatGrid } from "@/components/ui/stat-card"
-import { getScoreBand, faNumber, faPercent } from "@/lib/design-tokens"
+import { getScoreBand, faNumber, faPercent, faYear } from "@/lib/design-tokens"
 import { cn } from "@/lib/utils"
 import { PERSIAN_MONTHS, type RoleAggregate } from "@/lib/admin-analytics"
 
@@ -32,9 +32,11 @@ export interface OverviewStatsData {
   clientEvaluations: number
   clientAverage: number
   clientSkipped: number
-  /** Coverage for the current Persian month. */
+  /** Coverage for the month the dashboard is showing. */
   month: number
   year: number
+  /** False for a past month, where `expectedThisMonth` is only an estimate. */
+  isOpenPeriod: boolean
   expectedThisMonth: number
   filedThisMonth: number
   completionRate: number
@@ -58,7 +60,7 @@ export function OverviewStats({
     ? stats.completionRate
     : 0
   const rolesWithData = roleAggregates.filter((r) => r.count > 0)
-  const periodLabel = `${PERSIAN_MONTHS[stats.month - 1]} ${faNumber(stats.year)}`
+  const periodLabel = `${PERSIAN_MONTHS[stats.month - 1]} ${faYear(stats.year)}`
 
   return (
     <div className="space-y-5">
@@ -109,9 +111,14 @@ export function OverviewStats({
           <Progress
             value={completion}
             className="mt-3"
-            aria-label="نرخ تکمیل ارزیابی‌های این ماه"
+            aria-label={`نرخ تکمیل ارزیابی‌های ${periodLabel}`}
             indicatorClassName={completion >= 80 ? "bg-success" : "bg-primary"}
           />
+          {!stats.isOpenPeriod && (
+            <p className="mt-2 text-xs text-foreground-subtle">
+              تقریبی — بر اساس ترکیب فعلی تیم
+            </p>
+          )}
           <p className="mt-2 flex flex-wrap items-center gap-3 text-xs text-foreground-subtle">
             <span className="inline-flex items-center gap-1">
               <CheckCircle2 className="size-3 text-success" aria-hidden />

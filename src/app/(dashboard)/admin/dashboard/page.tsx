@@ -197,6 +197,8 @@ export default async function AdminDashboardPage({
     clientSkipped: clientRecords.length - scoredClient.length,
     month: coverage.month,
     year: coverage.year,
+    isOpenPeriod:
+      period.month === openPeriod.month && period.year === openPeriod.year,
     expectedThisMonth: coverage.expected,
     filedThisMonth: coverage.filed,
     completionRate: coverage.completionRate,
